@@ -27,6 +27,7 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBOutlet weak var sendButton: UIButton!
   var ref: Firebase!
   var messages: [FDataSnapshot]! = []
+  var msglength: NSNumber = 10
   private var _refHandle: FirebaseHandle!
   private var userInt: UInt32 = arc4random()
 
@@ -71,6 +72,37 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
     self.banner.loadRequest(GADRequest())
 
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
+
+    // [START completion_handler]
+    let completion:RCNDefaultConfigCompletion = {(config:RCNConfig!, status:RCNConfigStatus, error:NSError!) -> Void in
+      if (error != nil) {
+        // There has been an error fetching the config
+        print("Error fetching config: \(error.localizedDescription)")
+      } else {
+        // Parse your config data
+        // [START_EXCLUDE]
+        // [START read_data]
+        self.msglength = config.numberForKey("friendly_msg_length", defaultValue: 10)
+        print("Friendly msg length config: \(self.msglength)")
+        // [END read_data]
+        // [END_EXCLUDE]
+      }
+    }
+    // [END completion_handler]
+
+    // [START fetch_config]
+    let customVariables = ["build": "dev"]
+    // 43200 secs = 12 hours
+    RCNConfig.fetchDefaultConfigWithExpirationDuration(43200, customVariables: customVariables,
+      completionHandler: completion)
+    // [END fetch_config]
+  }
+
+  func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+    guard let text = textField.text else { return true }
+
+    let newLength = text.utf16.count + string.utf16.count - range.length
+    return newLength <= self.msglength.integerValue // Bool
   }
 
   override func viewWillAppear(animated: Bool) {

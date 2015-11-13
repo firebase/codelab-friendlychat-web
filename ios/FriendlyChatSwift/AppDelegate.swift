@@ -15,7 +15,7 @@
 //
 
 import UIKit
-import Firebase.CloudMessaging
+import Firebase.Core
 import Firebase.AppInvite
 
 @UIApplicationMain

@@ -4,10 +4,10 @@ source 'sso://cpdc-eap/spec.git'
 source 'https://github.com/CocoaPods/Specs.git'
 
 pod 'FirebaseAuth'
-pod 'FirebaseDatabase', '~> 0.0.3'
-#pod 'Firebase/RemoteConfig'
+pod 'FirebaseDatabase'
+pod 'Firebase/RemoteConfig'
 pod 'Firebase/AdMob'
-pod 'Firebase/AppInvite'
+pod 'Firebase/AppInvites'
 pod 'Firebase/Core'
 pod 'Firebase/CloudMessaging'
 

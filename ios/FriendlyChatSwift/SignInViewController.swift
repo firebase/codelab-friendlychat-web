@@ -18,7 +18,6 @@ import UIKit
 import Firebase.Core
 import Firebase.SignIn
 import Firebase.AppInvite
-import Firebase
 
 class SignInViewController: UIViewController, FIRAuthUIDelegate {
 

@@ -21,3 +21,9 @@
 #import "FirebaseAuth/FIRUser.h"
 #import "FirebaseApp/FIRFirebaseApp.h"
 #import "FirebaseApp/FIRFirebaseOptions.h"
+#import <Firebase/Core.h>
+#import <Firebase/AdMob.h>
+//#import <Firebase/AppInvite.h>
+#import "FirebaseAuth/FIRAuth.h"
+#import <FirebaseDatabase/Firebase.h>
+#import <GoogleCloudMessaging/GCMReceiverDelegate.h>
