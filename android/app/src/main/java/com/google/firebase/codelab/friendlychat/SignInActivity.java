@@ -1,15 +1,28 @@
+/**
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.google.firebase.codelab.friendlychat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.android.gms.measurement.AppMeasurement;
-import com.google.codelab.friendlychat2.R;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseUser;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,7 +33,7 @@ import com.google.firebase.auth.ui.SignInUIBuilder;
 public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "SignInActivity";
-    private static final String SERVER_CLIENT_ID = "906673614271-mn53ivjoeavnk3oaki8l604o24nfm33j.apps.googleusercontent.com";
+    private static final String SERVER_CLIENT_ID = "YOUR_SERVER_CLIENT_ID";
     private FirebaseAuth mFirebaseAuth;
     private AppMeasurement mAppMeasurement;
 
@@ -42,11 +55,8 @@ public class SignInActivity extends AppCompatActivity {
                 Bundle payload = new Bundle();
                 payload.putString(AppMeasurement.Param.VALUE, "success");
                 mAppMeasurement.logEvent(AppMeasurement.Event.LOGIN, payload);
-                PreferenceManager.getDefaultSharedPreferences(SignInActivity.this)
-                        .edit()
-                        .putBoolean(MainActivity.SIGNED_IN, true)
-                        .apply();
                 startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                mFirebaseAuth.removeAuthResultCallback(this);
                 finish();
             }
 
@@ -54,8 +64,11 @@ public class SignInActivity extends AppCompatActivity {
             public void onAuthenticationError(com.google.firebase.FirebaseError firebaseError) {
                 Log.e(TAG, "Sign in error: " + firebaseError.getErrorCode());
                 Bundle payload = new Bundle();
+                // TODO(arthurthompson): No sign of this value in Firebase console, confirm whether or not the payload of a
+                // LOGIN event is ignored.
                 payload.putString(AppMeasurement.Param.VALUE, "failed");
                 mAppMeasurement.logEvent(AppMeasurement.Event.LOGIN, payload);
+                mFirebaseAuth.removeAuthResultCallback(this);
             }
         });
 

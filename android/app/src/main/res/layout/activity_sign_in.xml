@@ -6,17 +6,11 @@
               android:layout_height="match_parent"
               android:gravity="center_vertical|center_horizontal">
 
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="@string/sign_in"
         android:id="@+id/button"
         android:layout_gravity="center_horizontal"/>
-
-    <!--<com.google.android.gms.common.SignInButton-->
-        <!--android:id="@+id/sign_in_button"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content" />-->
 
 </LinearLayout>
