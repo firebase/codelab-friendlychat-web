@@ -27,13 +27,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
     launchOptions: [NSObject: AnyObject]?) -> Bool {
       NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectToFriendlyPing",
         name: Constants.NotificationKeys.SignedIn, object: nil)
-      configureFIRContext()
+      configureFIRContext(launchOptions)
       configureGCMService()
       registerForRemoteNotifications(application)
       return true
   }
 
-  func configureFIRContext() {
+  func configureFIRContext(launchOptions: [NSObject: AnyObject]?) {
     // [START firebase_configure]
     // Use Firebase library to configure APIs
     do {
@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
     // [END firebase_configure]
 
     // Initialize sign-in
-    GINInvite.applicationDidFinishLaunching()
+    GINInvite.applicationDidFinishLaunchingWithOptions(launchOptions)
 
     // [START usermanagement_initialize]
     // Configure the default Firebase application
@@ -102,7 +102,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
       let invite = GINInvite.handleURL(url, sourceApplication:sourceApplication, annotation:annotation)
 
       if (invite != nil) {
-        GINInvite.completeInvitation()
         let matchType =
         (invite.matchType == GINReceivedInviteMatchType.Weak) ? "Weak" : "Strong"
         print("Invite received from: \(sourceApplication) Deeplink: \(invite.deepLink)," +
