@@ -33,11 +33,11 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
-//  @IBOutlet var clients: ClientListDataSource!
 
   @IBAction func didSendMessage(sender: UIButton) {
     textFieldShouldReturn(textField)
   }
+
   @IBAction func didInvite(sender: UIButton) {
     let invite = GINInvite.inviteDialog()
     invite.setMessage("Message")
@@ -67,12 +67,18 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
       self.ref = Firebase(url: plist["FIREBASE_DATABASE_URL"] as! String)
     }
 
+    loadAd()
+    self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
+    fetchConfig()
+  }
+
+  func loadAd() {
     self.banner.adUnitID = FIRContext.sharedInstance().adUnitIDForBannerTest
     self.banner.rootViewController = self
     self.banner.loadRequest(GADRequest())
+  }
 
-    self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
-
+  func fetchConfig() {
     // [START completion_handler]
     let completion:RCNDefaultConfigCompletion = {(config:RCNConfig!, status:RCNConfigStatus, error:NSError!) -> Void in
       if (error != nil) {
@@ -145,6 +151,19 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
     return cell!
   }
 
+  // UITextViewDelegate protocol methods
+  func textFieldShouldReturn(textField: UITextField) -> Bool {
+
+    // Push data to Firebase Database
+    if let user = AppState.sharedInstance.displayName {
+      self.ref.childByAppendingPath("messages").childByAutoId().setValue([Constants.MessageFields.name: user, Constants.MessageFields.text: textField.text as String!, Constants.MessageFields.photoUrl: "\(AppState.sharedInstance.photoUrl)"])
+    } else {
+      self.ref.childByAppendingPath("messages").childByAutoId().setValue([Constants.MessageFields.name: "User\(self.userInt)", Constants.MessageFields.text: textField.text as String!, Constants.MessageFields.photoUrl: "\(AppState.sharedInstance.photoUrl)"])
+    }
+    textField.text = ""
+    return true
+  }
+
   func showReceivedMessage(notification: NSNotification) {
     if let info = notification.userInfo as? Dictionary<String,AnyObject> {
       if let aps = info["aps"] as? Dictionary<String, String> {
@@ -181,18 +200,4 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
     showAlert("Error", message: error)
     print(error)
   }
-
-  // UITextViewDelegate protocol methods
-  func textFieldShouldReturn(textField: UITextField) -> Bool {
-
-    // Push data to Firebase Database
-    if let user = AppState.sharedInstance.displayName {
-      self.ref.childByAppendingPath("messages").childByAutoId().setValue([Constants.MessageFields.name: user, Constants.MessageFields.text: textField.text as String!, Constants.MessageFields.photoUrl: "\(AppState.sharedInstance.photoUrl)"])
-    } else {
-      self.ref.childByAppendingPath("messages").childByAutoId().setValue([Constants.MessageFields.name: "User\(self.userInt)", Constants.MessageFields.text: textField.text as String!, Constants.MessageFields.photoUrl: "\(AppState.sharedInstance.photoUrl)"])
-    }
-    textField.text = ""
-    return true
-  }
-
 }

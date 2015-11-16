@@ -27,13 +27,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
     launchOptions: [NSObject: AnyObject]?) -> Bool {
       NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectToFriendlyPing",
         name: Constants.NotificationKeys.SignedIn, object: nil)
-      configureFIRContext(launchOptions)
+      configureFIRContext()
+      // Initialize sign-in
+      GINInvite.applicationDidFinishLaunchingWithOptions(launchOptions)
+      configureSignIn()
       configureGCMService()
       registerForRemoteNotifications(application)
       return true
   }
 
-  func configureFIRContext(launchOptions: [NSObject: AnyObject]?) {
+  func configureFIRContext() {
     // [START firebase_configure]
     // Use Firebase library to configure APIs
     do {
@@ -42,10 +45,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
       print ("Error configuring Firebase services: \(configureError)")
     }
     // [END firebase_configure]
+  }
 
-    // Initialize sign-in
-    GINInvite.applicationDidFinishLaunchingWithOptions(launchOptions)
-
+  func configureSignIn() {
     // [START usermanagement_initialize]
     // Configure the default Firebase application
     let googleSignIn = FIRGoogleSignInAuthProvider.init(clientId: FIRContext.sharedInstance().serviceInfo.clientID)
@@ -56,18 +58,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
     firebaseOptions.signInProviders = [googleSignIn!];
     FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID, options: firebaseOptions)
     // [END usermanagement_initialize]
+  }
 
+
+  func configureGCMService() {
     let senderID = FIRContext.sharedInstance().serviceInfo.gcmSenderID
     AppState.sharedInstance.senderID = senderID
     AppState.sharedInstance.serverAddress = "\(senderID)@gcm.googleapis.com"
-  }
 
-    func configureGCMService() {
-      let config = GCMConfig.defaultConfig()
-      config.receiverDelegate = self
-      config.logLevel = GCMLogLevel.Debug
-      GCMService.sharedInstance().startWithConfig(config)
-    }
+    let config = GCMConfig.defaultConfig()
+    config.receiverDelegate = self
+    config.logLevel = GCMLogLevel.Debug
+    GCMService.sharedInstance().startWithConfig(config)
+  }
 
   func registerForRemoteNotifications(application: UIApplication) {
     if #available(iOS 8.0, *) {
@@ -113,7 +116,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
       return GIDSignIn.sharedInstance().handleURL(url, sourceApplication: sourceApplication, annotation: annotation)
   }
   // [END openurl]
-
 
   func applicationDidBecomeActive( application: UIApplication) {
     GCMService.sharedInstance().connectWithHandler({
