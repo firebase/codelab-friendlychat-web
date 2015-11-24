@@ -51,11 +51,7 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
     NSNotificationCenter.defaultCenter().addObserver(self, selector: "showReceivedMessage:",
       name:Constants.NotificationKeys.Message, object: nil)
 
-    // This will change pending in cl/106974108
-    if let plist = NSDictionary(contentsOfFile: NSBundle.mainBundle().pathForResource("GoogleService-Info", ofType: "plist")!) {
-      self.ref = Firebase(url: plist["FIREBASE_DATABASE_URL"] as! String)
-    }
-
+    self.ref = Firebase(url: FIRContext.sharedInstance().serviceInfo.databaseURL)
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
