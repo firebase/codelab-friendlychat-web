@@ -12,5 +12,17 @@
       "msg" : "I am fine",
       "user" : "anonymous"
     }
+  },
+  "users" : {
+    "user_1" : {
+			"name": "frank",
+			"gcmToken": "none",
+			"profile_pic": "url_to_profile_pic"
+    },
+		"user_2" : {
+			"name": "jane",
+			"gcmToken": "none",
+			"profile_pic": "url_to_profile_pic"
+    }
   }
 }
