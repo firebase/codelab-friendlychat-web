@@ -62,11 +62,7 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
     NSNotificationCenter.defaultCenter().addObserver(self, selector: "showReceivedMessage:",
       name:Constants.NotificationKeys.Message, object: nil)
 
-    // This will change pending in cl/106974108
-    if let plist = NSDictionary(contentsOfFile: NSBundle.mainBundle().pathForResource("GoogleService-Info", ofType: "plist")!) {
-      self.ref = Firebase(url: plist["FIREBASE_DATABASE_URL"] as! String)
-    }
-
+    self.ref = Firebase(url: FIRContext.sharedInstance().serviceInfo.databaseURL)
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
@@ -153,13 +149,19 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   // UITextViewDelegate protocol methods
   func textFieldShouldReturn(textField: UITextField) -> Bool {
+    var data = [Constants.MessageFields.text: textField.text as String!,
+                Constants.MessageFields.name: "User\(self.userInt)"]
+    if let user = AppState.sharedInstance.displayName {
+      data[Constants.MessageFields.name] = user
+    } else {
+      data[Constants.MessageFields.name] = "User\(self.userInt)"
+    }
+    if let photoUrl = AppState.sharedInstance.photoUrl {
+      data[Constants.MessageFields.photoUrl] = photoUrl.absoluteString
+    }
 
     // Push data to Firebase Database
-    if let user = AppState.sharedInstance.displayName {
-      self.ref.childByAppendingPath("messages").childByAutoId().setValue([Constants.MessageFields.name: user, Constants.MessageFields.text: textField.text as String!, Constants.MessageFields.photoUrl: "\(AppState.sharedInstance.photoUrl)"])
-    } else {
-      self.ref.childByAppendingPath("messages").childByAutoId().setValue([Constants.MessageFields.name: "User\(self.userInt)", Constants.MessageFields.text: textField.text as String!, Constants.MessageFields.photoUrl: "\(AppState.sharedInstance.photoUrl)"])
-    }
+    self.ref.childByAppendingPath("messages").childByAutoId().setValue(data)
     textField.text = ""
     return true
   }
