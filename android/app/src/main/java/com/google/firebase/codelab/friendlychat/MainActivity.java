@@ -59,15 +59,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        public TextView mMessageTextView;
-        public TextView mMessengerTextView;
-        public CircleImageView mMessengerImageView;
+        public TextView messageTextView;
+        public TextView messengerTextView;
+        public CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
             super(v);
-            mMessageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
-            mMessengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
-            mMessengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
+            messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
+            messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
+            messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
         }
     }
 
@@ -150,15 +150,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                viewHolder.mMessageTextView.setText(friendlyMessage.getMsg());
-                viewHolder.mMessengerTextView.setText(friendlyMessage.getUser());
+                viewHolder.messageTextView.setText(friendlyMessage.getMsg());
+                viewHolder.messengerTextView.setText(friendlyMessage.getUser());
                 if (friendlyMessage.getPhotoUrl() == null) {
-                    viewHolder.mMessengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
+                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
                             R.drawable.ic_account_circle_black_36dp));
                 } else {
                     Glide.with(MainActivity.this)
                             .load(friendlyMessage.getPhotoUrl())
-                            .into(viewHolder.mMessengerImageView);
+                            .into(viewHolder.messengerImageView);
                 }
             }
         };

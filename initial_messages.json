@@ -1,28 +1,24 @@
 {
   "messages" : {
     "-K2ib4H77rj0LYewF7dP" : {
-      "msg" : "Hi",
+      "msg" : "hello",
       "user" : "anonymous"
     },
     "-K2ib5JHRbbL0NrztUfO" : {
-      "msg" : "How are you",
+      "msg" : "how are you",
       "user" : "anonymous"
     },
     "-K2ib62mjHh34CAUbide" : {
-      "msg" : "I am fine",
+      "msg" : "i am fine",
       "user" : "anonymous"
     }
   },
   "users" : {
     "user_1" : {
-			"name": "frank",
-			"gcmToken": "none",
-			"profile_pic": "url_to_profile_pic"
+			"name": "frank"
     },
 		"user_2" : {
-			"name": "jane",
-			"gcmToken": "none",
-			"profile_pic": "url_to_profile_pic"
+			"name": "jane"
     }
   }
 }
