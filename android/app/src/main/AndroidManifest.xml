@@ -18,7 +18,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.google.firebase.codelab.friendlychat.SignInActivity"/>
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"

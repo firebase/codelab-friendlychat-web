@@ -51,8 +51,7 @@ import com.google.android.gms.config.ConfigApi;
 import com.google.android.gms.config.ConfigStatusCodes;
 import com.google.android.gms.measurement.AppMeasurement;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseUser;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.FirebaseOptions;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -77,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 10;
     public static final String ANONYMOUS = "anonymous";
     public static final String FIREBASE_DB_URL = "YOUR_DB_URL";
-    private static final String SIGN_OUT_EVENT = "sign_out";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
     private String mUsername;
     private String mPhotoUrl;
@@ -100,40 +98,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         setContentView(R.layout.activity_main);
 
         // Initialize FirebaseApp, this allows database calls on behalf of the signed in user.
-        FirebaseApp.initializeApp(this, getString(R.string.google_app_id));
+        FirebaseApp.initializeApp(this, getString(R.string.google_app_id),
+                new FirebaseOptions(getString(R.string.google_crash_reporting_api_key)));
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
-
-        // Check if the user is signed in, if not redirect to the SignInActivity.
-        // TODO(arthurthompson): Launch SignInActivity with startActivityForResult.
-        if (!isSignedIn()) {
-            startActivity(new Intent(this, SignInActivity.class));
-            finish();
-            return;
-        }
 
         // Check if the InstanceID token, required to receive GCM messages has been retrieved, start registration
         // service if not yet retrieved.
         if (!mSharedPreferences.getBoolean(CodelabPreferences.INSTANCE_ID_TOKEN_RETRIEVED, false)) {
             startService(new Intent(this, RegistrationIntentService.class));
         }
-
-        FirebaseAuth firebaseAuth = FirebaseAuth.getAuth();
-        if (firebaseAuth.getCurrentUser() != null) {
-            // FirebaseUser properties may be null, only it's ID is guaranteed to be non null.
-            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-            if (firebaseUser.getDisplayName() != null) {
-                mUsername = firebaseUser.getDisplayName();
-            } else if (firebaseUser.getEmail() != null) {
-                mUsername = firebaseUser.getEmail();
-            } else {
-                mUsername = firebaseUser.getUserId();
-            }
-            if (firebaseAuth.getCurrentUser().getPhotoUrl() != null) {
-                mPhotoUrl = firebaseAuth.getCurrentUser().getPhotoUrl().toString();
-            }
-        }
-
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
@@ -266,9 +240,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.sign_out_menu:
-                signOut();
-                return true;
             case R.id.invite_menu:
                 sendInvitation();
                 return true;
@@ -283,17 +254,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .setCallToActionText(getString(R.string.invitation_cta))
                 .build();
         startActivityForResult(intent, REQUEST_INVITE);
-    }
-
-    private void signOut() {
-        FirebaseAuth.getAuth().signOut(this);
-        startActivity(new Intent(this, SignInActivity.class));
-        mAppMeasurement.logEvent(SIGN_OUT_EVENT, null);
-        finish();
-    }
-
-    private boolean isSignedIn() {
-        return FirebaseAuth.getAuth().getCurrentUser() != null;
     }
 
     // Fetch the config to determine the allowed length of messages.
@@ -337,10 +297,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         if (requestCode == REQUEST_INVITE) {
             if (resultCode == RESULT_OK) {
+                // Use Firebase Measurement to log that invitation was sent.
+                Bundle payload = new Bundle();
+                payload.putString(AppMeasurement.Param.VALUE, "inv_sent");
+                mAppMeasurement.logEvent(AppMeasurement.Event.SHARE, payload);
+
                 // Check how many invitations were sent and log.
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
                 Log.d(TAG, "Invitations sent: " + ids.length);
             } else {
+                // Use Firebase Measurement to log that invitation was not sent
+                Bundle payload = new Bundle();
+                payload.putString(AppMeasurement.Param.VALUE, "inv_not_sent");
+                mAppMeasurement.logEvent(AppMeasurement.Event.SHARE, payload);
+
                 // Sending failed or it was canceled, show failure message to the user
                 Log.d(TAG, "Failed to send invitation.");
             }
