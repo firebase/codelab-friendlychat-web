@@ -48,13 +48,13 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   // [START invite_finished]
-  func inviteFinishedWithInvitations(invitationIds: [AnyObject]!, error: NSError!) {
-    if (error != nil) {
-      print("Failed: " + error.localizedDescription)
-    } else {
-      print("Invitations sent")
-    }
-  }
+//  func inviteFinishedWithInvitations(invitationIds: [AnyObject], error: NSError) {
+//    if (error != nil) {
+//      print("Failed: " + error.localizedDescription)
+//    } else {
+//      print("Invitations sent")
+//    }
+//  }
   // [END invite_finished]
 
   override func viewDidLoad() {

@@ -50,11 +50,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
   func configureSignIn() {
     // [START usermanagement_initialize]
     // Configure the default Firebase application
-    let googleSignIn = FIRGoogleSignInAuthProvider.init(clientId: FIRContext.sharedInstance().serviceInfo.clientID)
+    let googleSignIn = FIRGoogleSignInAuthProvider.init(clientID: FIRContext.sharedInstance().serviceInfo.clientID)
 
     let firebaseOptions = FIRFirebaseOptions()
-    firebaseOptions.GITkitAPIKey = FIRContext.sharedInstance().serviceInfo.apiKey
-    firebaseOptions.GITkitWidgetURL = NSURL(string: "https://gitkitmobile.appspot.com/gitkit.jsp")
+    firebaseOptions.APIKey = FIRContext.sharedInstance().serviceInfo.apiKey
+    firebaseOptions.authWidgetURL = NSURL(string: "https://gitkitmobile.appspot.com/gitkit.jsp")
     firebaseOptions.signInProviders = [googleSignIn!];
     FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID, options: firebaseOptions)
     // [END usermanagement_initialize]
@@ -102,16 +102,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
   // [START openurl]
   func application(application: UIApplication,
     openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
-      let invite = GINInvite.handleURL(url, sourceApplication:sourceApplication, annotation:annotation)
-
-      if (invite != nil) {
-        let matchType =
-        (invite.matchType == GINReceivedInviteMatchType.Weak) ? "Weak" : "Strong"
-        print("Invite received from: \(sourceApplication) Deeplink: \(invite.deepLink)," +
-          "Id: \(invite.inviteId), Type: \(matchType)")
-        GINInvite.convertInvitation(invite.inviteId)
-        return true
-      }
+//      let invite = GINInvite.handleURL(url, sourceApplication:sourceApplication, annotation:annotation)
+//      if (invite != nil) {
+//        let matchType =
+//        (invite.matchType == GINReceivedInviteMatchType.Weak) ? "Weak" : "Strong"
+//        print("Invite received from: \(sourceApplication) Deeplink: \(invite.deepLink)," +
+//          "Id: \(invite.inviteId), Type: \(matchType)")
+//        GINInvite.convertInvitation(invite.inviteId)
+//        return true
+//      }
 
       return GIDSignIn.sharedInstance().handleURL(url, sourceApplication: sourceApplication, annotation: annotation)
   }
