@@ -18,14 +18,14 @@ import Firebase.Core
 class MeasurementHelper: NSObject {
 
   static func sendLoginEvent() {
-    GMRAppMeasurement.logEventWithName(kGMREventLogin, parameters: nil)
+    FIRAnalytics.logEventWithName(kFIREventLogin, parameters: nil)
   }
 
   static func sendLogoutEvent() {
-    GMRAppMeasurement.logEventWithName("logout", parameters: nil)
+    FIRAnalytics.logEventWithName("logout", parameters: nil)
   }
 
   static func sendPingEvent() {
-    GMRAppMeasurement.logEventWithName(kGMREventShare, parameters: nil)
+    FIRAnalytics.logEventWithName(kFIREventShare, parameters: nil)
   }
 }
