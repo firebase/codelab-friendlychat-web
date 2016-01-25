@@ -3,4 +3,7 @@
     <item
         android:id="@+id/invite_menu"
         android:title="@string/invite_menu_label"/>
+    <item
+        android:id="@+id/crash_menu"
+        android:title="@string/cause_crash"/>
 </menu>

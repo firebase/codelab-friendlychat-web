@@ -49,6 +49,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.config.Config;
 import com.google.android.gms.config.ConfigApi;
 import com.google.android.gms.config.ConfigStatusCodes;
+import com.google.android.gms.crash.Crash;
 import com.google.android.gms.measurement.AppMeasurement;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -243,9 +244,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             case R.id.invite_menu:
                 sendInvitation();
                 return true;
+            case R.id.crash_menu:
+                Crash.log(Log.ERROR, TAG, "crash caused");
+                causeCrash();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void causeCrash() {
+        throw new NullPointerException("Fake null pointer exception");
     }
 
     private void sendInvitation() {
