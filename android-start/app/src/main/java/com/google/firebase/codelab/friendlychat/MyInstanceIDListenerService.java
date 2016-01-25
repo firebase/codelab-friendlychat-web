@@ -18,6 +18,7 @@ package com.google.firebase.codelab.friendlychat;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 
+import com.google.android.gms.iid.InstanceIDListenerService;
 
 public class MyInstanceIDListenerService {
 

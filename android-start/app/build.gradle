@@ -40,6 +40,12 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:1.3.0'
 
     // Firebase
+    compile 'com.google.android.gms:firebase-database:8.5.2'
+    compile 'com.google.android.gms:firebase-config:8.5.2'
+    compile 'com.google.android.gms:firebase-appinvites:8.5.2'
+    compile 'com.google.android.gms:firebase-gcm:8.5.2'
+    compile 'com.google.android.gms:play-services-ads:8.5.2'
+    compile 'com.google.android.gms:firebase-crash:8.5.2'
 
 
     // Testing dependencies
@@ -48,3 +54,5 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.2'
     androidTestCompile 'com.android.support:support-annotations:23.1.1'
 }
+
+apply plugin: 'com.google.gms.google-services'

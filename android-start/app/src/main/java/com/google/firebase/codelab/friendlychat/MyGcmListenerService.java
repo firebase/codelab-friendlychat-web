@@ -18,6 +18,8 @@ package com.google.firebase.codelab.friendlychat;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.gcm.GcmListenerService;
+
 public class MyGcmListenerService {
 
     public void onMessageReceived(String from, Bundle data) {
