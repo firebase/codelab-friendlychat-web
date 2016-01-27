@@ -47,7 +47,13 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
     invite.open()
   }
 
-  // [START invite_finished]
+  @IBAction func didPressCrash(sender: AnyObject) {
+    withVaList([]) {
+      FCRLog(false, "Cause Crash button clicked", $0)
+    }
+    fatalError()
+  }
+
 //  func inviteFinishedWithInvitations(invitationIds: [AnyObject], error: NSError) {
 //    if (error != nil) {
 //      print("Failed: " + error.localizedDescription)
@@ -55,7 +61,6 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
 //      print("Invitations sent")
 //    }
 //  }
-  // [END invite_finished]
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -66,6 +71,13 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
+
+    // Log that the view did load, true is used here so the log message will be
+    // shown in the console output. If false is used the message is not shown in
+    // the console output.
+    withVaList([]) {
+      FCRLogv(true, "View loaded", $0)
+    }
   }
 
   func loadAd() {
@@ -75,29 +87,21 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func fetchConfig() {
-    // [START completion_handler]
     let completion:RCNDefaultConfigCompletion = {(config:RCNConfig!, status:RCNConfigStatus, error:NSError!) -> Void in
       if (error != nil) {
         // There has been an error fetching the config
         print("Error fetching config: \(error.localizedDescription)")
       } else {
         // Parse your config data
-        // [START_EXCLUDE]
-        // [START read_data]
         self.msglength = config.numberForKey("friendly_msg_length", defaultValue: 10)
         print("Friendly msg length config: \(self.msglength)")
-        // [END read_data]
-        // [END_EXCLUDE]
       }
     }
-    // [END completion_handler]
 
-    // [START fetch_config]
     let customVariables = ["build": "dev"]
     // 43200 secs = 12 hours
     RCNConfig.fetchDefaultConfigWithExpirationDuration(43200, customVariables: customVariables,
       completionHandler: completion)
-    // [END fetch_config]
   }
 
   func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {

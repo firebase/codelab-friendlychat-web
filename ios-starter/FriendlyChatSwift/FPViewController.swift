@@ -41,10 +41,11 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBAction func didInvite(sender: UIButton) {
   }
 
-  // [START invite_finished]
+  @IBAction func didPressCrash(sender: AnyObject) {
+  }
+
   func inviteFinishedWithInvitations(invitationIds: [AnyObject]!, error: NSError!) {
   }
-  // [END invite_finished]
 
   override func viewDidLoad() {
     super.viewDidLoad()

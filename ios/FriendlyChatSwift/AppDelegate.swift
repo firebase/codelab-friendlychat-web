@@ -37,18 +37,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
   }
 
   func configureFIRContext() {
-    // [START firebase_configure]
     // Use Firebase library to configure APIs
     do {
       try FIRContext.sharedInstance().configure()
     } catch let configureError as NSError{
       print ("Error configuring Firebase services: \(configureError)")
     }
-    // [END firebase_configure]
   }
 
   func configureSignIn() {
-    // [START usermanagement_initialize]
     // Configure the default Firebase application
     let googleSignIn = FIRGoogleSignInAuthProvider.init(clientID: FIRContext.sharedInstance().serviceInfo.clientID)
 
@@ -57,7 +54,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
     firebaseOptions.authWidgetURL = NSURL(string: "https://gitkitmobile.appspot.com/gitkit.jsp")
     firebaseOptions.signInProviders = [googleSignIn!];
     FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID, options: firebaseOptions)
-    // [END usermanagement_initialize]
   }
 
 
@@ -99,7 +95,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
     return false
   }
 
-  // [START openurl]
   func application(application: UIApplication,
     openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
 //      let invite = GINInvite.handleURL(url, sourceApplication:sourceApplication, annotation:annotation)
@@ -114,7 +109,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
 
       return GIDSignIn.sharedInstance().handleURL(url, sourceApplication: sourceApplication, annotation: annotation)
   }
-  // [END openurl]
 
   func applicationDidBecomeActive( application: UIApplication) {
     GCMService.sharedInstance().connectWithHandler({

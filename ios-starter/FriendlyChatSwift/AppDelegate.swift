@@ -35,14 +35,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
   }
 
   func configureFIRContext() {
-    // [START firebase_configure]
     // Use Firebase library to configure APIs
     do {
       try FIRContext.sharedInstance().configure()
     } catch let configureError as NSError{
       print ("Error configuring Firebase services: \(configureError)")
     }
-    // [END firebase_configure]
   }
 
   func configureSignIn() {
@@ -72,12 +70,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
     return true
   }
 
-  // [START openurl]
   func application(application: UIApplication,
     openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
       return true
   }
-  // [END openurl]
 
   func applicationDidBecomeActive( application: UIApplication) {
   }
