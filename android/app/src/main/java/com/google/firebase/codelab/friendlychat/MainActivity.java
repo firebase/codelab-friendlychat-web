@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         // Initialize FirebaseApp, this allows database calls on behalf of the signed in user.
         FirebaseApp.initializeApp(this, getString(R.string.google_app_id),
-                new FirebaseOptions(getString(R.string.google_crash_reporting_api_key)));
+                new FirebaseOptions(getString(R.string.google_api_key)));
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
 
