@@ -49,18 +49,18 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   @IBAction func didPressCrash(sender: AnyObject) {
     withVaList([]) {
-      FCRLog(false, "Cause Crash button clicked", $0)
+      FCRLogv(false, "Cause Crash button clicked", $0)
     }
     fatalError()
   }
 
-//  func inviteFinishedWithInvitations(invitationIds: [AnyObject], error: NSError) {
-//    if (error != nil) {
-//      print("Failed: " + error.localizedDescription)
-//    } else {
-//      print("Invitations sent")
-//    }
-//  }
+  func inviteFinishedWithInvitations(invitationIds: [AnyObject], error: NSError?) {
+    if (error != nil) {
+      print("Failed: " + error!.localizedDescription)
+    } else {
+      print("Invitations sent")
+    }
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
