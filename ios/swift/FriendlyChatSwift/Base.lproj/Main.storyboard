@@ -9,7 +9,7 @@
         <!--SignInViewController-->
         <scene sceneID="SMy-V3-Z7c">
             <objects>
-                <viewController storyboardIdentifier="SignInViewController" id="zxq-GO-nHP" userLabel="SignInViewController" customClass="SignInViewController" customModule="FriendlyChat" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SignInViewController" id="zxq-GO-nHP" userLabel="SignInViewController" customClass="SignInViewController" customModule="FriendlyChatSwift" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="abG-qv-YP8"/>
                         <viewControllerLayoutGuide type="bottom" id="bqo-tI-KbX"/>
@@ -90,7 +90,7 @@
                                         <rect key="frame" x="0.0" y="22" width="568" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="f9j-WJ-CnU" id="6Nv-bs-fSR">
-                                            <rect key="frame" x="0.0" y="0.0" width="568" height="50"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="568" height="49.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -133,10 +133,10 @@
                                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bzG-Ms-LOb">
                                         <rect key="frame" x="367" y="5" width="46" height="30"/>
                                         <state key="normal" title="Crash">
-                                            <color key="titleColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                                            <color key="titleColor" red="0.1215686275" green="0.12941176469999999" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
                                         </state>
                                         <connections>
-                                            <action selector="didPressCrash:" destination="uMT-A3-F60" eventType="touchUpInside" id="2mu-yr-bIK"/>
+                                            <action selector="didPressCrash:" destination="uMT-A3-F60" eventType="touchUpInside" id="BEe-gm-h9y"/>
                                         </connections>
                                     </button>
                                 </subviews>
