@@ -133,7 +133,7 @@
                                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bzG-Ms-LOb">
                                         <rect key="frame" x="367" y="5" width="46" height="30"/>
                                         <state key="normal" title="Crash">
-                                            <color key="titleColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                                            <color key="titleColor" red="0.1215686275" green="0.12941176469999999" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
                                         </state>
                                         <connections>
                                             <action selector="didPressCrash:" destination="uMT-A3-F60" eventType="touchUpInside" id="BEe-gm-h9y"/>
