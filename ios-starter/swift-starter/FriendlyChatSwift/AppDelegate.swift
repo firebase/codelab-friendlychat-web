@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
 
   func application(application: UIApplication, didFinishLaunchingWithOptions
     launchOptions: [NSObject: AnyObject]?) -> Bool {
-      NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectToFriendlyPing",
+      NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectToFriendlyChat",
         name: Constants.NotificationKeys.SignedIn, object: nil)
       configureFIRContext()
       configureSignIn()
@@ -51,19 +51,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
   }
 
   func registerForRemoteNotifications(application: UIApplication) {
-    if #available(iOS 8.0, *) {
-      let types: UIUserNotificationType = [UIUserNotificationType.Badge,
-        UIUserNotificationType.Alert, UIUserNotificationType.Sound]
+    let types: UIUserNotificationType = [.Alert, .Badge, .Sound]
       let settings: UIUserNotificationSettings =
       UIUserNotificationSettings( forTypes: types, categories: nil )
       application.registerUserNotificationSettings(settings)
       application.registerForRemoteNotifications()
-
-    } else {
-      // Fallback on earlier versions
-      let types: UIRemoteNotificationType = [.Alert, .Badge, .Sound]
-      application.registerForRemoteNotificationTypes(types)
-    }
   }
 
   func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
@@ -110,7 +102,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
     fetchCompletionHandler handler: (UIBackgroundFetchResult) -> Void) {
   }
 
-  func connectToFriendlyPing() {
+  func connectToFriendlyChat() {
     if AppState.sharedInstance.connectedToGcm && AppState.sharedInstance.signedIn &&
       AppState.sharedInstance.registrationToken != nil {
         subscribeToTopic()

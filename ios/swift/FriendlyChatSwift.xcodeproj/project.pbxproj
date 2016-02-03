@@ -98,11 +98,11 @@
 			children = (
 				5F5A537D1ADE67D500F81DF0 /* AppDelegate.swift */,
 				5F5A537F1ADE67D500F81DF0 /* FPViewController.swift */,
-				5F5A537B1ADE67D500F81DF0 /* Supporting Files */,
 				2C8E6C2A1B16875B0073CE3D /* SignInViewController.swift */,
 				2CA807BB1B21702E009AD7F2 /* MeasurementHelper.swift */,
 				2CA807BD1B217B21009AD7F2 /* AppState.swift */,
 				2C595F041B34B73A00355AE7 /* Constants.swift */,
+				5F5A537B1ADE67D500F81DF0 /* Supporting Files */,
 			);
 			path = FriendlyChatSwift;
 			sourceTree = "<group>";

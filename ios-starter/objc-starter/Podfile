@@ -1,0 +1,16 @@
+# FriendlyChat Codelab
+source 'https://cpdc-eap.googlesource.com/spec.git'
+source 'https://github.com/CocoaPods/Specs.git'
+
+pod 'FirebaseAuth'
+pod 'FirebaseAuthProviderGoogle'
+pod 'FirebaseAuthUI'
+pod 'FirebaseDatabase'
+pod 'Firebase/RemoteConfig'
+pod 'Firebase/AdMob'
+pod 'Firebase/AppInvites'
+pod 'Firebase/Core'
+pod 'Firebase/CloudMessaging'
+pod 'Firebase/CrashReporting'
+
+platform :ios, '8.0'
