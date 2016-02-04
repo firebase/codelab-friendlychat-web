@@ -14,19 +14,21 @@
 //  limitations under the License.
 //
 
-#import "MeasurementHelper.h"
+#import "Constants.h"
 
-@import Firebase.Core;
+@implementation Constants
 
-@implementation MeasurementHelper
+NSString *const GCMStringsTopic = @"/topics/global";
 
-+ (void)sendLoginEvent {
-}
+NSString *const NotificationKeysSignedIn = @"onSignInCompleted";
+NSString *const NotificationKeysRegistration = @"onRegistrationCompleted";
+NSString *const NotificationKeysMessage = @"onMessageReceived";
 
-+ (void)sendLogoutEvent {
-}
+NSString *const SeguesSignInToFp = @"SignInToFP";
+NSString *const SeguesFpToSignIn = @"FPToSignIn";
 
-+ (void)sendPingEvent{
-}
+NSString *const MessageFieldsname = @"name";
+NSString *const MessageFieldstext = @"text";
+NSString *const MessageFieldsphotoUrl = @"photoUrl";
 
 @end

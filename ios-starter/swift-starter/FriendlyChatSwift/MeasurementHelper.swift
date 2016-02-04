@@ -14,7 +14,7 @@
 //  limitations under the License.
 //
 
-import Firebase.Core
+import Firebase.Analytics
 class MeasurementHelper: NSObject {
 
   static func sendLoginEvent() {

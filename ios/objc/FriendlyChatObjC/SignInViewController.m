@@ -36,7 +36,24 @@
 @implementation SignInViewController
 
 - (IBAction)didTapSignIn:(UIButton *)sender {
-  [self signedIn];
+  FIRAuth *firebaseAuth = [FIRAuth auth];
+  FIRAuthUI *firebaseAuthUI = [FIRAuthUI authUIWithAuth:firebaseAuth delegate:self];
+  [firebaseAuthUI presentSignInWithCallback:^(FIRUser *_Nullable user,
+                                              NSError *_Nullable error) {
+    if (error) {
+      NSLog(error.localizedDescription);
+      return;
+    }
+
+    [MeasurementHelper sendLoginEvent];
+
+    [AppState sharedInstance].displayName = user.displayName;
+    [AppState sharedInstance].photoUrl = user.photoURL;
+    [AppState sharedInstance].signedIn = YES;
+    [[NSNotificationCenter defaultCenter] postNotificationName:NotificationKeysSignedIn
+                                                        object:nil userInfo:nil];
+    [self signedIn];
+  }];
 }
 
 - (void)signedIn {

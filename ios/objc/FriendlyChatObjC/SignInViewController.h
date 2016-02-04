@@ -14,19 +14,9 @@
 //  limitations under the License.
 //
 
-#import "MeasurementHelper.h"
+#import <Foundation/Foundation.h>
+@import UIKit;
 
-@import Firebase.Core;
-
-@implementation MeasurementHelper
-
-+ (void)sendLoginEvent {
-}
-
-+ (void)sendLogoutEvent {
-}
-
-+ (void)sendPingEvent{
-}
+@interface SignInViewController : UIViewController
 
 @end

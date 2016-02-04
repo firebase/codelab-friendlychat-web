@@ -28,9 +28,7 @@ class SignInViewController: UIViewController, FIRAuthUIDelegate {
   }
 
   @IBAction func didTapSignIn(sender: UIButton) {
-    // [START usermanagement_config]
     let firebaseAuth = FIRAuth.init(forApp:FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID)!)
-    // [END usermanagement_config]
     let firebaseAuthUI:FIRAuthUI = FIRAuthUI.init(auth: firebaseAuth!, delegate: self)
 
     firebaseAuthUI.presentSignInWithCallback({(user, error) in

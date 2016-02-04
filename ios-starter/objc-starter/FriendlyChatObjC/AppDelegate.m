@@ -15,11 +15,12 @@
 //
 
 #import "AppDelegate.h"
-#import "Constants.h"
 #import "AppState.h"
-#import "FirebaseAuthProviderGoogle/FIRGoogleSignInAuthProvider.h"
+#import "Constants.h"
 #import "FirebaseApp/FIRFirebaseApp.h"
 #import "FirebaseApp/FIRFirebaseOptions.h"
+#import "FirebaseAuthProviderGoogle/FIRGoogleSignInAuthProvider.h"
+
 @import Firebase.AdMob;
 @import Firebase.AppInvite;
 @import Firebase.CloudMessaging;
