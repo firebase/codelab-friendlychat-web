@@ -44,7 +44,7 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBAction func didPressCrash(sender: AnyObject) {
   }
 
-  func inviteFinishedWithInvitations(invitationIds: [AnyObject]!, error: NSError!) {
+  func inviteFinishedWithInvitations(invitationIds: [AnyObject], error: NSError?) {
   }
 
   override func viewDidLoad() {
@@ -84,7 +84,7 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
     // Dequeue cell
-    let cell: UITableViewCell! = self.clientTable .dequeueReusableCellWithIdentifier("tableViewCell", forIndexPath: indexPath)
+    let cell: UITableViewCell! = self.clientTable.dequeueReusableCellWithIdentifier("tableViewCell", forIndexPath: indexPath)
 
     return cell!
   }
@@ -111,15 +111,11 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   func showAlert(title:String, message:String) {
     dispatch_async(dispatch_get_main_queue()) {
-      if #available(iOS 8.0, *) {
         let alert = UIAlertController(title: title,
             message: message, preferredStyle: .Alert)
         let dismissAction = UIAlertAction(title: "Dismiss", style: .Destructive, handler: nil)
         alert.addAction(dismissAction)
         self.presentViewController(alert, animated: true, completion: nil)
-      } else {
-          // Fallback on earlier versions
-      }
     }
   }
 

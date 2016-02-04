@@ -189,15 +189,11 @@ class FPViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   func showAlert(title:String, message:String) {
     dispatch_async(dispatch_get_main_queue()) {
-      if #available(iOS 8.0, *) {
         let alert = UIAlertController(title: title,
             message: message, preferredStyle: .Alert)
         let dismissAction = UIAlertAction(title: "Dismiss", style: .Destructive, handler: nil)
         alert.addAction(dismissAction)
         self.presentViewController(alert, animated: true, completion: nil)
-      } else {
-          // Fallback on earlier versions
-      }
     }
   }
 

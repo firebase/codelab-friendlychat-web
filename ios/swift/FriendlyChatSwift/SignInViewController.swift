@@ -34,7 +34,6 @@ class SignInViewController: UIViewController, FIRAuthUIDelegate {
     let firebaseAuthUI:FIRAuthUI = FIRAuthUI.init(auth: firebaseAuth!, delegate: self)
 
     firebaseAuthUI.presentSignInWithCallback({(user, error) in
-      if #available(iOS 8.0, *) {
         if ((error) != nil) {
           print("\(error!.localizedDescription)")
           return
@@ -48,9 +47,6 @@ class SignInViewController: UIViewController, FIRAuthUIDelegate {
         NSNotificationCenter.defaultCenter().postNotificationName(Constants.NotificationKeys.SignedIn,
           object: nil, userInfo: nil)
         self.signedIn()
-      } else {
-        // Fallback on earlier versions
-      }
     })
   }
 
