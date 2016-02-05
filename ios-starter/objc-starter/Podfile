@@ -14,3 +14,4 @@ pod 'Firebase/CloudMessaging'
 pod 'Firebase/CrashReporting'
 
 platform :ios, '8.0'
+target 'FriendlyChatObjC'
