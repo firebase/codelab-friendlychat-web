@@ -14,19 +14,12 @@
 //  limitations under the License.
 //
 
-#import "MeasurementHelper.h"
+#import <UIKit/UIKit.h>
 
-@import Firebase.Core;
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@implementation MeasurementHelper
+@property (strong, nonatomic) UIWindow *window;
 
-+ (void)sendLoginEvent {
-}
-
-+ (void)sendLogoutEvent {
-}
-
-+ (void)sendPingEvent{
-}
 
 @end
+

@@ -14,19 +14,11 @@
 //  limitations under the License.
 //
 
-#import "MeasurementHelper.h"
+#import <UIKit/UIKit.h>
+#import "AppDelegate.h"
 
-@import Firebase.Core;
-
-@implementation MeasurementHelper
-
-+ (void)sendLoginEvent {
+int main(int argc, char * argv[]) {
+  @autoreleasepool {
+      return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+  }
 }
-
-+ (void)sendLogoutEvent {
-}
-
-+ (void)sendPingEvent{
-}
-
-@end

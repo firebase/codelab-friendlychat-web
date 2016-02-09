@@ -14,19 +14,12 @@
 //  limitations under the License.
 //
 
-#import "MeasurementHelper.h"
+#import <Foundation/Foundation.h>
 
-@import Firebase.Core;
+@interface MeasurementHelper : NSObject
 
-@implementation MeasurementHelper
-
-+ (void)sendLoginEvent {
-}
-
-+ (void)sendLogoutEvent {
-}
-
-+ (void)sendPingEvent{
-}
++ (void)sendLoginEvent;
++ (void)sendLogoutEvent;
++ (void)sendPingEvent;
 
 @end

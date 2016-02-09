@@ -21,12 +21,15 @@
 @implementation MeasurementHelper
 
 + (void)sendLoginEvent {
+  [FIRAnalytics logEventWithName:kFIREventLogin parameters:nil];
 }
 
 + (void)sendLogoutEvent {
+  [FIRAnalytics logEventWithName:@"logout" parameters:nil];
 }
 
 + (void)sendPingEvent{
+  [FIRAnalytics logEventWithName:kFIREventShare parameters:nil];
 }
 
 @end

@@ -16,7 +16,7 @@
 
 @import UIKit;
 
-@interface FPViewController : UIViewController
+@interface FCViewController : UIViewController
 
 
 @end

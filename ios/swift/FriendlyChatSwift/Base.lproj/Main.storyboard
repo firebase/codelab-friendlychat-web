@@ -73,7 +73,7 @@
         <!--FPViewController-->
         <scene sceneID="moX-1M-48c">
             <objects>
-                <viewController title="FPViewController" id="uMT-A3-F60" customClass="FPViewController" sceneMemberID="viewController">
+                <viewController title="FPViewController" id="uMT-A3-F60" customClass="FCViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="yPS-DS-Klf"/>
                         <viewControllerLayoutGuide type="bottom" id="X8X-0F-Bdi"/>

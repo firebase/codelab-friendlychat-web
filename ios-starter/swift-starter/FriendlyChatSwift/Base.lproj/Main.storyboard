@@ -73,7 +73,7 @@
         <!--FPViewController-->
         <scene sceneID="moX-1M-48c">
             <objects>
-                <viewController title="FPViewController" id="uMT-A3-F60" customClass="FPViewController" sceneMemberID="viewController">
+                <viewController title="FPViewController" id="uMT-A3-F60" customClass="FCViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="yPS-DS-Klf"/>
                         <viewControllerLayoutGuide type="bottom" id="X8X-0F-Bdi"/>
@@ -90,7 +90,7 @@
                                         <rect key="frame" x="0.0" y="22" width="568" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="f9j-WJ-CnU" id="6Nv-bs-fSR">
-                                            <rect key="frame" x="0.0" y="0.0" width="568" height="50"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="568" height="49.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                     </tableViewCell>

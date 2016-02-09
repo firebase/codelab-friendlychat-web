@@ -14,19 +14,17 @@
 //  limitations under the License.
 //
 
-#import "MeasurementHelper.h"
+#import "AppState.h"
 
-@import Firebase.Core;
+@implementation AppState
 
-@implementation MeasurementHelper
-
-+ (void)sendLoginEvent {
-}
-
-+ (void)sendLogoutEvent {
-}
-
-+ (void)sendPingEvent{
++ (AppState *)sharedInstance {
+  static AppState *sharedMyInstance = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    sharedMyInstance = [[self alloc] init];
+  });
+  return sharedMyInstance;
 }
 
 @end
