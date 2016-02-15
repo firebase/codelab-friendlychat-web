@@ -15,16 +15,21 @@
 //
 
 import UIKit
+
 import FirebaseDatabase
+import FirebaseApp
+import FirebaseAuth
 import Firebase.SignIn
 import Firebase.Core
 
 @objc(FCViewController)
-class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, GINInviteDelegate {
+class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, GINInviteDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var sendButton: UIButton!
+
+  var storageRef: FIRStorage!
   var ref: Firebase!
   var messages: [FDataSnapshot]! = []
   var msglength: NSNumber = 10
@@ -55,8 +60,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func inviteFinishedWithInvitations(invitationIds: [AnyObject], error: NSError?) {
-    if (error != nil) {
-      print("Failed: " + error!.localizedDescription)
+    if let error = error {
+      print("Failed: " + error.localizedDescription)
     } else {
       print("Invitations sent")
     }
@@ -87,8 +92,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func fetchConfig() {
-    let completion:RCNDefaultConfigCompletion = {(config:RCNConfig!, status:RCNConfigStatus, error:NSError!) -> Void in
-      if (error != nil) {
+    let completion:RCNDefaultConfigCompletion = {(config:RCNConfig!, status:RCNConfigStatus, error:NSError?) -> Void in
+      if let error = error {
         // There has been an error fetching the config
         print("Error fetching config: \(error.localizedDescription)")
       } else {
@@ -179,10 +184,15 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   @IBAction func signOut(sender: UIButton) {
-    let firebaseAuth = FIRAuth.init(forApp:FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID)!)
-    firebaseAuth?.signOut()
-    AppState.sharedInstance.signedIn = false
-    performSegueWithIdentifier(Constants.Segues.FpToSignIn, sender: nil)
+    let firebaseAuth = FIRAuth.auth()
+    do {
+      try firebaseAuth?.signOut()
+      performSegueWithIdentifier("SignOut", sender: nil)
+      AppState.sharedInstance.signedIn = false
+      performSegueWithIdentifier(Constants.Segues.FpToSignIn, sender: nil)
+    } catch let signOutError as NSError {
+      print ("Error signing out: %@", signOutError)
+    }
   }
 
   func showAlert(title:String, message:String) {

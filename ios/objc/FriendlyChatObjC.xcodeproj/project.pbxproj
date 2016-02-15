@@ -17,11 +17,10 @@
 		107960B31C613231003DB6CC /* shared in Resources */ = {isa = PBXBuildFile; fileRef = 107960B21C613231003DB6CC /* shared */; };
 		107960B61C613263003DB6CC /* SignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B51C613263003DB6CC /* SignInViewController.m */; };
 		107960B91C6156B3003DB6CC /* AppState.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B81C6156B3003DB6CC /* AppState.m */; };
-		D47E93F225AE9C9FA9B48317 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 09553FA2155F1286700748A3 /* libPods.a */; };
+		1F29CA3745994936CBE9CCE6 /* libPods-FriendlyChatObjC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D73F609D8BDD9A3F5D0CBACE /* libPods-FriendlyChatObjC.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		09553FA2155F1286700748A3 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		107960801C6130EF003DB6CC /* FriendlyChatObjC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FriendlyChatObjC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		107960841C6130EF003DB6CC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		107960861C6130EF003DB6CC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -39,8 +38,9 @@
 		107960B51C613263003DB6CC /* SignInViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignInViewController.m; sourceTree = "<group>"; };
 		107960B71C6156B3003DB6CC /* AppState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppState.h; sourceTree = "<group>"; };
 		107960B81C6156B3003DB6CC /* AppState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppState.m; sourceTree = "<group>"; };
-		8BD898C61676AA7B36A9C2BB /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
-		D217A532DF804849771902E1 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		C1F233B0D21B81D18C3E1809 /* Pods-FriendlyChatObjC.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FriendlyChatObjC.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FriendlyChatObjC/Pods-FriendlyChatObjC.debug.xcconfig"; sourceTree = "<group>"; };
+		D73F609D8BDD9A3F5D0CBACE /* libPods-FriendlyChatObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-FriendlyChatObjC.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB50661134D380991503BDF4 /* Pods-FriendlyChatObjC.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FriendlyChatObjC.release.xcconfig"; path = "Pods/Target Support Files/Pods-FriendlyChatObjC/Pods-FriendlyChatObjC.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,21 +48,30 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D47E93F225AE9C9FA9B48317 /* libPods.a in Frameworks */,
+				1F29CA3745994936CBE9CCE6 /* libPods-FriendlyChatObjC.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0FEAB1B8FCEE5A7CA01B2040 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C1F233B0D21B81D18C3E1809 /* Pods-FriendlyChatObjC.debug.xcconfig */,
+				FB50661134D380991503BDF4 /* Pods-FriendlyChatObjC.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		107960771C6130EF003DB6CC = {
 			isa = PBXGroup;
 			children = (
 				107960B21C613231003DB6CC /* shared */,
 				107960821C6130EF003DB6CC /* FriendlyChatObjC */,
 				107960811C6130EF003DB6CC /* Products */,
-				1D4955605473E374A5F22989 /* Pods */,
-				7C0962C843C920A619B7F9CF /* Frameworks */,
+				0FEAB1B8FCEE5A7CA01B2040 /* Pods */,
+				C9665EC0D12D7A6D45D75582 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -104,19 +113,10 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		1D4955605473E374A5F22989 /* Pods */ = {
+		C9665EC0D12D7A6D45D75582 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D217A532DF804849771902E1 /* Pods.debug.xcconfig */,
-				8BD898C61676AA7B36A9C2BB /* Pods.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
-		7C0962C843C920A619B7F9CF /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				09553FA2155F1286700748A3 /* libPods.a */,
+				D73F609D8BDD9A3F5D0CBACE /* libPods-FriendlyChatObjC.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -128,12 +128,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 107960A21C6130EF003DB6CC /* Build configuration list for PBXNativeTarget "FriendlyChatObjC" */;
 			buildPhases = (
-				150ADCAE85D44F4AC577F06D /* Check Pods Manifest.lock */,
+				D5A4EA24B9669C86F8AF340D /* Check Pods Manifest.lock */,
 				1079607C1C6130EF003DB6CC /* Sources */,
 				1079607D1C6130EF003DB6CC /* Frameworks */,
 				1079607E1C6130EF003DB6CC /* Resources */,
-				EDB480D98005120F6131ADD2 /* Embed Pods Frameworks */,
-				E02EC713CC2C11D079670C12 /* Copy Pods Resources */,
+				EF6308B918CEE6FFF535E0B0 /* Embed Pods Frameworks */,
+				C88A3B4B750F74FB6E3B3612 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -190,7 +190,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		150ADCAE85D44F4AC577F06D /* Check Pods Manifest.lock */ = {
+		C88A3B4B750F74FB6E3B3612 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FriendlyChatObjC/Pods-FriendlyChatObjC-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D5A4EA24B9669C86F8AF340D /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -205,22 +220,7 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		E02EC713CC2C11D079670C12 /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		EDB480D98005120F6131ADD2 /* Embed Pods Frameworks */ = {
+		EF6308B918CEE6FFF535E0B0 /* Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -232,7 +232,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FriendlyChatObjC/Pods-FriendlyChatObjC-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -339,7 +339,7 @@
 		};
 		107960A31C6130EF003DB6CC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D217A532DF804849771902E1 /* Pods.debug.xcconfig */;
+			baseConfigurationReference = C1F233B0D21B81D18C3E1809 /* Pods-FriendlyChatObjC.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = FriendlyChatObjC/Info.plist;
@@ -351,7 +351,7 @@
 		};
 		107960A41C6130EF003DB6CC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BD898C61676AA7B36A9C2BB /* Pods.release.xcconfig */;
+			baseConfigurationReference = FB50661134D380991503BDF4 /* Pods-FriendlyChatObjC.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = FriendlyChatObjC/Info.plist;
