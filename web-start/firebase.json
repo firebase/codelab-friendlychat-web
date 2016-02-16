@@ -1,0 +1,11 @@
+{
+  "firebase": "<APP_ID>",
+  "rules": "security-rules.json",
+  "public": "./",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**",
+    "functions"
+  ]
+}
