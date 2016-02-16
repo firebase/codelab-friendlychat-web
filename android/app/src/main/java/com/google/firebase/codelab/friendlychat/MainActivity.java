@@ -53,6 +53,8 @@ import com.google.android.gms.crash.Crash;
 import com.google.android.gms.measurement.AppMeasurement;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.FirebaseUser;
+import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -76,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final int REQUEST_INVITE = 1;
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 10;
     public static final String ANONYMOUS = "anonymous";
-    public static final String FIREBASE_DB_URL = "YOUR_DB_URL";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
     private String mUsername;
     private String mPhotoUrl;
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private FirebaseRecyclerViewAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
     private Firebase mFirebaseDatabase;
+    private FirebaseAuth mAuth;
     private EditText mMessageEditText;
     private AppMeasurement mAppMeasurement;
     private GoogleApiClient mClient;
@@ -104,6 +106,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
 
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getAuth();
+
         // Check if the InstanceID token, required to receive GCM messages has been retrieved, start registration
         // service if not yet retrieved.
         if (!mSharedPreferences.getBoolean(CodelabPreferences.INSTANCE_ID_TOKEN_RETRIEVED, false)) {
@@ -115,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
 
-        mFirebaseDatabase = new Firebase(FIREBASE_DB_URL);
+        mFirebaseDatabase = new Firebase(getString(R.string.firebase_database_url));
         mFirebaseAdapter = new FirebaseRecyclerViewAdapter<FriendlyMessage, MessageViewHolder>(
                         FriendlyMessage.class,
                         R.layout.item_message,
@@ -208,6 +213,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            // Not signed in, launch the Sign In activity
+            startActivity(new Intent(this, SignInActivity.class));
+        } else {
+            mUsername = user.getEmail();
+        }
+    }
+
+    @Override
     public void onPause() {
         if (mAdView != null) {
             mAdView.pause();
@@ -247,6 +265,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             case R.id.crash_menu:
                 Crash.log(Log.ERROR, TAG, "crash caused");
                 causeCrash();
+                return true;
+            case R.id.sign_out_menu:
+                mAuth.signOut(this);
+                mUsername = ANONYMOUS;
+                startActivity(new Intent(this, SignInActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

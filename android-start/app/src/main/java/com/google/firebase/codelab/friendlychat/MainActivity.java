@@ -53,6 +53,7 @@ import com.google.android.gms.crash.Crash;
 import com.google.android.gms.measurement.AppMeasurement;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private String mPhotoUrl;
     private SharedPreferences mSharedPreferences;
 
+    private FirebaseAuth mAuth;
     private Button mSendButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
@@ -142,6 +144,11 @@ public class MainActivity extends AppCompatActivity {
                 // Send messages on click.
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     @Override

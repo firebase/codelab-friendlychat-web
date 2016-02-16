@@ -19,10 +19,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".SignInActivity" />
+
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="gcm.play.android.samples.com.gcmquickstart" />
@@ -31,7 +33,7 @@
 
         <service
             android:name=".MyGcmListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
@@ -41,14 +43,14 @@
             android:name=".MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
 
         <service
             android:name=".RegistrationIntentService"
-            android:exported="false">
-        </service>
+            android:exported="false" />
+
     </application>
 
 </manifest>
