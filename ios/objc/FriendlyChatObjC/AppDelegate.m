@@ -17,10 +17,10 @@
 #import "AppDelegate.h"
 #import "AppState.h"
 #import "Constants.h"
-#import "FirebaseApp/FIRFirebaseApp.h"
-#import "FirebaseApp/FIRFirebaseOptions.h"
-#import "FirebaseAuthProviderGoogle/FIRGoogleSignInAuthProvider.h"
 
+@import FirebaseApp;
+@import FirebaseAuth;
+@import FirebaseGoogleAuthProvider;
 @import Firebase.AppInvite;
 @import Firebase.CloudMessaging;
 @import Firebase.Core;
@@ -52,14 +52,12 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 }
 
 - (void)configureSignIn {
-  FIRGoogleSignInAuthProvider *googleSignIn = [[FIRGoogleSignInAuthProvider alloc]
+  FIRGoogleAuthProvider *googleProvider = [[FIRGoogleAuthProvider alloc]
       initWithClientID:[FIRContext sharedInstance].serviceInfo.clientID];
 
   FIRFirebaseOptions *firebaseOptions = [[FIRFirebaseOptions alloc] init];
   firebaseOptions.APIKey = [FIRContext sharedInstance].serviceInfo.apiKey;
-  firebaseOptions.authWidgetURL =
-      [NSURL URLWithString:@"https://gitkitmobile.appspot.com/gitkit.jsp"];
-  firebaseOptions.signInProviders = @[googleSignIn];
+  firebaseOptions.signInProviders = @[ googleProvider ];
   [FIRFirebaseApp initializedAppWithAppId:[FIRContext sharedInstance].serviceInfo.googleAppID
                                   options:firebaseOptions];
 }

@@ -15,6 +15,10 @@
 //
 
 import UIKit
+
+import FirebaseApp
+import FirebaseAuth
+import FirebaseGoogleAuthProvider
 import Firebase.AppInvite
 
 @UIApplicationMain
@@ -46,11 +50,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
 
   func configureSignIn() {
     // Configure the default Firebase application
-    let googleSignIn = FIRGoogleSignInAuthProvider.init(clientID: FIRContext.sharedInstance().serviceInfo.clientID)
+    let googleSignIn = FIRGoogleAuthProvider.init(clientID: FIRContext.sharedInstance().serviceInfo.clientID)
 
     let firebaseOptions = FIRFirebaseOptions()
     firebaseOptions.APIKey = FIRContext.sharedInstance().serviceInfo.apiKey
-    firebaseOptions.authWidgetURL = NSURL(string: "https://gitkitmobile.appspot.com/gitkit.jsp")
     firebaseOptions.signInProviders = [googleSignIn!];
     FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID, options: firebaseOptions)
   }

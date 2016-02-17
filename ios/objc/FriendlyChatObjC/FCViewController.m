@@ -16,10 +16,11 @@
 
 #import "AppState.h"
 #import "Constants.h"
-#import "FirebaseAuth/FIRAuth.h"
 #import "FCViewController.h"
 
 @import FirebaseDatabase;
+@import FirebaseApp;
+@import FirebaseAuth;
 @import Firebase.AdMob;
 @import Firebase.AppInvite;
 @import Firebase.Config;
@@ -211,7 +212,12 @@ UInt32 userInt;
 
 - (IBAction)signOut:(UIButton *)sender {
   FIRAuth *firebaseAuth = [FIRAuth auth];
-  [firebaseAuth signOut];
+  NSError *signOutError;
+  BOOL status = [firebaseAuth signOut:&signOutError];
+  if (!status) {
+    NSLog(@"Error signing out: %@", signOutError);
+    return;
+  }
   [AppState sharedInstance].signedIn = false;
   [self performSegueWithIdentifier:SeguesFpToSignIn sender:nil];
 }

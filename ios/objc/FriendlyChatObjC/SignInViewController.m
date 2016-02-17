@@ -16,47 +16,70 @@
 
 #import "AppState.h"
 #import "Constants.h"
-#import "FirebaseApp/FIRFirebaseApp.h"
-#import "FirebaseApp/FIRFirebaseOptions.h"
-#import "FirebaseAuthUI/FIRAuthUI.h"
-#import "FirebaseAuthProviderGoogle/FIRGoogleSignInAuthProvider.h"
-#import "FirebaseAuth/FIRUser.h"
 #import "MeasurementHelper.h"
 #import "SignInViewController.h"
 
-@import Firebase.Core;
-@import Firebase.SignIn;
+@import FirebaseAuth;
+@import FirebaseAuthUI;
 
-@interface SignInViewController ()<FIRAuthUIDelegate>
-
-@property(nonatomic, weak) IBOutlet UIButton *signInButton;
-
+@interface SignInViewController ()
+@property (weak, nonatomic) IBOutlet UITextField *emailField;
+@property (weak, nonatomic) IBOutlet UITextField *passwordField;
 @end
 
 @implementation SignInViewController
 
-- (IBAction)didTapSignIn:(UIButton *)sender {
-  FIRAuth *firebaseAuth = [FIRAuth auth];
-  FIRAuthUI *firebaseAuthUI = [FIRAuthUI authUIWithAuth:firebaseAuth delegate:self];
-  [firebaseAuthUI presentSignInWithCallback:^(FIRUser *_Nullable user,
-                                              NSError *_Nullable error) {
-    if (error) {
-      NSLog(error.localizedDescription);
-      return;
-    }
-
-    [MeasurementHelper sendLoginEvent];
-
-    [AppState sharedInstance].displayName = user.displayName;
-    [AppState sharedInstance].photoUrl = user.photoURL;
-    [AppState sharedInstance].signedIn = YES;
-    [[NSNotificationCenter defaultCenter] postNotificationName:NotificationKeysSignedIn
-                                                        object:nil userInfo:nil];
-    [self signedIn];
+- (IBAction)didTapSignIn:(id)sender {
+  // Sign In with credentials.
+  NSString *email = _emailField.text;
+  NSString *password = _passwordField.text;
+  [[FIRAuth auth] signInWithEmail:email
+                         password:password
+                         callback:^(FIRUser * _Nullable user, NSError * _Nullable error) {
+                           if (error) {
+                             NSLog(error.localizedDescription);
+                             return;
+                           }
+                           [self signedIn: user];
   }];
 }
 
-- (void)signedIn {
+- (IBAction)didTapSignUp:(id)sender {
+  NSString *email = _emailField.text;
+  NSString *password = _passwordField.text;
+  [[FIRAuth auth] createUserWithEmail:email
+                             password:password
+                             callback:^(FIRUser * _Nullable user, NSError * _Nullable error) {
+                               if (error) {
+                                 NSLog(error.localizedDescription);
+                                 return;
+                               }
+                               [self signedIn: user];
+                             }];
+}
+
+- (IBAction)didTapSignInWithGoogle:(id)sender {
+  FIRAuth *firebaseAuth = [FIRAuth auth];
+  FIRAuthUI *firebaseAuthUI = [FIRAuthUI authUIForApp:firebaseAuth.app];
+  [firebaseAuthUI presentSignInWithViewController:self callback:^(FIRUser *_Nullable user,
+      NSError *_Nullable error) {
+        if (error) {
+          NSLog(error.localizedDescription);
+      return;
+    }
+   [self signedIn: user];
+  }];
+}
+
+
+- (void)signedIn:(FIRUser *)user {
+  [MeasurementHelper sendLoginEvent];
+
+  [AppState sharedInstance].displayName = user.displayName;
+  [AppState sharedInstance].photoUrl = user.photoURL;
+  [AppState sharedInstance].signedIn = YES;
+  [[NSNotificationCenter defaultCenter] postNotificationName:NotificationKeysSignedIn
+                                                      object:nil userInfo:nil];
   [self performSegueWithIdentifier:SeguesSignInToFp sender:nil];
 }
 
