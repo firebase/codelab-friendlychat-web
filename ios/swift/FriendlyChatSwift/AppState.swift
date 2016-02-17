@@ -14,6 +14,8 @@
 //  limitations under the License.
 //
 
+import Foundation
+
 class AppState: NSObject {
 
   static let sharedInstance = AppState()
