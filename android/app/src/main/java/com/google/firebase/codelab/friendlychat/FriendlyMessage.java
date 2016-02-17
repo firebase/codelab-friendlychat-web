@@ -18,16 +18,16 @@ package com.google.firebase.codelab.friendlychat;
 public class FriendlyMessage {
 
     private String id;
-    private String msg;
-    private String user;
+    private String text;
+    private String name;
     private String photoUrl;
 
     public FriendlyMessage() {
     }
 
-    public FriendlyMessage(String msg, String user, String photoUrl) {
-        this.msg = msg;
-        this.user = user;
+    public FriendlyMessage(String text, String name, String photoUrl) {
+        this.text = text;
+        this.name = name;
         this.photoUrl = photoUrl;
     }
 
@@ -39,20 +39,20 @@ public class FriendlyMessage {
         this.id = id;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getText() {
+        return text;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public String getUser() {
-        return user;
+    public String getName() {
+        return name;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPhotoUrl() {
