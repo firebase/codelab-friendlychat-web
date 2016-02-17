@@ -53,6 +53,7 @@ import com.google.android.gms.crash.Crash;
 import com.google.android.gms.measurement.AppMeasurement;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.FirebaseUser;
 import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private String mPhotoUrl;
     private SharedPreferences mSharedPreferences;
 
+    private FirebaseUser mUser;
     private FirebaseAuth mAuth;
     private Button mSendButton;
     private RecyclerView mMessageRecyclerView;

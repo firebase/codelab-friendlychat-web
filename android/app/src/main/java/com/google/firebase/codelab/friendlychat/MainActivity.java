@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private ProgressBar mProgressBar;
     private Firebase mFirebaseDatabase;
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
     private EditText mMessageEditText;
     private AppMeasurement mAppMeasurement;
     private GoogleApiClient mClient;
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getAuth();
+        mUser = mAuth.getCurrentUser();
 
         // Check if the InstanceID token, required to receive GCM messages has been retrieved, start registration
         // service if not yet retrieved.
@@ -216,12 +218,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void onStart() {
         super.onStart();
 
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
+        mUser = mAuth.getCurrentUser();
+        if (mUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
         } else {
-            mUsername = user.getEmail();
+            mUsername = mUser.getEmail();
         }
     }
 
