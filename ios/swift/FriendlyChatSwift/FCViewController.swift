@@ -29,7 +29,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var sendButton: UIButton!
 
-  var storageRef: FIRStorage!
   var ref: Firebase!
   var messages: [FDataSnapshot]! = []
   var msglength: NSNumber = 10
