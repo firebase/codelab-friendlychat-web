@@ -20,11 +20,6 @@ class AppState: NSObject {
 
   static let sharedInstance = AppState()
 
-  var connectedToGcm = false
-  var subscribed = false
-  var registrationToken: String?
-  var senderID: String?
-  var serverAddress: String?
   var signedIn = false
   var displayName: String?
   var photoUrl: NSURL?

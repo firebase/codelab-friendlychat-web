@@ -22,14 +22,16 @@
 @import FirebaseApp;
 @import FirebaseAuth;
 @import Firebase.AdMob;
-@import Firebase.AppInvite;
 @import Firebase.Config;
 @import Firebase.Core;
 @import Firebase.CrashReporting;
-@import Firebase.SignIn;
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
-    UITextFieldDelegate, GINInviteDelegate>
+UITextFieldDelegate> {
+  int _msglength;
+  FirebaseHandle _refHandle;
+  UInt32 _userInt;
+}
 
 @property(nonatomic, weak) IBOutlet UITextField *textField;
 @property(nonatomic, weak) IBOutlet UIButton *sendButton;
@@ -37,38 +39,15 @@
 @property(nonatomic, weak) IBOutlet GADBannerView *banner;
 @property(nonatomic, weak) IBOutlet UITableView *clientTable;
 
+@property (strong, nonatomic) Firebase *ref;
+@property (strong, nonatomic) NSMutableArray<FDataSnapshot *> *messages;
+
 @end
 
 @implementation FCViewController
 
-Firebase *ref;
-NSMutableArray<FDataSnapshot *> *messages;
-int msglength = 10;
-FirebaseHandle _refHandle;
-UInt32 userInt;
-
--(id) init
-{
-  self = [super init];
-  if(self)
-  {
-    messages = @[];
-    userInt = arc4random();
-  }
-  return self;
-}
-
 - (IBAction)didSendMessage:(UIButton *)sender {
   [self textFieldShouldReturn:_textField];
-}
-
-- (IBAction)didInvite:(UIButton *)sender {
-  id<GINInviteBuilder> invite = [GINInvite inviteDialog];
-  [invite setMessage:@"Message"];
-  [invite setTitle:@"Title"];
-  [invite setDeepLink:@"/invite"];
-
-  [invite open];
 }
 
 - (IBAction)didPressCrash:(id)sender {
@@ -76,20 +55,14 @@ UInt32 userInt;
   assert(NO);
 }
 
-- (void)inviteFinishedWithInvitations:(NSArray *)invitationIds error:(NSError *)error {
-  if (error) {
-    NSLog(@"Failed: %@", error.localizedDescription);
-  } else {
-    NSLog(@"Invitations sent");
-  }
-}
-
 - (void)viewDidLoad {
   [super viewDidLoad];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector: @selector(showReceivedMessage:)
-                                               name:NotificationKeysMessage object: nil];
 
-  ref = [[Firebase alloc] initWithUrl:[FIRContext sharedInstance].serviceInfo.databaseURL];
+  _ref = [[Firebase alloc] initWithUrl:[FIRContext sharedInstance].serviceInfo.databaseURL];
+  _userInt = arc4random();
+  _msglength = 10;
+  _messages = [[NSMutableArray alloc] init];
+
   [self loadAd];
   [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
   [self fetchConfig];
@@ -113,8 +86,8 @@ UInt32 userInt;
       NSLog(@"Error fetching config: %@", error.localizedDescription);
     } else {
       // Parse your config data
-      msglength = [config numberForKey:@"friendly_msg_length" defaultValue:[NSNumber numberWithInt:10]];
-      NSLog(@"Friendly msg length config: %d", msglength);
+      _msglength = [[config numberForKey:@"friendly_msg_length" defaultValue:[NSNumber numberWithInt:10]] intValue];
+      NSLog(@"Friendly msg length config: %d", _msglength);
     }
   };
 
@@ -123,7 +96,6 @@ UInt32 userInt;
   [RCNConfig fetchDefaultConfigWithExpirationDuration:43200
                                       customVariables:customVariables
                                     completionHandler:completion];
-
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(nonnull NSString *)string {
@@ -132,26 +104,25 @@ UInt32 userInt;
     return YES;
   }
   long newLength = text.length + string.length - range.length;
-  return (newLength <= msglength);
+  return (newLength <= _msglength);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-  [messages removeAllObjects];
+  [_messages removeAllObjects];
   // Listen for new messages in the Firebase database
-  _refHandle = [[ref childByAppendingPath:@"messages"] observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
-    [messages addObject:snapshot];
-    [_clientTable insertRowsAtIndexPaths:[NSIndexPath indexPathForRow:messages.count-1 inSection:0] withRowAnimation: UITableViewRowAnimationAutomatic];
-
+  _refHandle = [[_ref childByAppendingPath:@"messages"] observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
+    [_messages addObject:snapshot];
+    [_clientTable insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_messages.count-1 inSection:0]] withRowAnimation: UITableViewRowAnimationAutomatic];
   }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-  [ref removeObserverWithHandle:_refHandle];
+  [_ref removeObserverWithHandle:_refHandle];
 }
 
 // UITableViewDataSource protocol methods
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  return [messages count];
+  return [_messages count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -159,7 +130,7 @@ UInt32 userInt;
   UITableViewCell *cell = [_clientTable dequeueReusableCellWithIdentifier:@"tableViewCell" forIndexPath:indexPath];
 
   // Unpack message from Firebase DataSnapshot
-  FDataSnapshot *messageSnapshot = messages[indexPath.row];
+  FDataSnapshot *messageSnapshot = _messages[indexPath.row];
   NSDictionary<NSString *, NSString *> *message = messageSnapshot.value;
   NSString *name = message[MessageFieldsname];
   NSString *text = message[MessageFieldstext];
@@ -181,8 +152,9 @@ UInt32 userInt;
 
 // UITextViewDelegate protocol methods
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-  NSMutableDictionary *data = @{MessageFieldstext: textField.text,
-                         MessageFieldsname: [NSString stringWithFormat:@"User%d", userInt]};
+  NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+  data[MessageFieldstext] = textField.text;
+  data[MessageFieldsname] = [NSString stringWithFormat:@"User%d", _userInt];
   NSString *user = [AppState sharedInstance].displayName;
   if (user) {
     data[MessageFieldsname] = user;
@@ -193,21 +165,9 @@ UInt32 userInt;
   }
 
   // Push data to Firebase Database
-  [[[ref childByAppendingPath:@"messages"] childByAutoId] setValue:data];
+  [[[_ref childByAppendingPath:@"messages"] childByAutoId] setValue:data];
   textField.text = @"";
   return YES;
-}
-
-- (void)showReceivedMessage:(NSNotification *)notification {
-  NSDictionary *info = notification.userInfo;
-  if (info) {
-    NSDictionary *aps = info[@"aps"];
-    if (aps) {
-      [self showAlert:@"Message received" message:aps[@"alert"]];
-    }
-  } else {
-    NSLog(@"Software failure. Guru meditation.");
-  }
 }
 
 - (IBAction)signOut:(UIButton *)sender {
@@ -229,12 +189,6 @@ UInt32 userInt;
     [alert addAction:dismissAction];
     [self presentViewController:alert animated: true completion: nil];
   });
-}
-
-- (void)guruMeditation {
-  NSString *error = @"Software failure. Guru meditation.";
-  [self showAlert:@"Error" message: error];
-  NSLog(error);
 }
 
 @end

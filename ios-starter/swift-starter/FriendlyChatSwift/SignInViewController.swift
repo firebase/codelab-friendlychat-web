@@ -15,23 +15,32 @@
 //
 
 import UIKit
+
+import FirebaseAuth
 import Firebase.Core
-import Firebase.SignIn
-import Firebase.AppInvite
 
-class SignInViewController: UIViewController, FIRAuthUIDelegate {
+@objc(SignInViewController)
+class SignInViewController: UIViewController {
 
-  @IBOutlet weak var signInButton: UIButton!
+  @IBOutlet weak var emailField: UITextField!
+  @IBOutlet weak var passwordField: UITextField!
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
+  @IBAction func didTapSignIn(sender: AnyObject) {
+    signedIn(nil)
   }
 
-  @IBAction func didTapSignIn(sender: UIButton) {
-        self.signedIn()
+  @IBAction func didTapSignUp(sender: AnyObject) {
+    signedIn(nil)
   }
 
-  func signedIn() {
+  @IBAction func didRequestPasswordReset(sender: AnyObject) {
+  }
+
+  func signedIn(user: FIRUser?) {
+    MeasurementHelper.sendLoginEvent()
+
+    AppState.sharedInstance.signedIn = true
+    NSNotificationCenter.defaultCenter().postNotificationName(Constants.NotificationKeys.SignedIn, object: nil, userInfo: nil)
     performSegueWithIdentifier(Constants.Segues.SignInToFp, sender: nil)
   }
 

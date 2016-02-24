@@ -16,30 +16,35 @@
 
 #import "AppState.h"
 #import "Constants.h"
-#import "FirebaseApp/FIRFirebaseApp.h"
-#import "FirebaseApp/FIRFirebaseOptions.h"
-#import "FirebaseAuthUI/FIRAuthUI.h"
-#import "FirebaseAuthProviderGoogle/FIRGoogleSignInAuthProvider.h"
-#import "FirebaseAuth/FIRUser.h"
 #import "MeasurementHelper.h"
 #import "SignInViewController.h"
 
-@import Firebase.Core;
-@import Firebase.SignIn;
+@import FirebaseAuth;
 
-@interface SignInViewController ()<FIRAuthUIDelegate>
-
-@property(nonatomic, weak) IBOutlet UIButton *signInButton;
-
+@interface SignInViewController ()
+@property (weak, nonatomic) IBOutlet UITextField *emailField;
+@property (weak, nonatomic) IBOutlet UITextField *passwordField;
 @end
 
 @implementation SignInViewController
 
-- (IBAction)didTapSignIn:(UIButton *)sender {
-  [self signedIn];
+- (IBAction)didTapSignIn:(id)sender {
+  [self signedIn:NULL];
 }
 
-- (void)signedIn {
+- (IBAction)didTapSignUp:(id)sender {
+  [self signedIn:NULL];
+}
+
+- (IBAction)didRequestPasswordReset:(id)sender {
+}
+
+- (void)signedIn:(FIRUser *)user {
+  [MeasurementHelper sendLoginEvent];
+
+  [AppState sharedInstance].signedIn = YES;
+  [[NSNotificationCenter defaultCenter] postNotificationName:NotificationKeysSignedIn
+                                                      object:nil userInfo:nil];
   [self performSegueWithIdentifier:SeguesSignInToFp sender:nil];
 }
 

@@ -17,195 +17,25 @@
 import UIKit
 
 import FirebaseApp
-import FirebaseAuth
-import FirebaseGoogleAuthProvider
-import Firebase.AppInvite
+import Firebase.Core
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, GCMReceiverDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var window: UIWindow?
 
   func application(application: UIApplication, didFinishLaunchingWithOptions
     launchOptions: [NSObject: AnyObject]?) -> Bool {
-      NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectToFriendlyChat",
-        name: Constants.NotificationKeys.SignedIn, object: nil)
-      configureFIRContext()
-      // Initialize sign-in
-      GINInvite.applicationDidFinishLaunchingWithOptions(launchOptions)
-      configureSignIn()
-      configureGCMService()
-      registerForRemoteNotifications(application)
+      do {
+        try FIRContext.sharedInstance().configure()
+      } catch let configureError as NSError{
+        print ("Error configuring Firebase services: \(configureError)")
+      }
+
+      let firebaseOptions = FIRFirebaseOptions()
+      firebaseOptions.APIKey = FIRContext.sharedInstance().serviceInfo.apiKey
+      FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID, options: firebaseOptions)
       return true
   }
 
-  func configureFIRContext() {
-    // Use Firebase library to configure APIs
-    do {
-      try FIRContext.sharedInstance().configure()
-    } catch let configureError as NSError{
-      print ("Error configuring Firebase services: \(configureError)")
-    }
-  }
-
-  func configureSignIn() {
-    // Configure the default Firebase application
-    let googleSignIn = FIRGoogleAuthProvider.init(clientID: FIRContext.sharedInstance().serviceInfo.clientID)
-
-    let firebaseOptions = FIRFirebaseOptions()
-    firebaseOptions.APIKey = FIRContext.sharedInstance().serviceInfo.apiKey
-    firebaseOptions.signInProviders = [googleSignIn!];
-    FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID, options: firebaseOptions)
-  }
-
-
-  func configureGCMService() {
-    let senderID = FIRContext.sharedInstance().serviceInfo.gcmSenderID
-    AppState.sharedInstance.senderID = senderID
-    AppState.sharedInstance.serverAddress = "\(senderID)@gcm.googleapis.com"
-
-    let config = GCMConfig.defaultConfig()
-    config.receiverDelegate = self
-    config.logLevel = GCMLogLevel.Debug
-    GCMService.sharedInstance().startWithConfig(config)
-  }
-
-  func registerForRemoteNotifications(application: UIApplication) {
-    let types: UIUserNotificationType = [.Alert, .Badge, .Sound]
-      let settings: UIUserNotificationSettings =
-      UIUserNotificationSettings( forTypes: types, categories: nil )
-      application.registerUserNotificationSettings(settings)
-      application.registerForRemoteNotifications()
-  }
-
-  func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-    if #available(iOS 9.0, *) {
-      if (FIRFirebaseApp.handleOpenURL(url, sourceApplication: options[UIApplicationOpenURLOptionsSourceApplicationKey] as! String)) {
-        return true
-      }
-    } else {
-      // Fallback on earlier versions
-    }
-    return false
-  }
-
-  func application(application: UIApplication,
-      openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
-    if let invite = GINInvite.handleURL(url, sourceApplication:sourceApplication, annotation:annotation) as? GINReceivedInvite {
-      let matchType =
-        (invite.matchType == GINReceivedInviteMatchType.Weak) ? "Weak" : "Strong"
-        print("Invite received from: \(sourceApplication) Deeplink: \(invite.deepLink)," +
-          "Id: \(invite.inviteId), Type: \(matchType)")
-        GINInvite.convertInvitation(invite.inviteId)
-        return true
-      }
-
-      return GIDSignIn.sharedInstance().handleURL(url, sourceApplication: sourceApplication, annotation: annotation)
-  }
-
-  func applicationDidBecomeActive( application: UIApplication) {
-    GCMService.sharedInstance().connectWithHandler({
-      (NSError error) -> Void in
-      if error != nil {
-        print("Could not connect to GCM: \(error.localizedDescription)")
-      } else {
-        print("Connected to GCM")
-        AppState.sharedInstance.connectedToGcm = true
-        self.connectToFriendlyChat()
-      }
-    })
-  }
-
-  func applicationDidEnterBackground(application: UIApplication) {
-    GCMService.sharedInstance().disconnect()
-    AppState.sharedInstance.connectedToGcm = false
-  }
-
-  func application( application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken
-    deviceToken: NSData ) {
-      GGLInstanceID.sharedInstance().startWithConfig(GGLInstanceIDConfig.defaultConfig())
-      let registrationOptions = [kGGLInstanceIDRegisterAPNSOption:deviceToken,
-        kGGLInstanceIDAPNSServerTypeSandboxOption:true]
-      GGLInstanceID.sharedInstance().tokenWithAuthorizedEntity(AppState.sharedInstance.senderID,
-        scope: kGGLInstanceIDScopeGCM, options: registrationOptions, handler: registrationHandler)
-  }
-
-  func application( application: UIApplication, didFailToRegisterForRemoteNotificationsWithError
-    error: NSError ) {
-      print("Registration for remote notification failed with error: \(error.localizedDescription)")
-      let userInfo = ["error": error.localizedDescription]
-      NSNotificationCenter.defaultCenter().postNotificationName(
-        Constants.NotificationKeys.Registration, object: nil, userInfo: userInfo)
-  }
-
-  func registrationHandler(registrationToken: String!, error: NSError!) {
-    if (registrationToken != nil) {
-      AppState.sharedInstance.registrationToken = registrationToken;
-      print("Registration Token: \(registrationToken)")
-      connectToFriendlyChat()
-      let userInfo = ["registrationToken": registrationToken]
-      NSNotificationCenter.defaultCenter().postNotificationName(
-        Constants.NotificationKeys.Registration, object: nil, userInfo: userInfo)
-    } else {
-      print("Registration to GCM failed with error: \(error.localizedDescription)")
-      let userInfo = ["error": error.localizedDescription]
-      NSNotificationCenter.defaultCenter().postNotificationName(
-        Constants.NotificationKeys.Registration, object: nil, userInfo: userInfo)
-    }
-  }
-
-  func application( application: UIApplication,
-    didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
-      GCMService.sharedInstance().appDidReceiveMessage(userInfo);
-      NSNotificationCenter.defaultCenter().postNotificationName(
-        Constants.NotificationKeys.Message, object: nil, userInfo: userInfo)
-  }
-
-  func application( application: UIApplication,
-    didReceiveRemoteNotification userInfo: [NSObject : AnyObject],
-    fetchCompletionHandler handler: (UIBackgroundFetchResult) -> Void) {
-      GCMService.sharedInstance().appDidReceiveMessage(userInfo);
-      NSNotificationCenter.defaultCenter().postNotificationName(
-        Constants.NotificationKeys.Message, object: nil, userInfo: userInfo)
-      handler(UIBackgroundFetchResult.NoData)
-  }
-
-  func connectToFriendlyChat() {
-    if AppState.sharedInstance.connectedToGcm && AppState.sharedInstance.signedIn &&
-      AppState.sharedInstance.registrationToken != nil {
-        subscribeToTopic()
-    }
-  }
-
-  func subscribeToTopic() {
-    if !AppState.sharedInstance.subscribed {
-      GCMPubSub().subscribeWithToken(AppState.sharedInstance.registrationToken!,
-        topic: Constants.GCMStrings.Topic, options: nil, handler: {
-          (NSError error) -> Void in
-          if (error != nil) {
-            // TODO(silvano): treat already subscribed with more grace
-            print("Error subscribing: \(error)")
-            print("Topic subscription failed with error: \(error.localizedDescription)")
-            let userInfo = ["error": error.localizedDescription]
-            NSNotificationCenter.defaultCenter().postNotificationName(
-              Constants.NotificationKeys.Registration, object: nil, userInfo: userInfo)
-          } else {
-            AppState.sharedInstance.subscribed = true
-          }
-      })
-    }
-  }
-
-  // TODO(silvano): do we actually need the message tracking in FP?
-  func willSendDataMessageWithID(messageID: String, error: NSError) {
-    print("Error sending message \(messageID): \(error)")
-  }
-
-  func didSendDataMessageWithID(messageID: String) {
-    print("Message \(messageID) successfully sent")
-  }
-
-  func didDeleteMessagesOnServer() {
-    print("Do something")
-  }
 }

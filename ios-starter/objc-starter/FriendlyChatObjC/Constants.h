@@ -18,11 +18,7 @@
 
 @interface Constants : NSObject
 
-extern NSString *const GCMStringsTopic;
-
 extern NSString *const NotificationKeysSignedIn;
-extern NSString *const NotificationKeysRegistration;
-extern NSString *const NotificationKeysMessage;
 
 extern NSString *const SeguesSignInToFp;
 extern NSString *const SeguesFpToSignIn;

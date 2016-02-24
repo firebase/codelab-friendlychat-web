@@ -19,16 +19,17 @@ import UIKit
 import FirebaseDatabase
 import FirebaseApp
 import FirebaseAuth
-import Firebase.SignIn
+import Firebase.AdMob
+import Firebase.Config
 import Firebase.Core
+import Firebase.CrashReporting
 
 @objc(FCViewController)
-class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, GINInviteDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var sendButton: UIButton!
-
   var ref: Firebase!
   var messages: [FDataSnapshot]! = []
   var msglength: NSNumber = 10
@@ -42,15 +43,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     textFieldShouldReturn(textField)
   }
 
-  @IBAction func didInvite(sender: UIButton) {
-    let invite = GINInvite.inviteDialog()
-    invite.setMessage("Message")
-    invite.setTitle("Title")
-    invite.setDeepLink("/invite")
-
-    invite.open()
-  }
-
   @IBAction func didPressCrash(sender: AnyObject) {
     withVaList([]) {
       FCRLogv(false, "Cause Crash button clicked", $0)
@@ -58,20 +50,10 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     fatalError()
   }
 
-  func inviteFinishedWithInvitations(invitationIds: [AnyObject], error: NSError?) {
-    if let error = error {
-      print("Failed: " + error.localizedDescription)
-    } else {
-      print("Invitations sent")
-    }
-  }
-
   override func viewDidLoad() {
     super.viewDidLoad()
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "showReceivedMessage:",
-      name:Constants.NotificationKeys.Message, object: nil)
 
-    self.ref = Firebase(url: FIRContext.sharedInstance().serviceInfo.databaseURL)
+    ref = Firebase.init(url: FIRContext.sharedInstance().serviceInfo.databaseURL)
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
@@ -91,7 +73,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func fetchConfig() {
-    let completion:RCNDefaultConfigCompletion = {(config:RCNConfig!, status:RCNConfigStatus, error:NSError?) -> Void in
+    let completion:RCNDefaultConfigCompletion = {(config:RCNConfig!, status:RCNConfigStatus, error:NSError?) in
       if let error = error {
         // There has been an error fetching the config
         print("Error fetching config: \(error.localizedDescription)")
@@ -136,7 +118,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
     // Dequeue cell
     let cell: UITableViewCell! = self.clientTable .dequeueReusableCellWithIdentifier("tableViewCell", forIndexPath: indexPath)
-
     // Unpack message from Firebase DataSnapshot
     let messageSnapshot: FDataSnapshot! = self.messages[indexPath.row]
     let message = messageSnapshot.value as! Dictionary<String, String>
@@ -151,42 +132,29 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
         }
       }
     }
-
     return cell!
   }
 
   // UITextViewDelegate protocol methods
   func textFieldShouldReturn(textField: UITextField) -> Bool {
     var data = [Constants.MessageFields.text: textField.text as String!,
-                Constants.MessageFields.name: "User\(self.userInt)"]
+      Constants.MessageFields.name: "User\(self.userInt)"]
     if let user = AppState.sharedInstance.displayName {
       data[Constants.MessageFields.name] = user
     }
     if let photoUrl = AppState.sharedInstance.photoUrl {
       data[Constants.MessageFields.photoUrl] = photoUrl.absoluteString
     }
-
     // Push data to Firebase Database
     self.ref.childByAppendingPath("messages").childByAutoId().setValue(data)
     textField.text = ""
     return true
   }
 
-  func showReceivedMessage(notification: NSNotification) {
-    if let info = notification.userInfo as? Dictionary<String,AnyObject> {
-      if let aps = info["aps"] as? Dictionary<String, String> {
-        showAlert("Message received", message: aps["alert"]!)
-      }
-    } else {
-      print("Software failure. Guru meditation.")
-    }
-  }
-
   @IBAction func signOut(sender: UIButton) {
     let firebaseAuth = FIRAuth.auth()
     do {
       try firebaseAuth?.signOut()
-      performSegueWithIdentifier("SignOut", sender: nil)
       AppState.sharedInstance.signedIn = false
       performSegueWithIdentifier(Constants.Segues.FpToSignIn, sender: nil)
     } catch let signOutError as NSError {
@@ -204,9 +172,4 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     }
   }
 
-  func guruMeditation() {
-    let error = "Software failure. Guru meditation."
-    showAlert("Error", message: error)
-    print(error)
-  }
 }

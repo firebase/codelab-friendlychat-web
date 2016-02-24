@@ -15,21 +15,15 @@
 //
 
 import UIKit
-import FirebaseApp
-import FirebaseAuth
-import FirebaseAuthUI
-import Firebase.Core
-import Firebase.SignIn
-import Firebase.AppInvite
 
+import FirebaseAuth
+import Firebase.Core
+
+@objc(SignInViewController)
 class SignInViewController: UIViewController {
 
   @IBOutlet weak var emailField: UITextField!
   @IBOutlet weak var passwordField: UITextField!
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-  }
 
   @IBAction func didTapSignIn(sender: AnyObject) {
     // Sign In with credentials.
@@ -43,7 +37,6 @@ class SignInViewController: UIViewController {
       self.signedIn(user!)
     })
   }
-
   @IBAction func didTapSignUp(sender: AnyObject) {
     let email = emailField.text
     let password = passwordField.text
@@ -56,26 +49,30 @@ class SignInViewController: UIViewController {
     })
   }
 
-  @IBAction func didTapSignInWithGoogle(sender: AnyObject) {
-    let firebaseAuth = FIRAuth.auth()
-    let firebaseAuthUI = FIRAuthUI.init(forApp: firebaseAuth!.app!)
-    firebaseAuthUI!.presentSignInWithViewController(self) { (user, error) in
-      if let error = error {
-        print(error.localizedDescription)
+  @IBAction func didRequestPasswordReset(sender: AnyObject) {
+    let prompt = UIAlertController.init(title: nil, message: "Email:", preferredStyle: UIAlertControllerStyle.Alert)
+    let okAction = UIAlertAction.init(title: "OK", style: UIAlertActionStyle.Default) { (action) in
+      let userInput = prompt.textFields![0].text
+      if (userInput!.isEmpty) {
         return
       }
-      self.signedIn(user!)
+      FIRAuth.auth()?.sendPasswordResetWithEmail(userInput!, callback: { (error) in
+        if let error = error {
+          print(error.localizedDescription)
+          return
+        }
+      })
     }
+    prompt.addAction(okAction)
   }
 
-  func signedIn(user: FIRUser) {
+  func signedIn(user: FIRUser?) {
     MeasurementHelper.sendLoginEvent()
 
-    AppState.sharedInstance.displayName = user.displayName
-    AppState.sharedInstance.photoUrl = user.photoURL
+    AppState.sharedInstance.displayName = user?.displayName
+    AppState.sharedInstance.photoUrl = user?.photoURL
     AppState.sharedInstance.signedIn = true
-    NSNotificationCenter.defaultCenter().postNotificationName(Constants.NotificationKeys.SignedIn,
-      object: nil, userInfo: nil)
+    NSNotificationCenter.defaultCenter().postNotificationName(Constants.NotificationKeys.SignedIn, object: nil, userInfo: nil)
     performSegueWithIdentifier(Constants.Segues.SignInToFp, sender: nil)
   }
 

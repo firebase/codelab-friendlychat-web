@@ -37,7 +37,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.google.experimental0.dev</string>
+				<string>com.google.firebase.codelab.FriendlyChatSwift</string>
 			</array>
 		</dict>
 	</array>

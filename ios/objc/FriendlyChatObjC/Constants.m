@@ -18,11 +18,7 @@
 
 @implementation Constants
 
-NSString *const GCMStringsTopic = @"/topics/global";
-
 NSString *const NotificationKeysSignedIn = @"onSignInCompleted";
-NSString *const NotificationKeysRegistration = @"onRegistrationCompleted";
-NSString *const NotificationKeysMessage = @"onMessageReceived";
 
 NSString *const SeguesSignInToFp = @"SignInToFP";
 NSString *const SeguesFpToSignIn = @"FPToSignIn";

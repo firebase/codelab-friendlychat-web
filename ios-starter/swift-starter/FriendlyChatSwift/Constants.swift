@@ -15,14 +15,9 @@
 //
 
 struct Constants {
-  struct GCMStrings {
-    static let Topic = "/topics/global"
-  }
 
   struct NotificationKeys {
     static let SignedIn = "onSignInCompleted"
-    static let Registration = "onRegistrationCompleted"
-    static let Message = "onMessageReceived"
   }
 
   struct Segues {

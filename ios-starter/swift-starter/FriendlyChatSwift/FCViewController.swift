@@ -15,12 +15,17 @@
 //
 
 import UIKit
+
 import FirebaseDatabase
-import Firebase.SignIn
+import FirebaseApp
+import FirebaseAuth
+import Firebase.AdMob
+import Firebase.Config
 import Firebase.Core
+import Firebase.CrashReporting
 
 @objc(FCViewController)
-class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, GINInviteDelegate {
+class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
@@ -38,21 +43,13 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     textFieldShouldReturn(textField)
   }
 
-  @IBAction func didInvite(sender: UIButton) {
-  }
-
   @IBAction func didPressCrash(sender: AnyObject) {
-  }
-
-  func inviteFinishedWithInvitations(invitationIds: [AnyObject], error: NSError?) {
+    fatalError()
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "showReceivedMessage:",
-      name:Constants.NotificationKeys.Message, object: nil)
 
-    self.ref = Firebase(url: FIRContext.sharedInstance().serviceInfo.databaseURL)
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
@@ -79,7 +76,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   // UITableViewDataSource protocol methods
   func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return messages.count
+    return 0
   }
 
   func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -92,16 +89,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   // UITextViewDelegate protocol methods
   func textFieldShouldReturn(textField: UITextField) -> Bool {
     return true
-  }
-
-  func showReceivedMessage(notification: NSNotification) {
-    if let info = notification.userInfo as? Dictionary<String,AnyObject> {
-      if let aps = info["aps"] as? Dictionary<String, String> {
-        showAlert("Message received", message: aps["alert"]!)
-      }
-    } else {
-      print("Software failure. Guru meditation.")
-    }
   }
 
   @IBAction func signOut(sender: UIButton) {
@@ -119,9 +106,4 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     }
   }
 
-  func guruMeditation() {
-    let error = "Software failure. Guru meditation."
-    showAlert("Error", message: error)
-    print(error)
-  }
 }

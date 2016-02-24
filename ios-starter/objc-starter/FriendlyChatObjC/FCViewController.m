@@ -16,19 +16,22 @@
 
 #import "AppState.h"
 #import "Constants.h"
-#import "FirebaseAuth/FIRAuth.h"
 #import "FCViewController.h"
 
 @import FirebaseDatabase;
+@import FirebaseApp;
+@import FirebaseAuth;
 @import Firebase.AdMob;
-@import Firebase.AppInvite;
 @import Firebase.Config;
 @import Firebase.Core;
 @import Firebase.CrashReporting;
-@import Firebase.SignIn;
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
-    UITextFieldDelegate, GINInviteDelegate>
+UITextFieldDelegate> {
+  int _msglength;
+  FirebaseHandle _refHandle;
+  UInt32 _userInt;
+}
 
 @property(nonatomic, weak) IBOutlet UITextField *textField;
 @property(nonatomic, weak) IBOutlet UIButton *sendButton;
@@ -36,49 +39,32 @@
 @property(nonatomic, weak) IBOutlet GADBannerView *banner;
 @property(nonatomic, weak) IBOutlet UITableView *clientTable;
 
+@property (strong, nonatomic) Firebase *ref;
+@property (strong, nonatomic) NSMutableArray<FDataSnapshot *> *messages;
+
 @end
 
 @implementation FCViewController
-
-Firebase *ref;
-NSArray<FDataSnapshot *> *messages;
-int msglength = 10;
-FirebaseHandle _refHandle;
-UInt32 userInt;
-
--(id) init
-{
-  self = [super init];
-  if(self)
-  {
-    messages = @[];
-    userInt = arc4random();
-  }
-  return self;
-}
 
 - (IBAction)didSendMessage:(UIButton *)sender {
   [self textFieldShouldReturn:_textField];
 }
 
-- (IBAction)didInvite:(UIButton *)sender {
-}
-
 - (IBAction)didPressCrash:(id)sender {
-}
-
-- (void)inviteFinishedWithInvitations:(NSArray *)invitationIds error:(NSError *)error {
+  assert(NO);
 }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector: @selector(showReceivedMessage:)
-                                               name:NotificationKeysMessage object: nil];
 
-  ref = [[Firebase alloc] initWithUrl:[FIRContext sharedInstance].serviceInfo.databaseURL];
+  _userInt = arc4random();
+  _msglength = 10;
+  _messages = [[NSMutableArray alloc] init];
+
   [self loadAd];
   [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
   [self fetchConfig];
+
 }
 
 - (void)loadAd {
@@ -93,7 +79,7 @@ UInt32 userInt;
     return YES;
   }
   long newLength = text.length + string.length - range.length;
-  return (newLength <= msglength);
+  return (newLength <= _msglength);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -104,30 +90,19 @@ UInt32 userInt;
 
 // UITableViewDataSource protocol methods
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  return [messages count];
+  return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
   // Dequeue cell
   UITableViewCell *cell = [_clientTable dequeueReusableCellWithIdentifier:@"tableViewCell" forIndexPath:indexPath];
+
   return cell;
 }
 
 // UITextViewDelegate protocol methods
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
   return YES;
-}
-
-- (void)showReceivedMessage:(NSNotification *)notification {
-  NSDictionary *info = notification.userInfo;
-  if (info) {
-    NSDictionary *aps = info[@"aps"];
-    if (aps) {
-      [self showAlert:@"Message received" message:aps[@"alert"]];
-    }
-  } else {
-    NSLog(@"Software failure. Guru meditation.");
-  }
 }
 
 - (IBAction)signOut:(UIButton *)sender {
@@ -142,12 +117,6 @@ UInt32 userInt;
     [alert addAction:dismissAction];
     [self presentViewController:alert animated: true completion: nil];
   });
-}
-
-- (void)guruMeditation {
-  NSString *error = @"Software failure. Guru meditation.";
-  [self showAlert:@"Error" message: error];
-  NSLog(error);
 }
 
 @end

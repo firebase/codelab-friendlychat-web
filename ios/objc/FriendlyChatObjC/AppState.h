@@ -20,11 +20,6 @@
 
 + (AppState *)sharedInstance;
 
-@property (nonatomic) BOOL connectedToGcm;
-@property (nonatomic) BOOL subscribed;
-@property (nonatomic, retain) NSString *registrationToken;
-@property (nonatomic, retain) NSString *senderID;
-@property (nonatomic, retain) NSString *serverAddress;
 @property (nonatomic) BOOL signedIn;
 @property (nonatomic, retain) NSString *displayName;
 @property (nonatomic, retain) NSURL *photoUrl;

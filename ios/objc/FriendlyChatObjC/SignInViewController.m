@@ -20,7 +20,6 @@
 #import "SignInViewController.h"
 
 @import FirebaseAuth;
-@import FirebaseAuthUI;
 
 @interface SignInViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *emailField;
@@ -41,7 +40,7 @@
                              return;
                            }
                            [self signedIn: user];
-  }];
+                         }];
 }
 
 - (IBAction)didTapSignUp:(id)sender {
@@ -58,19 +57,34 @@
                              }];
 }
 
-- (IBAction)didTapSignInWithGoogle:(id)sender {
-  FIRAuth *firebaseAuth = [FIRAuth auth];
-  FIRAuthUI *firebaseAuthUI = [FIRAuthUI authUIForApp:firebaseAuth.app];
-  [firebaseAuthUI presentSignInWithViewController:self callback:^(FIRUser *_Nullable user,
-      NSError *_Nullable error) {
-        if (error) {
-          NSLog(error.localizedDescription);
-      return;
-    }
-   [self signedIn: user];
-  }];
-}
+- (IBAction)didRequestPasswordReset:(id)sender {
+  UIAlertController *prompt =
+  [UIAlertController alertControllerWithTitle:nil
+                                      message:@"Email:"
+                               preferredStyle:UIAlertControllerStyleAlert];
+  __weak UIAlertController *weakPrompt = prompt;
+  UIAlertAction *okAction = [UIAlertAction
+                             actionWithTitle:@"OK"
+                             style:UIAlertActionStyleDefault
+                             handler:^(UIAlertAction * _Nonnull action) {
+                               UIAlertController *strongPrompt = weakPrompt;
+                               NSString *userInput = strongPrompt.textFields[0].text;
+                               if (!userInput.length)
+                               {
+                                 return;
+                               }
+                               [[FIRAuth auth] sendPasswordResetWithEmail:userInput
+                                                                 callback:^(NSError * _Nullable error) {
+                                                                   if (error) {
+                                                                     NSLog(error.localizedDescription);
+                                                                     return;
+                                                                   }
+                                                                 }];
 
+                             }
+                             ];
+  [prompt addAction:okAction];
+}
 
 - (void)signedIn:(FIRUser *)user {
   [MeasurementHelper sendLoginEvent];
