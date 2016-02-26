@@ -51,7 +51,7 @@ UITextFieldDelegate> {
 }
 
 - (IBAction)didPressCrash:(id)sender {
-  FCRLog(NO, @"Cause Crash button clicked");
+  FCRLog(@"Cause Crash button clicked");
   assert(NO);
 }
 
@@ -67,10 +67,10 @@ UITextFieldDelegate> {
   [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
   [self fetchConfig];
 
-  // Log that the view did load, true is used here so the log message will be
-  // shown in the console output. If false is used the message is not shown in
+  // Log that the view did load, FCRNSLog is used here so the log message will be
+  // shown in the console output. If FCRLog is used the message is not shown in
   // the console output.
-  FCRLog(YES, @"View loaded");
+  FCRNSLog(@"View loaded");
 }
 
 - (void)loadAd {

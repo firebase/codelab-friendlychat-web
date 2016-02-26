@@ -45,7 +45,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   @IBAction func didPressCrash(sender: AnyObject) {
     withVaList([]) {
-      FCRLogv(false, "Cause Crash button clicked", $0)
+      FCRLogv("Cause Crash button clicked", $0)
     }
     fatalError()
   }
@@ -58,11 +58,11 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
 
-    // Log that the view did load, true is used here so the log message will be
-    // shown in the console output. If false is used the message is not shown in
+    // Log that the view did load, FCRNSLogv is used here so the log message will be
+    // shown in the console output. If FCRLogv is used the message is not shown in
     // the console output.
     withVaList([]) {
-      FCRLogv(true, "View loaded", $0)
+      FCRNSLogv("View loaded", $0)
     }
   }
 
