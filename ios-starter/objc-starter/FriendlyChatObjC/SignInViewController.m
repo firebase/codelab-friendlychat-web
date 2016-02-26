@@ -33,6 +33,10 @@
 }
 
 - (IBAction)didTapSignUp:(id)sender {
+  [self setDisplayName:NULL];
+}
+
+- (void)setDisplayName:(FIRUser *)user {
   [self signedIn:NULL];
 }
 

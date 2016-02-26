@@ -30,6 +30,10 @@ class SignInViewController: UIViewController {
   }
 
   @IBAction func didTapSignUp(sender: AnyObject) {
+    setDisplayName(nil)
+  }
+
+  func setDisplayName(user: FIRUser?) {
     signedIn(nil)
   }
 

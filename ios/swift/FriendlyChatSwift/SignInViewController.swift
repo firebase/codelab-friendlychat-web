@@ -45,7 +45,19 @@ class SignInViewController: UIViewController {
         print(error.localizedDescription)
         return
       }
-      self.signedIn(user!)
+      self.setDisplayName(user!)
+    })
+  }
+
+  func setDisplayName(user: FIRUser) {
+    let changeRequest = user.profileChangeRequest()
+    changeRequest.displayName = user.email!.componentsSeparatedByString("@")[0]
+    changeRequest.commitChangesWithCallback({ (error) in
+      if let error = error {
+        print(error.localizedDescription)
+        return
+      }
+      self.signedIn(FIRAuth.auth()?.currentUser)
     })
   }
 
@@ -69,7 +81,7 @@ class SignInViewController: UIViewController {
   func signedIn(user: FIRUser?) {
     MeasurementHelper.sendLoginEvent()
 
-    AppState.sharedInstance.displayName = user?.displayName
+    AppState.sharedInstance.displayName = user?.displayName ?? user?.email
     AppState.sharedInstance.photoUrl = user?.photoURL
     AppState.sharedInstance.signedIn = true
     NSNotificationCenter.defaultCenter().postNotificationName(Constants.NotificationKeys.SignedIn, object: nil, userInfo: nil)

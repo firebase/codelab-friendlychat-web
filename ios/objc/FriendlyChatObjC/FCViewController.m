@@ -154,7 +154,7 @@ UITextFieldDelegate> {
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
   NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
   data[MessageFieldstext] = textField.text;
-  data[MessageFieldsname] = [NSString stringWithFormat:@"User%d", _userInt];
+  data[MessageFieldsname] = [NSString stringWithFormat:@"User%d", (unsigned int)_userInt];
   NSString *user = [AppState sharedInstance].displayName;
   if (user) {
     data[MessageFieldsname] = user;

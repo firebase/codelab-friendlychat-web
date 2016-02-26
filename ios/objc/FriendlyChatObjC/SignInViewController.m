@@ -36,7 +36,7 @@
                          password:password
                          callback:^(FIRUser * _Nullable user, NSError * _Nullable error) {
                            if (error) {
-                             NSLog(error.localizedDescription);
+                             NSLog(@"%@", error.localizedDescription);
                              return;
                            }
                            [self signedIn: user];
@@ -50,11 +50,25 @@
                              password:password
                              callback:^(FIRUser * _Nullable user, NSError * _Nullable error) {
                                if (error) {
-                                 NSLog(error.localizedDescription);
+                                 NSLog(@"%@", error.localizedDescription);
                                  return;
                                }
-                               [self signedIn: user];
+                               [self setDisplayName: user];
                              }];
+}
+
+- (void)setDisplayName:(FIRUser *)user {
+  FIRUserProfileChangeRequest *changeRequest =
+      [user profileChangeRequest];
+  // Use first part of email as the default display name
+  changeRequest.displayName = [[user.email componentsSeparatedByString:@"@"] objectAtIndex:0];
+  [changeRequest commitChangesWithCallback:^(NSError *_Nullable error) {
+    if (error) {
+      NSLog(@"%@", error.localizedDescription);
+      return;
+    }
+    [self signedIn:[FIRAuth auth].currentUser];
+  }];
 }
 
 - (IBAction)didRequestPasswordReset:(id)sender {
@@ -76,7 +90,7 @@
                                [[FIRAuth auth] sendPasswordResetWithEmail:userInput
                                                                  callback:^(NSError * _Nullable error) {
                                                                    if (error) {
-                                                                     NSLog(error.localizedDescription);
+                                                                     NSLog(@"%@", error.localizedDescription);
                                                                      return;
                                                                    }
                                                                  }];
@@ -89,7 +103,7 @@
 - (void)signedIn:(FIRUser *)user {
   [MeasurementHelper sendLoginEvent];
 
-  [AppState sharedInstance].displayName = user.displayName;
+  [AppState sharedInstance].displayName = user.displayName.length > 0 ? user.displayName : user.email;
   [AppState sharedInstance].photoUrl = user.photoURL;
   [AppState sharedInstance].signedIn = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:NotificationKeysSignedIn
