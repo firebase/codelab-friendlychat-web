@@ -194,7 +194,7 @@
                                 </userDefinedRuntimeAttributes>
                             </view>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="STK-FK-gn5" userLabel="TextField">
-                                <rect key="frame" x="16" y="500" width="514" height="30"/>
+                                <rect key="frame" x="48" y="500" width="482" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                                 <connections>
@@ -219,22 +219,34 @@
                                     <action selector="didSendMessage:" destination="uMT-A3-F60" eventType="touchUpInside" id="QTo-o6-7gd"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nhb-8J-WZ5">
+                                <rect key="frame" x="16" y="503" width="24" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="24" id="1IF-84-GVk"/>
+                                </constraints>
+                                <state key="normal" image="ic_add_a_photo"/>
+                                <connections>
+                                    <action selector="didTapAddPhoto:" destination="uMT-A3-F60" eventType="touchUpInside" id="vaN-73-ycr"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="nhb-8J-WZ5" firstAttribute="leading" secondItem="DHD-HU-kCB" secondAttribute="leading" id="2gb-4Y-0nV"/>
+                            <constraint firstItem="STK-FK-gn5" firstAttribute="leading" secondItem="nhb-8J-WZ5" secondAttribute="trailing" constant="8" symbolic="YES" id="47z-nR-8nx"/>
                             <constraint firstAttribute="trailingMargin" secondItem="VRr-Ou-qfp" secondAttribute="trailing" constant="-20" id="7LE-0W-xWN"/>
                             <constraint firstItem="DHD-HU-kCB" firstAttribute="leading" secondItem="4Dk-Kp-xdq" secondAttribute="leadingMargin" constant="-4" id="8ff-Rm-C4p"/>
-                            <constraint firstItem="wv1-bL-LxQ" firstAttribute="top" secondItem="STK-FK-gn5" secondAttribute="top" id="KZN-IZ-s7q"/>
-                            <constraint firstItem="STK-FK-gn5" firstAttribute="top" secondItem="DHD-HU-kCB" secondAttribute="bottom" constant="8" symbolic="YES" id="O1Q-M4-hMe"/>
-                            <constraint firstItem="STK-FK-gn5" firstAttribute="leading" secondItem="DHD-HU-kCB" secondAttribute="leading" id="OBF-UR-sXj"/>
+                            <constraint firstItem="STK-FK-gn5" firstAttribute="centerY" secondItem="nhb-8J-WZ5" secondAttribute="centerY" id="MG1-Zi-pOg"/>
+                            <constraint firstItem="STK-FK-gn5" firstAttribute="top" secondItem="DHD-HU-kCB" secondAttribute="bottom" constant="8" symbolic="YES" id="VzZ-Uw-ID6"/>
                             <constraint firstItem="X8X-0F-Bdi" firstAttribute="top" secondItem="wv1-bL-LxQ" secondAttribute="bottom" constant="70" id="bLt-MX-wY3"/>
                             <constraint firstItem="DHD-HU-kCB" firstAttribute="top" secondItem="VRr-Ou-qfp" secondAttribute="bottom" constant="8" id="der-Ny-LDv"/>
-                            <constraint firstItem="wv1-bL-LxQ" firstAttribute="leading" secondItem="STK-FK-gn5" secondAttribute="trailing" constant="8" id="ebH-iJ-1d2"/>
+                            <constraint firstItem="wv1-bL-LxQ" firstAttribute="leading" secondItem="STK-FK-gn5" secondAttribute="trailing" constant="8" symbolic="YES" id="e7L-dI-PkH"/>
                             <constraint firstItem="wv1-bL-LxQ" firstAttribute="trailing" secondItem="DHD-HU-kCB" secondAttribute="trailing" id="jLu-32-ERV"/>
                             <constraint firstItem="VRr-Ou-qfp" firstAttribute="leading" secondItem="4Dk-Kp-xdq" secondAttribute="leadingMargin" constant="-20" id="lXP-yU-4e8"/>
                             <constraint firstItem="VRr-Ou-qfp" firstAttribute="top" secondItem="yPS-DS-Klf" secondAttribute="bottom" id="lgZ-Wt-SEn"/>
                             <constraint firstItem="9C0-fE-spr" firstAttribute="centerX" secondItem="DHD-HU-kCB" secondAttribute="centerX" id="n39-i8-dE7"/>
                             <constraint firstItem="9C0-fE-spr" firstAttribute="bottom" secondItem="X8X-0F-Bdi" secondAttribute="top" id="sLh-63-72I"/>
+                            <constraint firstItem="STK-FK-gn5" firstAttribute="top" secondItem="wv1-bL-LxQ" secondAttribute="top" id="spZ-ka-Cxy"/>
                             <constraint firstAttribute="trailingMargin" secondItem="DHD-HU-kCB" secondAttribute="trailing" constant="-4" id="xhU-Sl-tIr"/>
                         </constraints>
                     </view>
@@ -251,4 +263,7 @@
             <point key="canvasLocation" x="651" y="61"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="ic_add_a_photo" width="24" height="24"/>
+    </resources>
 </document>

@@ -18,6 +18,7 @@
 #import "Constants.h"
 #import "FCViewController.h"
 
+#import "FirebaseStorage.h"
 @import FirebaseDatabase;
 @import FirebaseApp;
 @import FirebaseAuth;
@@ -27,10 +28,9 @@
 @import Firebase.CrashReporting;
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
-UITextFieldDelegate> {
+UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
   int _msglength;
   FirebaseHandle _refHandle;
-  UInt32 _userInt;
 }
 
 @property(nonatomic, weak) IBOutlet UITextField *textField;
@@ -41,6 +41,7 @@ UITextFieldDelegate> {
 
 @property (strong, nonatomic) Firebase *ref;
 @property (strong, nonatomic) NSMutableArray<FDataSnapshot *> *messages;
+@property (strong, nonatomic) FIRStorage *storageRef;
 
 @end
 
@@ -57,20 +58,22 @@ UITextFieldDelegate> {
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  _userInt = arc4random();
   _msglength = 10;
   _messages = [[NSMutableArray alloc] init];
 
   [self loadAd];
   [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
   [self fetchConfig];
-
+  [self configureStorage];
 }
 
 - (void)loadAd {
 }
 
 - (void)fetchConfig {
+}
+
+- (void)configureStorage {
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(nonnull NSString *)string {
@@ -102,7 +105,47 @@ UITextFieldDelegate> {
 
 // UITextViewDelegate protocol methods
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
+  NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+  data[MessageFieldstext] = textField.text;
+  [self sendMessage:data];
+  textField.text = @"";
   return YES;
+}
+
+- (void)sendMessage:(NSDictionary *)data {
+}
+
+# pragma mark - Image Picker
+
+- (IBAction)didTapAddPhoto:(id)sender {
+  UIImagePickerController * picker = [[UIImagePickerController alloc] init];
+  picker.delegate = self;
+  if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+  } else {
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+  }
+
+  [self presentViewController:picker animated:YES completion:NULL];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker
+didFinishPickingMediaWithInfo:(NSDictionary *)info {
+  [picker dismissViewControllerAnimated:YES completion:NULL];
+
+  NSURL *referenceUrl = info[UIImagePickerControllerReferenceURL];
+  PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceUrl] options:nil];
+  PHAsset *asset = [assets firstObject];
+  [asset requestContentEditingInputWithOptions:nil
+                             completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
+                               NSString *imageFile = [contentEditingInput.fullSizeImageURL absoluteString];
+                               NSString *fileName = [[AppState sharedInstance].displayName stringByAppendingString:[referenceUrl lastPathComponent]];
+                             }
+   ];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+  [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (IBAction)signOut:(UIButton *)sender {

@@ -39,7 +39,7 @@
                              NSLog(@"%@", error.localizedDescription);
                              return;
                            }
-                           [self signedIn: user];
+                           [self signedIn:user];
                          }];
 }
 
@@ -53,7 +53,7 @@
                                  NSLog(@"%@", error.localizedDescription);
                                  return;
                                }
-                               [self setDisplayName: user];
+                               [self setDisplayName:user];
                              }];
 }
 

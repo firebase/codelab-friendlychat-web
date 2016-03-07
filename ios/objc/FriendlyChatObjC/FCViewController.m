@@ -14,10 +14,12 @@
 //  limitations under the License.
 //
 
+@import Photos;
 #import "AppState.h"
 #import "Constants.h"
 #import "FCViewController.h"
 
+#import "FirebaseStorage.h"
 @import FirebaseDatabase;
 @import FirebaseApp;
 @import FirebaseAuth;
@@ -27,10 +29,9 @@
 @import Firebase.CrashReporting;
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
-UITextFieldDelegate> {
+UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
   int _msglength;
   FirebaseHandle _refHandle;
-  UInt32 _userInt;
 }
 
 @property(nonatomic, weak) IBOutlet UITextField *textField;
@@ -41,6 +42,7 @@ UITextFieldDelegate> {
 
 @property (strong, nonatomic) Firebase *ref;
 @property (strong, nonatomic) NSMutableArray<FDataSnapshot *> *messages;
+@property (strong, nonatomic) FIRStorage *storageRef;
 
 @end
 
@@ -59,13 +61,13 @@ UITextFieldDelegate> {
   [super viewDidLoad];
 
   _ref = [[Firebase alloc] initWithUrl:[FIRContext sharedInstance].serviceInfo.databaseURL];
-  _userInt = arc4random();
   _msglength = 10;
   _messages = [[NSMutableArray alloc] init];
 
   [self loadAd];
   [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
   [self fetchConfig];
+  [self configureStorage];
 
   // Log that the view did load, FCRNSLog is used here so the log message will be
   // shown in the console output. If FCRLog is used the message is not shown in
@@ -98,6 +100,13 @@ UITextFieldDelegate> {
                                     completionHandler:completion];
 }
 
+- (void)configureStorage {
+  FIRFirebaseApp *app = [FIRFirebaseApp app];
+  // Configure manually with a storage bucket.
+  NSString *bucket = @"YOUR_PROJECT.storage.firebase.com";
+  self.storageRef = [[FIRStorage alloc] initWithApp:app bucketName:bucket];
+}
+
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(nonnull NSString *)string {
   NSString *text = textField.text;
   if (!text) {
@@ -112,7 +121,8 @@ UITextFieldDelegate> {
   // Listen for new messages in the Firebase database
   _refHandle = [[_ref childByAppendingPath:@"messages"] observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
     [_messages addObject:snapshot];
-    [_clientTable insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_messages.count-1 inSection:0]] withRowAnimation: UITableViewRowAnimationAutomatic];
+    [_clientTable reloadData];
+//    [_clientTable insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_messages.count-1 inSection:0]] withRowAnimation: UITableViewRowAnimationAutomatic];
   }];
 }
 
@@ -133,20 +143,31 @@ UITextFieldDelegate> {
   FDataSnapshot *messageSnapshot = _messages[indexPath.row];
   NSDictionary<NSString *, NSString *> *message = messageSnapshot.value;
   NSString *name = message[MessageFieldsname];
-  NSString *text = message[MessageFieldstext];
-  cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", name, text];
-  cell.imageView.image = [UIImage imageNamed: @"ic_account_circle"];
-  NSString *photoUrl = message[MessageFieldsphotoUrl];
-  if (photoUrl) {
-    NSURL *url = [NSURL URLWithString:photoUrl];
-    if (url) {
-      NSData *data = [NSData dataWithContentsOfURL:url];
-      if (data) {
-        cell.imageView.image = [UIImage imageWithData:data];
+  NSString *imageUrl = message[MessageFieldsimageUrl];
+  if (imageUrl) {
+    [[_storageRef childByAppendingString:imageUrl] dataWithCompletion:^(NSData *data, NSError *error) {
+      if (error) {
+        NSLog(@"Error downloading: %@", error);
+        return;
+      }
+      cell.imageView.image = [UIImage imageWithData:data];
+    }];
+    cell.textLabel.text = [NSString stringWithFormat:@"sent by: %@", name];
+  } else {
+    NSString *text = message[MessageFieldstext];
+    cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", name, text];
+    cell.imageView.image = [UIImage imageNamed: @"ic_account_circle"];
+    NSString *photoUrl = message[MessageFieldsphotoUrl];
+    if (photoUrl) {
+      NSURL *url = [NSURL URLWithString:photoUrl];
+      if (url) {
+        NSData *data = [NSData dataWithContentsOfURL:url];
+        if (data) {
+          cell.imageView.image = [UIImage imageWithData:data];
+        }
       }
     }
   }
-
   return cell;
 }
 
@@ -154,20 +175,65 @@ UITextFieldDelegate> {
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
   NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
   data[MessageFieldstext] = textField.text;
-  data[MessageFieldsname] = [NSString stringWithFormat:@"User%d", (unsigned int)_userInt];
-  NSString *user = [AppState sharedInstance].displayName;
-  if (user) {
-    data[MessageFieldsname] = user;
-  }
+  [self sendMessage:data];
+  textField.text = @"";
+  return YES;
+}
+
+- (void)sendMessage:(NSDictionary *)data {
+  NSMutableDictionary *mdata = [data mutableCopy];
+  mdata[MessageFieldsname] = [AppState sharedInstance].displayName;
   NSURL *photoUrl = AppState.sharedInstance.photoUrl;
   if (photoUrl) {
-    data[MessageFieldsphotoUrl] = [photoUrl absoluteString];
+    mdata[MessageFieldsphotoUrl] = [photoUrl absoluteString];
   }
 
   // Push data to Firebase Database
-  [[[_ref childByAppendingPath:@"messages"] childByAutoId] setValue:data];
-  textField.text = @"";
-  return YES;
+  [[[_ref childByAppendingPath:@"messages"] childByAutoId] setValue:mdata];
+}
+
+# pragma mark - Image Picker
+
+- (IBAction)didTapAddPhoto:(id)sender {
+  UIImagePickerController * picker = [[UIImagePickerController alloc] init];
+  picker.delegate = self;
+  if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+  } else {
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+  }
+
+  [self presentViewController:picker animated:YES completion:NULL];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker
+didFinishPickingMediaWithInfo:(NSDictionary *)info {
+  [picker dismissViewControllerAnimated:YES completion:NULL];
+
+  NSURL *referenceUrl = info[UIImagePickerControllerReferenceURL];
+  PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceUrl] options:nil];
+  PHAsset *asset = [assets firstObject];
+  [asset requestContentEditingInputWithOptions:nil
+                             completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
+                               NSString *imageFile = [contentEditingInput.fullSizeImageURL absoluteString];
+                               NSString *fileName = [[AppState sharedInstance].displayName stringByAppendingString:[referenceUrl lastPathComponent]];
+                               FIRStorageMetadata *metadata = [FIRStorageMetadata new];
+                               metadata.contentType = @"image/jpeg";
+                               [[_storageRef childByAppendingString:fileName]
+                                                            putFile:imageFile metadata:metadata
+                                                     withCompletion:^(FIRStorageMetadata *metadata, NSError *error) {
+                                                       if (error) {
+                                                         NSLog(@"Error uploading: %@", error);
+                                                         return;
+                                                       }
+                                                       [self sendMessage:@{MessageFieldsimageUrl: fileName}];
+                                                     }
+                                ];
+                             }];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+  [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (IBAction)signOut:(UIButton *)sender {

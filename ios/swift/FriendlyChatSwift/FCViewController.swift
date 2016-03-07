@@ -15,6 +15,7 @@
 //
 
 import UIKit
+import Photos
 
 import FirebaseDatabase
 import FirebaseApp
@@ -25,7 +26,8 @@ import Firebase.Core
 import Firebase.CrashReporting
 
 @objc(FCViewController)
-class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
+class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
+    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
@@ -34,7 +36,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   var messages: [FDataSnapshot]! = []
   var msglength: NSNumber = 10
   private var _refHandle: FirebaseHandle!
-  private var userInt: UInt32 = arc4random()
+
+  var storageRef: FIRStorage!;
 
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
@@ -57,6 +60,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
+    configureStorage()
 
     // Log that the view did load, FCRNSLogv is used here so the log message will be
     // shown in the console output. If FCRLogv is used the message is not shown in
@@ -88,6 +92,13 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     // 43200 secs = 12 hours
     RCNConfig.fetchDefaultConfigWithExpirationDuration(43200, customVariables: customVariables,
       completionHandler: completion)
+  }
+
+  func configureStorage() {
+    let app = FIRFirebaseApp.app()
+    // Configure manually with a storage bucket.
+    let bucket = "YOUR_PROJECT.storage.firebase.com"
+    storageRef = FIRStorage.init(app: app!, bucketName: bucket)
   }
 
   func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
@@ -122,33 +133,86 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     let messageSnapshot: FDataSnapshot! = self.messages[indexPath.row]
     let message = messageSnapshot.value as! Dictionary<String, String>
     let name = message[Constants.MessageFields.name] as String!
-    let text = message[Constants.MessageFields.text] as String!
-    cell!.textLabel?.text = name + ": " + text
-    cell!.imageView?.image = UIImage(named: "ic_account_circle")
-    if let photoUrl = message[Constants.MessageFields.photoUrl] {
-      if let url = NSURL(string:photoUrl) {
-        if let data = NSData(contentsOfURL: url) {
-          cell!.imageView?.image = UIImage(data: data)
+    if let imageUrl = message[Constants.MessageFields.imageUrl] {
+      storageRef.childByAppendingString(imageUrl).dataWithCompletion(){ (data, error) in
+        if let error = error {
+          print("Error downloading: \(error)")
+          return
+        }
+        cell.imageView?.image = UIImage.init(data: data)
+      }
+      cell!.textLabel?.text = "sent by: \(name)"
+    } else {
+      let text = message[Constants.MessageFields.text] as String!
+      cell!.textLabel?.text = name + ": " + text
+      cell!.imageView?.image = UIImage(named: "ic_account_circle")
+      if let photoUrl = message[Constants.MessageFields.photoUrl] {
+        if let url = NSURL(string:photoUrl) {
+          if let data = NSData(contentsOfURL: url) {
+            cell!.imageView?.image = UIImage(data: data)
+          }
         }
       }
+
     }
     return cell!
   }
 
   // UITextViewDelegate protocol methods
   func textFieldShouldReturn(textField: UITextField) -> Bool {
-    var data = [Constants.MessageFields.text: textField.text as String!,
-      Constants.MessageFields.name: "User\(self.userInt)"]
-    if let user = AppState.sharedInstance.displayName {
-      data[Constants.MessageFields.name] = user
-    }
+    let data = [Constants.MessageFields.text: textField.text! as String]
+    sendMessage(data)
+    return true
+  }
+
+  func sendMessage(var data: [String: String]) {
+    data[Constants.MessageFields.name] = AppState.sharedInstance.displayName
     if let photoUrl = AppState.sharedInstance.photoUrl {
       data[Constants.MessageFields.photoUrl] = photoUrl.absoluteString
     }
     // Push data to Firebase Database
     self.ref.childByAppendingPath("messages").childByAutoId().setValue(data)
-    textField.text = ""
-    return true
+  }
+
+  // MARK: - Image Picker
+
+  @IBAction func didTapAddPhoto(sender: AnyObject) {
+    let picker = UIImagePickerController()
+    picker.delegate = self
+    if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)) {
+      picker.sourceType = UIImagePickerControllerSourceType.Camera
+    } else {
+      picker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+    }
+
+    presentViewController(picker, animated: true, completion:nil)
+  }
+
+  func imagePickerController(picker: UIImagePickerController,
+    didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+      picker.dismissViewControllerAnimated(true, completion:nil)
+
+      let referenceUrl = info[UIImagePickerControllerReferenceURL] as! NSURL
+      let assets = PHAsset.fetchAssetsWithALAssetURLs([referenceUrl], options: nil)
+      let asset = assets.firstObject
+      asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
+        let imageFile = contentEditingInput?.fullSizeImageURL?.absoluteString
+        let fileName = AppState.sharedInstance.displayName! + referenceUrl.lastPathComponent!
+        let metadata = FIRStorageMetadata()
+        metadata.contentType = "image/jpeg"
+        self.storageRef.childByAppendingString(fileName)
+          .putFile(imageFile!, metadata: metadata) { (metadata, error) in
+            if let error = error {
+              print("Error uploading: \(error.description)")
+              return
+            }
+            self.sendMessage([Constants.MessageFields.imageUrl: imageFile!])
+          }
+      })
+  }
+
+  func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+    picker.dismissViewControllerAnimated(true, completion:nil)
   }
 
   @IBAction func signOut(sender: UIButton) {

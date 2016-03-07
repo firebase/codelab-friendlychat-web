@@ -16,6 +16,7 @@
 		107960B31C613231003DB6CC /* shared in Resources */ = {isa = PBXBuildFile; fileRef = 107960B21C613231003DB6CC /* shared */; };
 		107960B61C613263003DB6CC /* SignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B51C613263003DB6CC /* SignInViewController.m */; };
 		107960B91C6156B3003DB6CC /* AppState.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B81C6156B3003DB6CC /* AppState.m */; };
+		10D187BD1C8102F700D0DC91 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 10D187BC1C8102F700D0DC91 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		107960B51C613263003DB6CC /* SignInViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignInViewController.m; sourceTree = "<group>"; };
 		107960B71C6156B3003DB6CC /* AppState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppState.h; sourceTree = "<group>"; };
 		107960B81C6156B3003DB6CC /* AppState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppState.m; sourceTree = "<group>"; };
+		10D187BC1C8102F700D0DC91 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 		107960831C6130EF003DB6CC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				10D187BC1C8102F700D0DC91 /* GoogleService-Info.plist */,
 				107960AA1C6131E4003DB6CC /* Info.plist */,
 				107960A81C6131B6003DB6CC /* Main.storyboard */,
 				107960841C6130EF003DB6CC /* main.m */,
@@ -103,9 +106,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 107960A21C6130EF003DB6CC /* Build configuration list for PBXNativeTarget "FriendlyChatObjC" */;
 			buildPhases = (
+				913A1C9AEFEB4A262A2A1836 /* 📦 Check Pods Manifest.lock */,
 				1079607C1C6130EF003DB6CC /* Sources */,
 				1079607D1C6130EF003DB6CC /* Frameworks */,
 				1079607E1C6130EF003DB6CC /* Resources */,
+				64822B30FD301C4DEDC5E33B /* 📦 Embed Pods Frameworks */,
+				444373AC3C9DBBD76970F23E /* 📦 Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -155,10 +161,59 @@
 			files = (
 				107960B31C613231003DB6CC /* shared in Resources */,
 				107960A91C6131B6003DB6CC /* Main.storyboard in Resources */,
+				10D187BD1C8102F700D0DC91 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		444373AC3C9DBBD76970F23E /* 📦 Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FriendlyChatObjC/Pods-FriendlyChatObjC-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		64822B30FD301C4DEDC5E33B /* 📦 Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FriendlyChatObjC/Pods-FriendlyChatObjC-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		913A1C9AEFEB4A262A2A1836 /* 📦 Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1079607C1C6130EF003DB6CC /* Sources */ = {
@@ -198,6 +253,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -242,6 +298,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;

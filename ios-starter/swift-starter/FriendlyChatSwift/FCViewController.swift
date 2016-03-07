@@ -15,6 +15,7 @@
 //
 
 import UIKit
+import Photos
 
 import FirebaseDatabase
 import FirebaseApp
@@ -25,7 +26,8 @@ import Firebase.Core
 import Firebase.CrashReporting
 
 @objc(FCViewController)
-class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
+class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
+    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
@@ -34,7 +36,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   var messages: [FDataSnapshot]! = []
   var msglength: NSNumber = 10
   private var _refHandle: FirebaseHandle!
-  private var userInt: UInt32 = arc4random()
+
+  var storageRef: FIRStorage!;
 
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
@@ -53,12 +56,16 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
+    configureStorage()
   }
 
   func loadAd() {
   }
 
   func fetchConfig() {
+  }
+
+  func configureStorage() {
   }
 
   func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
@@ -88,7 +95,43 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   // UITextViewDelegate protocol methods
   func textFieldShouldReturn(textField: UITextField) -> Bool {
+    let data = [Constants.MessageFields.text: textField.text! as String]
+    sendMessage(data)
     return true
+  }
+
+  func sendMessage(var data: [String: String]) {
+  }
+
+  // MARK: - Image Picker
+
+  @IBAction func didTapAddPhoto(sender: AnyObject) {
+    let picker = UIImagePickerController()
+    picker.delegate = self
+    if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)) {
+      picker.sourceType = UIImagePickerControllerSourceType.Camera
+    } else {
+      picker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+    }
+
+    presentViewController(picker, animated: true, completion:nil)
+  }
+
+  func imagePickerController(picker: UIImagePickerController,
+    didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+      picker.dismissViewControllerAnimated(true, completion:nil)
+
+      let referenceUrl = info[UIImagePickerControllerReferenceURL] as! NSURL
+      let assets = PHAsset.fetchAssetsWithALAssetURLs([referenceUrl], options: nil)
+      let asset = assets.firstObject
+      asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
+        let imageFile = contentEditingInput?.fullSizeImageURL?.absoluteString
+        let fileName = AppState.sharedInstance.displayName! + referenceUrl.lastPathComponent!
+      })
+  }
+
+  func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+    picker.dismissViewControllerAnimated(true, completion:nil)
   }
 
   @IBAction func signOut(sender: UIButton) {
