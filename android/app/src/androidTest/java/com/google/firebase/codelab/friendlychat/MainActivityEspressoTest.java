@@ -38,8 +38,8 @@ public class MainActivityEspressoTest {
             new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void displayInformationText_sameActivity() {
-        onView(ViewMatchers.withId(R.id.messageRecyclerView)).check(matches(isDisplayed()));
+    public void verifySignUpButtonDisplayed() {
+        onView(ViewMatchers.withId(R.id.button_sign_up)).check(matches(isDisplayed()));
     }
 
 }
