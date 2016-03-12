@@ -37,9 +37,5 @@ public class MainActivityEspressoTest {
     public ActivityTestRule<MainActivity> mActivityRule =
             new ActivityTestRule<>(MainActivity.class);
 
-    @Test
-    public void displayInformationText_sameActivity() {
-        onView(ViewMatchers.withId(R.id.messageRecyclerView)).check(matches(isDisplayed()));
-    }
-
+    // Add instrumentation test here
 }
