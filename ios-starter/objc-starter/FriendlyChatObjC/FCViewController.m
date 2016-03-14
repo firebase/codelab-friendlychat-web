@@ -55,6 +55,10 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   assert(NO);
 }
 
+- (IBAction)didPressFreshConfig:(id)sender {
+  [self fetchConfig];
+}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
 

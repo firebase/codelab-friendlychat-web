@@ -25,28 +25,34 @@ class SignInViewController: UIViewController {
   @IBOutlet weak var emailField: UITextField!
   @IBOutlet weak var passwordField: UITextField!
 
+  override func viewDidAppear(animated: Bool) {
+    if let user = FIRAuth.auth()?.currentUser {
+      self.signedIn(user)
+    }
+  }
+
   @IBAction func didTapSignIn(sender: AnyObject) {
     // Sign In with credentials.
     let email = emailField.text
     let password = passwordField.text
-    FIRAuth.auth()?.signInWithEmail(email!, password: password!, callback: { (user, error) in
+    FIRAuth.auth()?.signInWithEmail(email!, password: password!) { (user, error) in
       if let error = error {
         print(error.localizedDescription)
         return
       }
       self.signedIn(user!)
-    })
+    }
   }
   @IBAction func didTapSignUp(sender: AnyObject) {
     let email = emailField.text
     let password = passwordField.text
-    FIRAuth.auth()?.createUserWithEmail(email!, password: password!, callback: { (user, error) in
+    FIRAuth.auth()?.createUserWithEmail(email!, password: password!) { (user, error) in
       if let error = error {
         print(error.localizedDescription)
         return
       }
       self.setDisplayName(user!)
-    })
+    }
   }
 
   func setDisplayName(user: FIRUser) {
@@ -68,14 +74,16 @@ class SignInViewController: UIViewController {
       if (userInput!.isEmpty) {
         return
       }
-      FIRAuth.auth()?.sendPasswordResetWithEmail(userInput!, callback: { (error) in
+      FIRAuth.auth()?.sendPasswordResetWithEmail(userInput!) { (error) in
         if let error = error {
           print(error.localizedDescription)
           return
         }
-      })
+      }
     }
+    prompt.addTextFieldWithConfigurationHandler(nil)
     prompt.addAction(okAction)
+    presentViewController(prompt, animated: true, completion: nil);
   }
 
   func signedIn(user: FIRUser?) {

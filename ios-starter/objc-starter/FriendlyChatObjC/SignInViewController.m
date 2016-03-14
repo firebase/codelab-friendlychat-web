@@ -28,6 +28,9 @@
 
 @implementation SignInViewController
 
+- (void)viewDidAppear:(BOOL)animated {
+}
+
 - (IBAction)didTapSignIn:(id)sender {
   [self signedIn:NULL];
 }

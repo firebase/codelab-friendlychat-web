@@ -24,6 +24,6 @@ class MeasurementHelper: NSObject {
   static func sendLogoutEvent() {
   }
 
-  static func sendPingEvent() {
+  static func sendMessageEvent() {
   }
 }
