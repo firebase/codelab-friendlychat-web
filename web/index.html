@@ -85,6 +85,10 @@
             <button id="submit" disabled type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
               Send
             </button>
+            <input id="mediaCapture" type="file" accept="image/*,capture=camera">
+            <button id="submitImage" title="Add an image" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+              <i class="material-icons">image</i>
+            </button>
           </form>
         </div>
       </div>
@@ -102,7 +106,7 @@
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 <!-- Material Design Lite -->
 <script defer src="https://code.getmdl.io/1.1.1/material.min.js"></script>
-<script src="scripts/firebase-3.0.0-eap.1.js"></script>
+<script src="https://www.gstatic.com/firebasejs/staging/3.0.0-eap.2/firebase.js"></script>
 <script src="scripts/main.js"></script>
 </body>
 </html>

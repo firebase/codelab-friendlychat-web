@@ -16,8 +16,10 @@
 'use strict';
 
 // Project configuration static initializers.
+// TODO(DEVELOPER): Change these config variables.
 var DATABASE_URL = '<DATABASE_URL>';
 var API_KEY = '<API_KEY>';
+var PROJECT_ID = '<PROJECT_ID>';
 
 // Initializes FriendlyChat.
 function FriendlyChat() {
@@ -27,6 +29,8 @@ function FriendlyChat() {
   this.messageForm = document.getElementById('message-form');
   this.messageInput = document.getElementById('message');
   this.submitButton = document.getElementById('submit');
+  this.submitImageButton = document.getElementById('submitImage');
+  this.mediaCapture = document.getElementById('mediaCapture');
   this.userPic = document.getElementById('user-pic');
   this.userName = document.getElementById('user-name');
   this.signInButton = document.getElementById('sign-in');
@@ -42,12 +46,18 @@ function FriendlyChat() {
   this.messageInput.addEventListener('keyup', buttonTogglingHandler);
   this.messageInput.addEventListener('change', buttonTogglingHandler);
 
-  this.initFirebase(API_KEY, DATABASE_URL);
+  // Events for image upload.
+  this.submitImageButton.addEventListener('click', function() {
+    this.mediaCapture.click();
+  }.bind(this));
+  this.mediaCapture.addEventListener('change', this.saveImageMessage.bind(this));
+
+  this.initFirebase(API_KEY, DATABASE_URL, PROJECT_ID);
   this.loadMessages();
 }
 
 // Initializes Firebase.
-FriendlyChat.prototype.initFirebase = function(apiKey, databaseUrl) {
+FriendlyChat.prototype.initFirebase = function(apiKey, databaseUrl, projectId) {
   // TODO(DEVELOPER): Initialize Firebase.
 };
 
@@ -62,6 +72,31 @@ FriendlyChat.prototype.saveMessage = function(e) {
   if (this.messageInput.value) {
     // TODO(DEVELOPER): push new message to Firebase.
   }
+};
+
+// Sets the URL of the given img element with the URL of the image stored in Firebase Storage.
+FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
+  imgElement.src = imageUri;
+
+  // TODO(DEVELOPER): If image is on Firebase Storage, fetch image URL and set img element's src.
+};
+
+// Saves a new message containing an image URI in Firebase.
+// This first saves the image in Firebase storage.
+FriendlyChat.prototype.saveImageMessage = function(e) {
+  var file = event.target.files[0];
+
+  // Check if the file is an image.
+  if (!file.type.match('image.*')) {
+    var data = {
+      message: 'You can only share images',
+      timeout: 2000
+    };
+    this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
+    return;
+  }
+
+  // TODO(DEVELOPER): Upload image to Firebase storage and add message.
 };
 
 // Signs-in Friendly Chat.
@@ -120,13 +155,16 @@ FriendlyChat.resetMaterialTextfield = function(element) {
 // Template for messages.
 FriendlyChat.MESSAGE_TEMPLATE =
     '<div class="message-container">' +
-      '<div class="pic"></div>' +
+      '<div class="spacing"><div class="pic"></div></div>' +
       '<div class="message"></div>' +
       '<div class="name"></div>' +
     '</div>';
 
+// A loading image URL.
+FriendlyChat.LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif';
+
 // Displays a Message in the UI.
-FriendlyChat.prototype.displayMessage = function(key, name, message, picUrl) {
+FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageUri) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -141,9 +179,19 @@ FriendlyChat.prototype.displayMessage = function(key, name, message, picUrl) {
   }
   div.querySelector('.name').textContent = name;
   var messageElement = div.querySelector('.message');
-  messageElement.textContent = message;
-  // Replace all line breaks by <br>.
-  messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
+  if (text) { // If the message is text.
+    messageElement.textContent = text;
+    // Replace all line breaks by <br>.
+    messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
+  } else if (imageUri) { // If the message is an image.
+    var image = document.createElement('img');
+    image.addEventListener('load', function() {
+      this.messageList.scrollTop = this.messageList.scrollHeight;
+    }.bind(this));
+    this.setImageUrl(imageUri, image);
+    messageElement.innerHTML = '';
+    messageElement.appendChild(image);
+  }
   // Show the card fading-in.
   setTimeout(function() {div.classList.add('visible')}, 1);
   this.messageList.scrollTop = this.messageList.scrollHeight;

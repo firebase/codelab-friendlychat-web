@@ -17,8 +17,12 @@
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
 }
-main, #messages-card, #messages-card-container {
-  height: calc(100% - 40px);
+main, #messages-card {
+  height: 100%;
+  padding-bottom: 0;
+}
+#messages-card-container {
+  height: calc(100% - 150px);
   padding-bottom: 0;
 }
 #messages-card {
@@ -72,13 +76,16 @@ main, #messages-card, #messages-card-container {
   opacity: 1;
 }
 .message-container .pic {
-  display: table-cell;
   background-image: url('/images/profile_placeholder.png');
   background-repeat: no-repeat;
   width: 30px;
   height: 30px;
   background-size: 30px;
   border-radius: 20px;
+}
+.message-container .spacing {
+  display: table-cell;
+  vertical-align: top;
 }
 .message-container .message {
   display: table-cell;
@@ -139,6 +146,21 @@ main, #messages-card, #messages-card-container {
   line-height: 36px;
   padding-right: 10px;
   padding-left: 20px;
+}
+#message-form #submitImage {
+  width: auto;
+  padding: 0 6px 0 1px;
+  min-width: 0;
+}
+#message-form #submitImage .material-icons {
+  top: -1px;
+}
+.message img {
+  max-width: 300px;
+  max-height: 200px;
+}
+#mediaCapture {
+  display: none;
 }
 @media screen and (max-width: 610px) {
   header {
