@@ -21,9 +21,7 @@ import FirebaseDatabase
 import FirebaseApp
 import FirebaseAuth
 import Firebase.AdMob
-import Firebase.Config
 import Firebase.Core
-import Firebase.CrashReporting
 
 @objc(FCViewController)
 class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
@@ -32,12 +30,13 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   // Instance variables
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var sendButton: UIButton!
-  var ref: Firebase!
-  var messages: [FDataSnapshot]! = []
+  var ref: FIRDatabaseReference!
+  var messages: [FIRDataSnapshot]! = []
   var msglength: NSNumber = 10
   private var _refHandle: FirebaseHandle!
 
-  var storageRef: FIRStorage!;
+  var storageRef: FIRStorageReference!
+  var remoteConfig: FIRRemoteConfig!
 
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
@@ -60,7 +59,17 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    ref = Firebase.init(url: FIRContext.sharedInstance().serviceInfo.databaseURL)
+    ref = FIRDatabase.database().reference
+
+    remoteConfig = FIRRemoteConfig()
+    // Create Remote Config Setting to enable developer mode.
+    // Fetching configs from the server is normally limited to 5 requests per hour.
+    // Enabling developer mode allows many more requests to be made per hour, so developers
+    // can test different config values during development.
+    let remoteConfigSettings = FIRRemoteConfigSettings()
+    remoteConfigSettings.developerModeEnabled = true
+    remoteConfig.configSettings = remoteConfigSettings
+
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
     fetchConfig()
@@ -81,28 +90,33 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func fetchConfig() {
-    let completion:RCNDefaultConfigCompletion = {(config:RCNConfig!, status:RCNConfigStatus, error:NSError?) in
-      if let error = error {
-        // There has been an error fetching the config
-        print("Error fetching config: \(error.localizedDescription)")
-      } else {
-        // Parse your config data
-        self.msglength = config.numberForKey("friendly_msg_length", defaultValue: 10)
-        print("Friendly msg length config: \(self.msglength)")
-      }
+    var expirationDuration: Double = 3600
+    // If in developer mode cacheExpiration is set to 0 so each fetch will retrieve values from
+    // the server.
+    if (self.remoteConfig.configSettings.developerModeEnabled) {
+      expirationDuration = 0
     }
 
-    let customVariables = ["build": "dev"]
-    // 43200 secs = 12 hours
-    RCNConfig.fetchDefaultConfigWithExpirationDuration(43200, customVariables: customVariables,
-      completionHandler: completion)
+    // cacheExpirationSeconds is set to cacheExpiration here, indicating that any previously
+    // fetched and cached config would be considered expired because it would have been fetched
+    // more than cacheExpiration seconds ago. Thus the next fetch would go to the server unless
+    // throttling is in progress. The default expiration duration is 43200 (12 hours).
+    remoteConfig.fetchWithExpirationDuration(expirationDuration) { (status, error) in
+      if (status == .Success) {
+        print("Config fetched!")
+        self.remoteConfig.activateFetched()
+        self.msglength = self.remoteConfig["friendly_msg_length"].numberValue!
+        print("Friendly msg length config: \(self.msglength)")
+      } else {
+        print("Config not fetched")
+        print("Error \(error)")
+      }
+    }
   }
 
   func configureStorage() {
     let app = FIRFirebaseApp.app()
-    // Configure manually with a storage bucket.
-    let bucket = "YOUR_PROJECT.storage.firebase.com"
-    storageRef = FIRStorage.init(app: app!, bucketName: bucket)
+    storageRef = FIRStorage.storage(app: app!).reference
   }
 
   func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
@@ -134,16 +148,16 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     // Dequeue cell
     let cell: UITableViewCell! = self.clientTable .dequeueReusableCellWithIdentifier("tableViewCell", forIndexPath: indexPath)
     // Unpack message from Firebase DataSnapshot
-    let messageSnapshot: FDataSnapshot! = self.messages[indexPath.row]
+    let messageSnapshot: FIRDataSnapshot! = self.messages[indexPath.row]
     let message = messageSnapshot.value as! Dictionary<String, String>
     let name = message[Constants.MessageFields.name] as String!
     if let imageUrl = message[Constants.MessageFields.imageUrl] {
-      storageRef.childByAppendingString(imageUrl).dataWithCompletion(){ (data, error) in
+      storageRef.childByAppendingPath(imageUrl).dataWithCompletion(){ (data, error) in
         if let error = error {
           print("Error downloading: \(error)")
           return
         }
-        cell.imageView?.image = UIImage.init(data: data)
+        cell.imageView?.image = UIImage.init(data: data!)
       }
       cell!.textLabel?.text = "sent by: \(name)"
     } else {
@@ -164,13 +178,14 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     return true
   }
 
-  func sendMessage(var data: [String: String]) {
-    data[Constants.MessageFields.name] = AppState.sharedInstance.displayName
+  func sendMessage(data: [String: String]) {
+    var mdata = data
+    mdata[Constants.MessageFields.name] = AppState.sharedInstance.displayName
     if let photoUrl = AppState.sharedInstance.photoUrl {
-      data[Constants.MessageFields.photoUrl] = photoUrl.absoluteString
+      mdata[Constants.MessageFields.photoUrl] = photoUrl.absoluteString
     }
     // Push data to Firebase Database
-    self.ref.childByAppendingPath("messages").childByAutoId().setValue(data)
+    self.ref.childByAppendingPath("messages").childByAutoId().setValue(mdata)
   }
 
   // MARK: - Image Picker
@@ -199,7 +214,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
         let fileName = AppState.sharedInstance.displayName! + referenceUrl.lastPathComponent!
         let metadata = FIRStorageMetadata()
         metadata.contentType = "image/jpeg"
-        self.storageRef.childByAppendingString(fileName)
+        self.storageRef.childByAppendingPath(fileName)
           .putFile(imageFile!, metadata: metadata) { (metadata, error) in
             if let error = error {
               print("Error uploading: \(error.description)")

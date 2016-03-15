@@ -14,18 +14,19 @@
 //  limitations under the License.
 //
 
+@import Photos;
 #import "AppState.h"
 #import "Constants.h"
 #import "FCViewController.h"
 
 #import "FirebaseStorage.h"
+#import "FIRRemoteConfig.h"
+#import "FCRLog.h"
 @import FirebaseDatabase;
 @import FirebaseApp;
 @import FirebaseAuth;
 @import Firebase.AdMob;
-@import Firebase.Config;
 @import Firebase.Core;
-@import Firebase.CrashReporting;
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
 UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
@@ -39,9 +40,10 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 @property(nonatomic, weak) IBOutlet GADBannerView *banner;
 @property(nonatomic, weak) IBOutlet UITableView *clientTable;
 
-@property (strong, nonatomic) Firebase *ref;
-@property (strong, nonatomic) NSMutableArray<FDataSnapshot *> *messages;
-@property (strong, nonatomic) FIRStorage *storageRef;
+@property (strong, nonatomic) FIRDatabaseReference *ref;
+@property (strong, nonatomic) NSMutableArray<FIRDataSnapshot *> *messages;
+@property (strong, nonatomic) FIRStorageReference *storageRef;
+@property (nonatomic, strong) FIRRemoteConfig *remoteConfig;
 
 @end
 

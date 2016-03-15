@@ -26,11 +26,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   NSError *error;
   BOOL status =[[FIRContext sharedInstance] configure:&error];
   NSAssert(status, @"Error configuring Firebase services: %@", error);
-
-  FIRFirebaseOptions *firebaseOptions = [[FIRFirebaseOptions alloc] init];
-  firebaseOptions.APIKey = [FIRContext sharedInstance].serviceInfo.apiKey;
-  [FIRFirebaseApp initializedAppWithAppId:[FIRContext sharedInstance].serviceInfo.googleAppID
-                                  options:firebaseOptions];
+  [FIRApp configure];
   return YES;
 }
 
