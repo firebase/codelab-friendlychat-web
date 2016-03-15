@@ -26,7 +26,7 @@
 + (void)sendLogoutEvent {
 }
 
-+ (void)sendPingEvent{
++ (void)sendMessageEvent{
 }
 
 @end

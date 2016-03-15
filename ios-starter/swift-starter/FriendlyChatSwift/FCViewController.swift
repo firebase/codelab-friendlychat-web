@@ -50,6 +50,10 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     fatalError()
   }
 
+  @IBAction func didPressFreshConfig(sender: AnyObject) {
+    fetchConfig()
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 

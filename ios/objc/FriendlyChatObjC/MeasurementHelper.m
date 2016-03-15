@@ -28,8 +28,8 @@
   [FIRAnalytics logEventWithName:@"logout" parameters:nil];
 }
 
-+ (void)sendPingEvent{
-  [FIRAnalytics logEventWithName:kFIREventShare parameters:nil];
++ (void)sendMessageEvent{
+  [FIRAnalytics logEventWithName:@"message" parameters:nil];
 }
 
 @end

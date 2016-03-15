@@ -28,6 +28,13 @@
 
 @implementation SignInViewController
 
+- (void)viewDidAppear:(BOOL)animated {
+  FIRUser *user = [FIRAuth auth].currentUser;
+  if (user) {
+    [self signedIn:user];
+  }
+}
+
 - (IBAction)didTapSignIn:(id)sender {
   // Sign In with credentials.
   NSString *email = _emailField.text;
@@ -95,9 +102,10 @@
                                                                    }
                                                                  }];
 
-                             }
-                             ];
+                             }];
+  [prompt addTextFieldWithConfigurationHandler:nil];
   [prompt addAction:okAction];
+  [self presentViewController:prompt animated:YES completion:nil];
 }
 
 - (void)signedIn:(FIRUser *)user {

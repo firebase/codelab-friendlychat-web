@@ -53,6 +53,10 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     fatalError()
   }
 
+  @IBAction func didPressFreshConfig(sender: AnyObject) {
+    fetchConfig()
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -113,7 +117,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     // Listen for new messages in the Firebase database
     _refHandle = self.ref.childByAppendingPath("messages").observeEventType(.ChildAdded, withBlock: { (snapshot) -> Void in
       self.messages.append(snapshot)
-      self.clientTable.insertRowsAtIndexPaths([NSIndexPath(forRow: self.messages.count-1, inSection: 0)], withRowAnimation: UITableViewRowAnimation.Automatic)
+      self.clientTable.insertRowsAtIndexPaths([NSIndexPath(forRow: self.messages.count-1, inSection: 0)], withRowAnimation: .Automatic)
     })
   }
 
@@ -146,14 +150,9 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       let text = message[Constants.MessageFields.text] as String!
       cell!.textLabel?.text = name + ": " + text
       cell!.imageView?.image = UIImage(named: "ic_account_circle")
-      if let photoUrl = message[Constants.MessageFields.photoUrl] {
-        if let url = NSURL(string:photoUrl) {
-          if let data = NSData(contentsOfURL: url) {
-            cell!.imageView?.image = UIImage(data: data)
-          }
-        }
+      if let photoUrl = message[Constants.MessageFields.photoUrl], url = NSURL(string:photoUrl), data = NSData(contentsOfURL: url) {
+        cell!.imageView?.image = UIImage(data: data)
       }
-
     }
     return cell!
   }
@@ -180,9 +179,9 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     let picker = UIImagePickerController()
     picker.delegate = self
     if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)) {
-      picker.sourceType = UIImagePickerControllerSourceType.Camera
+      picker.sourceType = .Camera
     } else {
-      picker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+      picker.sourceType = .PhotoLibrary
     }
 
     presentViewController(picker, animated: true, completion:nil)
@@ -222,7 +221,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       AppState.sharedInstance.signedIn = false
       performSegueWithIdentifier(Constants.Segues.FpToSignIn, sender: nil)
     } catch let signOutError as NSError {
-      print ("Error signing out: %@", signOutError)
+      print ("Error signing out: \(signOutError)")
     }
   }
 
