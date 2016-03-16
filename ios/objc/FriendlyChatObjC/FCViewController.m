@@ -108,8 +108,8 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   // fetched and cached config would be considered expired because it would have been fetched
   // more than cacheExpiration seconds ago. Thus the next fetch would go to the server unless
   // throttling is in progress. The default expiration duration is 43200 (12 hours).
-  [self.remoteConfig fetchWithExpirationDuration:expirationDuration completionHandler:^(FIRRemoteConfigStatus status, NSError *error) {
-    if (status == FIRRemoteConfigStatusSuccess) {
+  [self.remoteConfig fetchWithExpirationDuration:expirationDuration completionHandler:^(FIRRemoteConfigFetchStatus status, NSError *error) {
+    if (status == FIRRemoteConfigFetchStatusSuccess) {
       NSLog(@"Config fetched!");
       [_remoteConfig activateFetched];
       _msglength = _remoteConfig[@"friendly_msg_length"].numberValue.intValue;
