@@ -191,9 +191,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 
 // UITextViewDelegate protocol methods
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-  NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-  data[MessageFieldstext] = textField.text;
-  [self sendMessage:data];
+  [self sendMessage:@{MessageFieldstext: textField.text}];
   textField.text = @"";
   return YES;
 }
