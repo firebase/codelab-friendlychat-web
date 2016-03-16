@@ -37,24 +37,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.firebase.client.Firebase;
-import com.firebase.ui.FirebaseRecyclerViewAdapter;
+import com.firebase.ui.FirebaseRecyclerAdapter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.config.Config;
-import com.google.android.gms.config.ConfigApi;
-import com.google.android.gms.config.ConfigStatusCodes;
+import com.google.android.gms.config.FirebaseRemoteConfig;
+import com.google.android.gms.config.FirebaseRemoteConfigException;
+import com.google.android.gms.config.FirebaseRemoteConfigFetchCallback;
+import com.google.android.gms.config.FirebaseRemoteConfigSettings;
 import com.google.android.gms.crash.Crash;
 import com.google.android.gms.measurement.AppMeasurement;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.FirebaseUser;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -78,21 +79,23 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_INVITE = 1;
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 10;
     public static final String ANONYMOUS = "anonymous";
-    public static final String FIREBASE_DB_URL = "YOUR_DATABASE_URL";
-    private static final String SIGN_OUT_EVENT = "sign_out";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
     private String mUsername;
     private String mPhotoUrl;
     private SharedPreferences mSharedPreferences;
 
-    private FirebaseUser mUser;
-    private FirebaseAuth mAuth;
     private Button mSendButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
-    private FirebaseRecyclerViewAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
+    private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
+    private DatabaseReference mFirebaseDatabase;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
     private EditText mMessageEditText;
+    private AppMeasurement mAppMeasurement;
+    private AdView mAdView;
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
