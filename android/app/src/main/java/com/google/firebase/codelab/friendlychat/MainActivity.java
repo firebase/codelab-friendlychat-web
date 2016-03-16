@@ -37,28 +37,29 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.firebase.client.Firebase;
-import com.firebase.ui.FirebaseRecyclerViewAdapter;
+import com.firebase.ui.FirebaseRecyclerAdapter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.config.Config;
-import com.google.android.gms.config.ConfigApi;
-import com.google.android.gms.config.ConfigStatusCodes;
+import com.google.android.gms.config.FirebaseRemoteConfig;
+import com.google.android.gms.config.FirebaseRemoteConfigException;
+import com.google.android.gms.config.FirebaseRemoteConfigFetchCallback;
+import com.google.android.gms.config.FirebaseRemoteConfigSettings;
 import com.google.android.gms.crash.Crash;
 import com.google.android.gms.measurement.AppMeasurement;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.FirebaseUser;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity {
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView;
@@ -86,15 +87,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private Button mSendButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
-    private FirebaseRecyclerViewAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
+    private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
-    private Firebase mFirebaseDatabase;
+    private DatabaseReference mFirebaseDatabase;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private EditText mMessageEditText;
     private AppMeasurement mAppMeasurement;
-    private GoogleApiClient mClient;
     private AdView mAdView;
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         // Initialize FirebaseApp, this allows database calls on behalf of the signed in user.
         FirebaseApp.initializeApp(this, getString(R.string.google_app_id),
-                new FirebaseOptions(getString(R.string.google_api_key)));
+                new FirebaseOptions.Builder(getString(R.string.google_api_key)).build());
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
 
@@ -122,8 +123,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
 
-        mFirebaseDatabase = new Firebase(getString(R.string.firebase_database_url));
-        mFirebaseAdapter = new FirebaseRecyclerViewAdapter<FriendlyMessage, MessageViewHolder>(
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
                         FriendlyMessage.class,
                         R.layout.item_message,
                         MessageViewHolder.class,
@@ -171,12 +172,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Initialize Firebase Measurement.
         mAppMeasurement = AppMeasurement.getInstance(this);
 
-        // Initialize Google Api Client and retrieve config.
-        mClient = new GoogleApiClient.Builder(this)
-                .addApi(Config.API)
-                .addApi(AppInvite.API)
-                .enableAutoManage(this, this)
+        // Initialize Firebase Remote Config.
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
+        // Define Firebase Remote Config Settings.
+        FirebaseRemoteConfigSettings firebaseRemoteConfigSettings =
+                new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(true)
                 .build();
+
+        // Define default config values. Defaults are used when fetched config values are not
+        // available. Eg: if an error occurred fetching values from the server.
+        Map<String, Object> defaultConfigMap = new HashMap<>();
+        defaultConfigMap.put("friendly_msg_length", 10L);
+
+        // Apply config settings and default values.
+        mFirebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);
+        mFirebaseRemoteConfig.setDefaults(defaultConfigMap);
+
+        // Fetch remote config.
         fetchConfig();
 
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
@@ -269,9 +283,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 causeCrash();
                 return true;
             case R.id.sign_out_menu:
-                mAuth.signOut(this);
+                mAuth.signOut();
                 mUsername = ANONYMOUS;
                 startActivity(new Intent(this, SignInActivity.class));
+                return true;
+            case R.id.fresh_config_menu:
+                fetchConfig();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -292,36 +309,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     // Fetch the config to determine the allowed length of messages.
     public void fetchConfig() {
-        ConfigApi.FetchConfigRequest request = new ConfigApi.FetchConfigRequest.Builder()
-                .setCacheExpirationSeconds(0)
-                .build();
+        long cacheExpiration = 3600; // 1 hour in seconds
+        // If developer mode is enabled reduce cacheExpiration to 0 so that each fetch goes to the
+        // server. This should not be used in release builds.
+        if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+            cacheExpiration = 0;
+        }
+        mFirebaseRemoteConfig.fetch(cacheExpiration, new FirebaseRemoteConfigFetchCallback() {
+            @Override
+            public void onSuccess() {
+                // Make the fetched config available via FirebaseRemoteConfig get<type> calls.
+                mFirebaseRemoteConfig.activateFetched();
+                applyRetrievedLengthLimit();
+            }
 
-        Config.ConfigApi.fetchConfig(mClient, request)
-                .setResultCallback(new ResultCallback<ConfigApi.FetchConfigResult>() {
-                    @Override
-                    public void onResult(ConfigApi.FetchConfigResult fetchConfigResult) {
-                        Log.d(TAG, "onResult");
-                        if (fetchConfigResult.getStatus().isSuccess()) {
-                            applyRetrievedLengthLimit(fetchConfigResult);
-                        } else {
-                            // There has been an error fetching the config
-                            Log.w(TAG, "Error fetching config: " +
-                                    fetchConfigResult.getStatus().toString());
-                            if (fetchConfigResult.getStatus().getStatusCode() == ConfigStatusCodes.FETCH_THROTTLED) {
-                                // use cached config
-                                applyRetrievedLengthLimit(fetchConfigResult);
-                            } else {
-                                // apply restriction
-                                mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
-                            }
-                        }
-                    }
-                });
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult status) {
-        Log.w(TAG, "failed: " + status);
+            @Override
+            public void onFailure(FirebaseRemoteConfigException e) {
+                // There has been an error fetching the config
+                Log.w(TAG, "Error fetching config: " + e);
+                applyRetrievedLengthLimit();
+            }
+        });
     }
 
     @Override
@@ -355,9 +363,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
      * Apply retrieved length limit to edit text field. This result may be fresh from the server or it may be from
      * cached values.
      */
-    private void applyRetrievedLengthLimit(ConfigApi.FetchConfigResult fetchConfigResult) {
-        // get value from result
-        Long friendly_msg_length = fetchConfigResult.getAsLong("friendly_msg_length", DEFAULT_MSG_LENGTH_LIMIT, "configns:firebase");
+    private void applyRetrievedLengthLimit() {
+        Long friendly_msg_length = mFirebaseRemoteConfig.getLong("friendly_msg_length");
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
         Log.d(TAG, "FML is: " + friendly_msg_length);
     }

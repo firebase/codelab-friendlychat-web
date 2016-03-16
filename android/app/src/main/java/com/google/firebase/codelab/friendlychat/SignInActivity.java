@@ -42,7 +42,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         // Initialize FirebaseApp
         FirebaseApp.initializeApp(this, getString(R.string.google_app_id),
-                new FirebaseOptions(getString(R.string.google_api_key)));
+                new FirebaseOptions.Builder(getString(R.string.google_api_key)).build());
 
         // Initialize FirebaseAuth
         mAuth = FirebaseAuth.getAuth();

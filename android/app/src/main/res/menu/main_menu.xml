@@ -6,6 +6,10 @@
         android:title="@string/sign_out"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/fresh_config_menu"
+        android:title="@string/fresh_config"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/invite_menu"
         android:title="@string/invite_menu_label"/>
     <item
