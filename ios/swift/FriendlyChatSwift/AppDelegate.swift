@@ -25,17 +25,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
 
   func application(application: UIApplication, didFinishLaunchingWithOptions
-    launchOptions: [NSObject: AnyObject]?) -> Bool {
-      do {
-        try FIRContext.sharedInstance().configure()
-      } catch let configureError as NSError{
-        print ("Error configuring Firebase services: \(configureError)")
-      }
-
-      let firebaseOptions = FIRFirebaseOptions()
-      firebaseOptions.APIKey = FIRContext.sharedInstance().serviceInfo.apiKey
-      FIRFirebaseApp.initializedAppWithAppId(FIRContext.sharedInstance().serviceInfo.googleAppID, options: firebaseOptions)
-      return true
+      launchOptions: [NSObject: AnyObject]?) -> Bool {
+    do {
+      try FIRContext.sharedInstance().configure()
+    } catch let configureError as NSError{
+      print ("Error configuring Firebase services: \(configureError)")
+    }
+    FIRApp.configure()
+    return true
   }
 
 }

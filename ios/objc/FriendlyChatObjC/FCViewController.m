@@ -20,13 +20,13 @@
 #import "FCViewController.h"
 
 #import "FirebaseStorage.h"
+#import "FIRRemoteConfig.h"
+#import "FCRLog.h"
 @import FirebaseDatabase;
 @import FirebaseApp;
 @import FirebaseAuth;
 @import Firebase.AdMob;
-@import Firebase.Config;
 @import Firebase.Core;
-@import Firebase.CrashReporting;
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
 UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
@@ -40,9 +40,10 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 @property(nonatomic, weak) IBOutlet GADBannerView *banner;
 @property(nonatomic, weak) IBOutlet UITableView *clientTable;
 
-@property (strong, nonatomic) Firebase *ref;
-@property (strong, nonatomic) NSMutableArray<FDataSnapshot *> *messages;
-@property (strong, nonatomic) FIRStorage *storageRef;
+@property (strong, nonatomic) FIRDatabaseReference *ref;
+@property (strong, nonatomic) NSMutableArray<FIRDataSnapshot *> *messages;
+@property (strong, nonatomic) FIRStorageReference *storageRef;
+@property (nonatomic, strong) FIRRemoteConfig *remoteConfig;
 
 @end
 
@@ -64,7 +65,17 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  _ref = [[Firebase alloc] initWithUrl:[FIRContext sharedInstance].serviceInfo.databaseURL];
+  _ref = [FIRDatabase database].reference;
+
+  _remoteConfig = [FIRRemoteConfig remoteConfig];
+  // Create Remote Config Setting to enable developer mode.
+  // Fetching configs from the server is normally limited to 5 requests per hour.
+  // Enabling developer mode allows many more requests to be made per hour, so developers
+  // can test different config values during development.
+  FIRRemoteConfigSettings *remoteConfigSettings = [[FIRRemoteConfigSettings alloc] init];
+  remoteConfigSettings.developerModeEnabled = YES;
+  _remoteConfig.configSettings = remoteConfigSettings;
+
   _msglength = 10;
   _messages = [[NSMutableArray alloc] init];
 
@@ -86,29 +97,33 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 }
 
 - (void)fetchConfig {
-  RCNDefaultConfigCompletion completion = ^void(RCNConfig *config, RCNConfigStatus status, NSError *error) {
-    if (error) {
-      // There has been an error fetching the config
-      NSLog(@"Error fetching config: %@", error.localizedDescription);
-    } else {
-      // Parse your config data
-      _msglength = [[config numberForKey:@"friendly_msg_length" defaultValue:[NSNumber numberWithInt:10]] intValue];
-      NSLog(@"Friendly msg length config: %d", _msglength);
-    }
-  };
+  long expirationDuration = 3600;
+  // If in developer mode cacheExpiration is set to 0 so each fetch will retrieve values from
+  // the server.
+  if (self.remoteConfig.configSettings.developerModeEnabled) {
+    expirationDuration = 0;
+  }
 
-  NSDictionary *customVariables = @{@"build": @"dev"};
-  // 43200 secs = 12 hours
-  [RCNConfig fetchDefaultConfigWithExpirationDuration:43200
-                                      customVariables:customVariables
-                                    completionHandler:completion];
+  // cacheExpirationSeconds is set to cacheExpiration here, indicating that any previously
+  // fetched and cached config would be considered expired because it would have been fetched
+  // more than cacheExpiration seconds ago. Thus the next fetch would go to the server unless
+  // throttling is in progress. The default expiration duration is 43200 (12 hours).
+  [self.remoteConfig fetchWithExpirationDuration:expirationDuration completionHandler:^(FIRRemoteConfigStatus status, NSError *error) {
+    if (status == FIRRemoteConfigStatusSuccess) {
+      NSLog(@"Config fetched!");
+      [_remoteConfig activateFetched];
+      _msglength = _remoteConfig[@"friendly_msg_length"].numberValue.intValue;
+      NSLog(@"Friendly msg length config: %d", _msglength);
+    } else {
+      NSLog(@"Config not fetched");
+      NSLog(@"Error %@", error);
+    }
+  }];
 }
 
 - (void)configureStorage {
   FIRFirebaseApp *app = [FIRFirebaseApp app];
-  // Configure manually with a storage bucket.
-  NSString *bucket = @"YOUR_PROJECT.storage.firebase.com";
-  self.storageRef = [[FIRStorage alloc] initWithApp:app bucketName:bucket];
+  self.storageRef = [[FIRStorage storageForApp:app] reference];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(nonnull NSString *)string {
@@ -123,10 +138,9 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 - (void)viewWillAppear:(BOOL)animated {
   [_messages removeAllObjects];
   // Listen for new messages in the Firebase database
-  _refHandle = [[_ref childByAppendingPath:@"messages"] observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
+  _refHandle = [[_ref childByAppendingPath:@"messages"] observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
     [_messages addObject:snapshot];
-    [_clientTable reloadData];
-//    [_clientTable insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_messages.count-1 inSection:0]] withRowAnimation: UITableViewRowAnimationAutomatic];
+    [_clientTable insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_messages.count-1 inSection:0]] withRowAnimation: UITableViewRowAnimationAutomatic];
   }];
 }
 
@@ -144,12 +158,12 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   UITableViewCell *cell = [_clientTable dequeueReusableCellWithIdentifier:@"tableViewCell" forIndexPath:indexPath];
 
   // Unpack message from Firebase DataSnapshot
-  FDataSnapshot *messageSnapshot = _messages[indexPath.row];
+  FIRDataSnapshot *messageSnapshot = _messages[indexPath.row];
   NSDictionary<NSString *, NSString *> *message = messageSnapshot.value;
   NSString *name = message[MessageFieldsname];
   NSString *imageUrl = message[MessageFieldsimageUrl];
   if (imageUrl) {
-    [[_storageRef childByAppendingString:imageUrl] dataWithCompletion:^(NSData *data, NSError *error) {
+    [[_storageRef childByAppendingPath:imageUrl] dataWithCompletion:^(NSData *data, NSError *error) {
       if (error) {
         NSLog(@"Error downloading: %@", error);
         return;
@@ -223,15 +237,15 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
                                NSString *fileName = [[AppState sharedInstance].displayName stringByAppendingString:[referenceUrl lastPathComponent]];
                                FIRStorageMetadata *metadata = [FIRStorageMetadata new];
                                metadata.contentType = @"image/jpeg";
-                               [[_storageRef childByAppendingString:fileName]
-                                                            putFile:imageFile metadata:metadata
-                                                     withCompletion:^(FIRStorageMetadata *metadata, NSError *error) {
-                                                       if (error) {
-                                                         NSLog(@"Error uploading: %@", error);
-                                                         return;
-                                                       }
-                                                       [self sendMessage:@{MessageFieldsimageUrl: fileName}];
+                               [[_storageRef childByAppendingPath:fileName]
+                                                          putFile:imageFile metadata:metadata
+                                                   withCompletion:^(FIRStorageMetadata *metadata, NSError *error) {
+                                                     if (error) {
+                                                       NSLog(@"Error uploading: %@", error);
+                                                       return;
                                                      }
+                                                     [self sendMessage:@{MessageFieldsimageUrl: fileName}];
+                                                   }
                                 ];
                              }];
 }

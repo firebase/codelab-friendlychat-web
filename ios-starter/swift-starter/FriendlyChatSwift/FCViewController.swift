@@ -21,9 +21,7 @@ import FirebaseDatabase
 import FirebaseApp
 import FirebaseAuth
 import Firebase.AdMob
-import Firebase.Config
 import Firebase.Core
-import Firebase.CrashReporting
 
 @objc(FCViewController)
 class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
@@ -32,12 +30,13 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   // Instance variables
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var sendButton: UIButton!
-  var ref: Firebase!
-  var messages: [FDataSnapshot]! = []
+  var ref: FIRDatabaseReference!
+  var messages: [FIRDataSnapshot]! = []
   var msglength: NSNumber = 10
   private var _refHandle: FirebaseHandle!
 
-  var storageRef: FIRStorage!;
+  var storageRef: FIRStorageReference!
+  var remoteConfig: FIRRemoteConfig!
 
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
@@ -104,7 +103,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     return true
   }
 
-  func sendMessage(var data: [String: String]) {
+  func sendMessage(data: [String: String]) {
   }
 
   // MARK: - Image Picker
