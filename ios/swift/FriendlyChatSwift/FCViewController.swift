@@ -152,12 +152,16 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     let message = messageSnapshot.value as! Dictionary<String, String>
     let name = message[Constants.MessageFields.name] as String!
     if let imageUrl = message[Constants.MessageFields.imageUrl] {
-      storageRef.childByAppendingPath(imageUrl).dataWithCompletion(){ (data, error) in
-        if let error = error {
-          print("Error downloading: \(error)")
-          return
+      if imageUrl.hasPrefix("gs://") {
+        FIRStorage.storage(app: FIRFirebaseApp.app()!).referenceForURL(imageUrl).dataWithCompletion(){ (data, error) in
+          if let error = error {
+            print("Error downloading: \(error)")
+            return
+          }
+          cell.imageView?.image = UIImage.init(data: data!)
         }
-        cell.imageView?.image = UIImage.init(data: data!)
+      } else if let url = NSURL(string:imageUrl), data = NSData(contentsOfURL: url) {
+        cell.imageView?.image = UIImage.init(data: data)
       }
       cell!.textLabel?.text = "sent by: \(name)"
     } else {
@@ -211,16 +215,16 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       let asset = assets.firstObject
       asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
         let imageFile = contentEditingInput?.fullSizeImageURL?.absoluteString
-        let fileName = AppState.sharedInstance.displayName! + referenceUrl.lastPathComponent!
+        let filePath = "\(FIRAuth.auth()?.currentUser?.uid)/\(Int(NSDate.timeIntervalSinceReferenceDate() * 1000))/\(referenceUrl.lastPathComponent!)"
         let metadata = FIRStorageMetadata()
         metadata.contentType = "image/jpeg"
-        self.storageRef.childByAppendingPath(fileName)
+        self.storageRef.childByAppendingPath(filePath)
           .putFile(imageFile!, metadata: metadata) { (metadata, error) in
             if let error = error {
               print("Error uploading: \(error.description)")
               return
             }
-            self.sendMessage([Constants.MessageFields.imageUrl: imageFile!])
+            self.sendMessage([Constants.MessageFields.imageUrl: self.storageRef.childByAppendingPath((metadata?.path)!).description])
           }
       })
   }

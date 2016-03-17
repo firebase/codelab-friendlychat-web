@@ -163,13 +163,17 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   NSString *name = message[MessageFieldsname];
   NSString *imageUrl = message[MessageFieldsimageUrl];
   if (imageUrl) {
-    [[_storageRef childByAppendingPath:imageUrl] dataWithCompletion:^(NSData *data, NSError *error) {
-      if (error) {
-        NSLog(@"Error downloading: %@", error);
-        return;
-      }
-      cell.imageView.image = [UIImage imageWithData:data];
-    }];
+    if ([imageUrl hasPrefix:@"gs://"]) {
+      [[[FIRStorage storageForApp:[FIRFirebaseApp app]] referenceForURL:imageUrl] dataWithCompletion:^(NSData *data, NSError *error) {
+        if (error) {
+          NSLog(@"Error downloading: %@", error);
+          return;
+        }
+        cell.imageView.image = [UIImage imageWithData:data];
+      }];
+    } else {
+      cell.imageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]]];
+    }
     cell.textLabel.text = [NSString stringWithFormat:@"sent by: %@", name];
   } else {
     NSString *text = message[MessageFieldstext];
@@ -232,17 +236,18 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   [asset requestContentEditingInputWithOptions:nil
                              completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
                                NSString *imageFile = [contentEditingInput.fullSizeImageURL absoluteString];
-                               NSString *fileName = [[AppState sharedInstance].displayName stringByAppendingString:[referenceUrl lastPathComponent]];
+                               NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceUrl lastPathComponent]];
                                FIRStorageMetadata *metadata = [FIRStorageMetadata new];
                                metadata.contentType = @"image/jpeg";
-                               [[_storageRef childByAppendingPath:fileName]
+                               [[_storageRef childByAppendingPath:filePath]
                                                           putFile:imageFile metadata:metadata
                                                    withCompletion:^(FIRStorageMetadata *metadata, NSError *error) {
                                                      if (error) {
                                                        NSLog(@"Error uploading: %@", error);
                                                        return;
                                                      }
-                                                     [self sendMessage:@{MessageFieldsimageUrl: fileName}];
+                                                     [self sendMessage:@{MessageFieldsimageUrl:
+                                                         [_storageRef childByAppendingPath:metadata.path].description}];
                                                    }
                                 ];
                              }];
