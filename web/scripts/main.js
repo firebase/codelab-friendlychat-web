@@ -79,7 +79,7 @@ FriendlyChat.prototype.loadMessages = function() {
   var setMessage = function(data) {
     var val = data.val();
     this.displayMessage(data.key(), val.name, val.text, val.photoUrl, val.imageUrl);
-  }.bind(this)
+  }.bind(this);
   this.messagesDbRef.limitToLast(12).on('child_added', setMessage);
   this.messagesDbRef.on('child_changed', setMessage);
 };
@@ -109,7 +109,7 @@ FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
     imgElement.src = FriendlyChat.LOADING_IMAGE_URL; // Display a loading image in the mean time.
     this.app.storage().ref(imageUri).getMetadata().then(function(metadata) {
       imgElement.src = metadata.downloadUrls[0];
-    })
+    });
   } else {
     imgElement.src = imageUri;
   }
