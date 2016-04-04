@@ -1,11 +1,12 @@
 {
-  "firebase": "<PROJECT_ID>",
   "rules": "security-rules.json",
-  "public": "./",
-  "ignore": [
-    "firebase.json",
-    "**/.*",
-    "**/node_modules/**",
-    "functions"
-  ]
+  "hosting": {
+    "public": "./",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "functions"
+    ]
+  }
 }
