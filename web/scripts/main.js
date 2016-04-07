@@ -60,10 +60,10 @@ function FriendlyChat() {
 FriendlyChat.prototype.initFirebase = function(apiKey, databaseUrl, projectId) {
   var fbConfig = {
     apiKey: apiKey,
-    databaseUrl: databaseUrl,
+    databaseURL: databaseUrl,
     projectId: projectId
   };
-  this.app = firebase.App.initialize(fbConfig);
+  this.app = firebase.initializeApp(fbConfig);
   this.databaseRef = this.app.database().ref();
   this.storageRef = this.app.storage().ref();
 };
@@ -78,7 +78,7 @@ FriendlyChat.prototype.loadMessages = function() {
   // Loads the last 12 messages and listen for new ones.
   var setMessage = function(data) {
     var val = data.val();
-    this.displayMessage(data.key(), val.name, val.text, val.photoUrl, val.imageUrl);
+    this.displayMessage(data.key, val.name, val.text, val.photoUrl, val.imageUrl);
   }.bind(this);
   this.messagesDbRef.limitToLast(12).on('child_added', setMessage);
   this.messagesDbRef.on('child_changed', setMessage);
@@ -97,7 +97,7 @@ FriendlyChat.prototype.saveMessage = function(e) {
       FriendlyChat.resetMaterialTextfield(this.messageInput);
       this.toggleButton();
     }.bind(this)).catch(function(error) {
-      console.log(error);
+      console.error('Error writing new message to Firebase Database', error);
     });
   }
 };
@@ -107,8 +107,8 @@ FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
   // If the image is a Firebase Storage URI we fetch the URL.
   if (imageUri.indexOf('gs://') == 0) {
     imgElement.src = FriendlyChat.LOADING_IMAGE_URL; // Display a loading image in the mean time.
-    this.app.storage().ref(imageUri).getMetadata().then(function(metadata) {
-      imgElement.src = metadata.downloadUrls[0];
+    this.app.storage().refFromURL(imageUri).getMetadata().then(function(metadata) {
+      imgElement.src = metadata.downloadURLs[0];
     });
   } else {
     imgElement.src = imageUri;
@@ -152,10 +152,11 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
       uploadTask.on('state_changed', null, function(error) {
         console.error('There was an error uploading a file to Firebase Storage:', error);
       }, function() {
-        console.log('Uploaded file to Firebase Storage. Path:', uploadTask.metadata.fullPath,
-            'Size:', this.totalBytes, 'bytes.');
-        console.log(this.storageRef.child(uploadTask.metadata.fullPath).toString());
-        data.update({imageUrl: this.storageRef.child(uploadTask.metadata.fullPath).toString()});
+        var filePath = uploadTask.snapshot.metadata.fullPath;
+        console.log('Uploaded file to Firebase Storage. Path:', filePath,
+            'Size:', uploadTask.snapshot.totalBytes, 'bytes.');
+        console.log(this.storageRef.child(filePath).toString());
+        data.update({imageUrl: this.storageRef.child(filePath).toString()});
       }.bind(this));
     }.bind(this));
   }
@@ -177,16 +178,17 @@ FriendlyChat.prototype.signIn = function(googleUser) {
   this.signInButton.setAttribute('hidden', true);
   this.signOutButton.removeAttribute('hidden');
 
-  // Sign in Firebase with credential from the Google user.
-  if (this.app.auth().currentUser) {
-    var credential = firebase.GoogleAuthProvider.credential({
+  // Sign in Firebase with credential from the Google user if not already signed-in.
+  if (!this.app.auth().currentUser) {
+    var credential = firebase.auth.GoogleAuthProvider.credential({
       'idToken' : googleUser.getAuthResponse().id_token
     });
-    this.app.auth().signInWithCredential(credential).then(function () {
-      this.loadMessages();
-    }.bind(this), function (error) {
-      console.log('Error signing in Firebase', error);
-    }.bind(this));
+    this.app.auth().signInWithCredential(credential).then(this.loadMessages.bind(this),
+        function(error) {
+          console.error('Error signing in Firebase', error);
+        });
+  } else {
+    this.loadMessages();
   }
 };
 
