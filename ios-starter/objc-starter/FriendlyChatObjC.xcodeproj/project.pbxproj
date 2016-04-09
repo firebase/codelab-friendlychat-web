@@ -104,9 +104,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 107960A21C6130EF003DB6CC /* Build configuration list for PBXNativeTarget "FriendlyChatObjC" */;
 			buildPhases = (
+				5524E02CC9C55787F2894CF7 /* 📦 Check Pods Manifest.lock */,
 				1079607C1C6130EF003DB6CC /* Sources */,
 				1079607D1C6130EF003DB6CC /* Frameworks */,
 				1079607E1C6130EF003DB6CC /* Resources */,
+				2207AD20E6C7E0A62AFEDC1C /* 📦 Embed Pods Frameworks */,
+				6917503AE9FE8E30BA7E7DB5 /* 📦 Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -161,6 +164,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2207AD20E6C7E0A62AFEDC1C /* 📦 Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FriendlyChatObjC/Pods-FriendlyChatObjC-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5524E02CC9C55787F2894CF7 /* 📦 Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		6917503AE9FE8E30BA7E7DB5 /* 📦 Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FriendlyChatObjC/Pods-FriendlyChatObjC-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1079607C1C6130EF003DB6CC /* Sources */ = {

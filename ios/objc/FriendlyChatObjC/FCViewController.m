@@ -14,24 +14,30 @@
 //  limitations under the License.
 //
 
-@import Photos;
 #import "AppState.h"
 #import "Constants.h"
 #import "FCViewController.h"
 
-#import "FirebaseStorage.h"
-#import "FIRRemoteConfig.h"
-#import "FCRLog.h"
-@import FirebaseDatabase;
-@import FirebaseApp;
+@import Photos;
+
 @import FirebaseAuth;
-@import Firebase.AdMob;
-@import Firebase.Core;
+@import FirebaseCrashReporting;
+@import FirebaseDatabase;
+@import FirebaseRemoteConfig;
+@import FirebaseStorage;
+@import GoogleMobileAds;
+
+/**
+ * AdMob ad unit IDs are not currently stored inside the google-services.plist file. Developers
+ * using AdMob can store them as custom values in another plist, or simply use constants. Note that
+ * these ad units are configured to return only test ads, and should not be used outside this sample.
+ */
+static NSString* const kBannerAdUnitID = @"ca-app-pub-3940256099942544/2934735716";
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
 UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
   int _msglength;
-  FirebaseHandle _refHandle;
+  FIRDatabaseHandle _refHandle;
 }
 
 @property(nonatomic, weak) IBOutlet UITextField *textField;
@@ -54,7 +60,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 }
 
 - (IBAction)didPressCrash:(id)sender {
-  FCRLog(@"Cause Crash button clicked");
+  FIRCrashLog(@"Cause Crash button clicked");
   assert(NO);
 }
 
@@ -84,14 +90,14 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   [self fetchConfig];
   [self configureStorage];
 
-  // Log that the view did load, FCRNSLog is used here so the log message will be
-  // shown in the console output. If FCRLog is used the message is not shown in
+  // Log that the view did load, FIRCrashNSLog is used here so the log message will be
+  // shown in the console output. If FIRCrashLog is used the message is not shown in
   // the console output.
-  FCRNSLog(@"View loaded");
+  FIRCrashNSLog(@"View loaded");
 }
 
 - (void)loadAd {
-  self.banner.adUnitID = [FIRContext sharedInstance].adUnitIDForBannerTest;
+  self.banner.adUnitID = kBannerAdUnitID;
   self.banner.rootViewController = self;
   [self.banner loadRequest:[GADRequest request]];
 }
@@ -122,8 +128,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 }
 
 - (void)configureStorage {
-  FIRFirebaseApp *app = [FIRFirebaseApp app];
-  self.storageRef = [[FIRStorage storageForApp:app] reference];
+  self.storageRef = [[FIRStorage storage] reference];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(nonnull NSString *)string {
@@ -138,7 +143,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 - (void)viewWillAppear:(BOOL)animated {
   [_messages removeAllObjects];
   // Listen for new messages in the Firebase database
-  _refHandle = [[_ref childByAppendingPath:@"messages"] observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+  _refHandle = [[_ref child:@"messages"] observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
     [_messages addObject:snapshot];
     [_clientTable insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_messages.count-1 inSection:0]] withRowAnimation: UITableViewRowAnimationAutomatic];
   }];
@@ -164,7 +169,8 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   NSString *imageUrl = message[MessageFieldsimageUrl];
   if (imageUrl) {
     if ([imageUrl hasPrefix:@"gs://"]) {
-      [[[FIRStorage storageForApp:[FIRFirebaseApp app]] referenceForURL:imageUrl] dataWithCompletion:^(NSData *data, NSError *error) {
+      [[[FIRStorage storage] referenceForURL:imageUrl] dataWithMaxSize:INT64_MAX
+                                                            completion:^(NSData *data, NSError *error) {
         if (error) {
           NSLog(@"Error downloading: %@", error);
           return;
@@ -209,7 +215,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   }
 
   // Push data to Firebase Database
-  [[[_ref childByAppendingPath:@"messages"] childByAutoId] setValue:mdata];
+  [[[_ref child:@"messages"] childByAutoId] setValue:mdata];
 }
 
 # pragma mark - Image Picker
@@ -235,20 +241,20 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   PHAsset *asset = [assets firstObject];
   [asset requestContentEditingInputWithOptions:nil
                              completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
-                               NSString *imageFile = [contentEditingInput.fullSizeImageURL absoluteString];
+                               NSURL *imageFile = contentEditingInput.fullSizeImageURL;
                                NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceUrl lastPathComponent]];
                                FIRStorageMetadata *metadata = [FIRStorageMetadata new];
                                metadata.contentType = @"image/jpeg";
-                               [[_storageRef childByAppendingPath:filePath]
-                                                          putFile:imageFile metadata:metadata
-                                                   withCompletion:^(FIRStorageMetadata *metadata, NSError *error) {
-                                                     if (error) {
-                                                       NSLog(@"Error uploading: %@", error);
-                                                       return;
-                                                     }
-                                                     [self sendMessage:@{MessageFieldsimageUrl:
-                                                         [_storageRef childByAppendingPath:metadata.path].description}];
-                                                   }
+                               [[_storageRef child:filePath]
+                                           putFile:imageFile metadata:metadata
+                                        completion:^(FIRStorageMetadata *metadata, NSError *error) {
+                                      if (error) {
+                                        NSLog(@"Error uploading: %@", error);
+                                        return;
+                                      }
+                                      [self sendMessage:@{MessageFieldsimageUrl:
+                                      [_storageRef child:metadata.path].description}];
+                                    }
                                 ];
                              }];
 }

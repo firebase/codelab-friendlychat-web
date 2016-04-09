@@ -17,7 +17,6 @@
 import UIKit
 
 import FirebaseAuth
-import Firebase.Core
 
 @objc(SignInViewController)
 class SignInViewController: UIViewController {

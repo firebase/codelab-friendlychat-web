@@ -14,24 +14,30 @@
 //  limitations under the License.
 //
 
-@import Photos;
 #import "AppState.h"
 #import "Constants.h"
 #import "FCViewController.h"
 
-#import "FirebaseStorage.h"
-#import "FIRRemoteConfig.h"
-#import "FCRLog.h"
-@import FirebaseDatabase;
-@import FirebaseApp;
+@import Photos;
+
 @import FirebaseAuth;
-@import Firebase.AdMob;
-@import Firebase.Core;
+@import FirebaseCrashReporting;
+@import FirebaseDatabase;
+@import FirebaseRemoteConfig;
+@import FirebaseStorage;
+@import GoogleMobileAds;
+
+/**
+ * AdMob ad unit IDs are not currently stored inside the google-services.plist file. Developers
+ * using AdMob can store them as custom values in another plist, or simply use constants. Note that
+ * these ad units are configured to return only test ads, and should not be used outside this sample.
+ */
+static NSString* const kBannerAdUnitID = @"ca-app-pub-3940256099942544/2934735716";
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
 UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
   int _msglength;
-  FirebaseHandle _refHandle;
+  FIRDatabaseHandle _refHandle;
 }
 
 @property(nonatomic, weak) IBOutlet UITextField *textField;
@@ -99,13 +105,12 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 
 // UITableViewDataSource protocol methods
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  return 0;
+  return [_messages count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
   // Dequeue cell
   UITableViewCell *cell = [_clientTable dequeueReusableCellWithIdentifier:@"tableViewCell" forIndexPath:indexPath];
-
   return cell;
 }
 

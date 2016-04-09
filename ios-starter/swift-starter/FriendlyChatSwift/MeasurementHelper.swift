@@ -14,7 +14,7 @@
 //  limitations under the License.
 //
 
-import Firebase.Core
+import FirebaseAnalytics
 
 class MeasurementHelper: NSObject {
 
