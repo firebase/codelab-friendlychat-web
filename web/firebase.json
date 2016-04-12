@@ -4,9 +4,7 @@
     "public": "./",
     "ignore": [
       "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "functions"
+      "security-rules.json"
     ]
   }
 }

@@ -15,12 +15,6 @@
  */
 'use strict';
 
-// Project configuration static initializers.
-// TODO(DEVELOPER): Change these config variables.
-var DATABASE_URL = '<DATABASE_URL>';
-var API_KEY = '<API_KEY>';
-var PROJECT_ID = '<PROJECT_ID>';
-
 // Initializes FriendlyChat.
 function FriendlyChat() {
 
@@ -52,12 +46,12 @@ function FriendlyChat() {
   }.bind(this));
   this.mediaCapture.addEventListener('change', this.saveImageMessage.bind(this));
 
-  this.initFirebase(API_KEY, DATABASE_URL, PROJECT_ID);
+  this.initFirebase();
   this.loadMessages();
 }
 
 // Initializes Firebase.
-FriendlyChat.prototype.initFirebase = function(apiKey, databaseUrl, projectId) {
+FriendlyChat.prototype.initFirebase = function() {
   // TODO(DEVELOPER): Initialize Firebase.
 };
 
