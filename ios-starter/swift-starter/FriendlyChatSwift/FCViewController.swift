@@ -14,14 +14,22 @@
 //  limitations under the License.
 //
 
-import UIKit
 import Photos
+import UIKit
 
-import FirebaseDatabase
-import FirebaseApp
 import FirebaseAuth
-import Firebase.AdMob
-import Firebase.Core
+import FirebaseCrashReporting
+import FirebaseDatabase
+import FirebaseRemoteConfig
+import FirebaseStorage
+import GoogleMobileAds
+
+/**
+ * AdMob ad unit IDs are not currently stored inside the google-services.plist file. Developers
+ * using AdMob can store them as custom values in another plist, or simply use constants. Note that
+ * these ad units are configured to return only test ads, and should not be used outside this sample.
+ */
+let kBannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
 
 @objc(FCViewController)
 class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
@@ -33,7 +41,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   var ref: FIRDatabaseReference!
   var messages: [FIRDataSnapshot]! = []
   var msglength: NSNumber = 10
-  private var _refHandle: FirebaseHandle!
+  private var _refHandle: FIRDatabaseHandle!
 
   var storageRef: FIRStorageReference!
   var remoteConfig: FIRRemoteConfig!
@@ -86,7 +94,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   // UITableViewDataSource protocol methods
   func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 0
+    return messages.count
   }
 
   func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -128,7 +136,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       let assets = PHAsset.fetchAssetsWithALAssetURLs([referenceUrl], options: nil)
       let asset = assets.firstObject
       asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
-        let imageFile = contentEditingInput?.fullSizeImageURL?.absoluteString
+        let imageFile = contentEditingInput?.fullSizeImageURL
         let fileName = AppState.sharedInstance.displayName! + referenceUrl.lastPathComponent!
       })
   }

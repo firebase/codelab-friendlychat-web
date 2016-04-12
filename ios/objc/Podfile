@@ -1,13 +1,18 @@
 # FriendlyChat Codelab
-source 'https://cpdc-eap.googlesource/spec.git'
+source 'https://cpdc-eap.googlesource.com/spec.git'
 source 'https://github.com/CocoaPods/Specs.git'
 
-pod 'FirebaseStorage'
+platform :ios, '7.0'
+
+pod 'Firebase/Storage'
 pod 'Firebase/AdMob'
 pod 'Firebase/Auth'
 pod 'Firebase/CrashReporting'
 pod 'Firebase/Database'
 pod 'Firebase/RemoteConfig'
 
-platform :ios, '7.0'
-target 'FriendlyChatObjC'
+# If using CocoaPods 1.0.0+, use the new target syntax.
+# target 'FriendlyChatObjC'
+
+# and delete the link_with command.
+link_with 'FriendlyChatObjC'

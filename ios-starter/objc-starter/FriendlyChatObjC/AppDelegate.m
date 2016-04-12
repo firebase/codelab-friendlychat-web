@@ -16,13 +16,12 @@
 
 #import "AppDelegate.h"
 
-@import FirebaseApp;
-@import Firebase.Core;
+@import FirebaseAnalytics;
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application
-    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   return YES;
 }
 

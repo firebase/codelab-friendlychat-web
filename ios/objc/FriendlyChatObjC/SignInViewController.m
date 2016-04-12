@@ -41,13 +41,13 @@
   NSString *password = _passwordField.text;
   [[FIRAuth auth] signInWithEmail:email
                          password:password
-                         callback:^(FIRUser * _Nullable user, NSError * _Nullable error) {
-                           if (error) {
-                             NSLog(@"%@", error.localizedDescription);
-                             return;
-                           }
-                           [self signedIn:user];
-                         }];
+                       completion:^(FIRUser * _Nullable user, NSError * _Nullable error) {
+                         if (error) {
+                           NSLog(@"%@", error.localizedDescription);
+                           return;
+                         }
+                         [self signedIn:user];
+                       }];
 }
 
 - (IBAction)didTapSignUp:(id)sender {
@@ -55,13 +55,13 @@
   NSString *password = _passwordField.text;
   [[FIRAuth auth] createUserWithEmail:email
                              password:password
-                             callback:^(FIRUser * _Nullable user, NSError * _Nullable error) {
-                               if (error) {
-                                 NSLog(@"%@", error.localizedDescription);
-                                 return;
-                               }
-                               [self setDisplayName:user];
-                             }];
+                           completion:^(FIRUser * _Nullable user, NSError * _Nullable error) {
+                             if (error) {
+                               NSLog(@"%@", error.localizedDescription);
+                               return;
+                             }
+                             [self setDisplayName:user];
+                           }];
 }
 
 - (void)setDisplayName:(FIRUser *)user {
@@ -69,7 +69,7 @@
       [user profileChangeRequest];
   // Use first part of email as the default display name
   changeRequest.displayName = [[user.email componentsSeparatedByString:@"@"] objectAtIndex:0];
-  [changeRequest commitChangesWithCallback:^(NSError *_Nullable error) {
+  [changeRequest commitChangesWithCompletion:^(NSError *_Nullable error) {
     if (error) {
       NSLog(@"%@", error.localizedDescription);
       return;
@@ -95,12 +95,12 @@
                                  return;
                                }
                                [[FIRAuth auth] sendPasswordResetWithEmail:userInput
-                                                                 callback:^(NSError * _Nullable error) {
-                                                                   if (error) {
-                                                                     NSLog(@"%@", error.localizedDescription);
-                                                                     return;
-                                                                   }
-                                                                 }];
+                                                               completion:^(NSError * _Nullable error) {
+                                                                 if (error) {
+                                                                   NSLog(@"%@", error.localizedDescription);
+                                                                   return;
+                                                                 }
+                                                               }];
 
                              }];
   [prompt addTextFieldWithConfigurationHandler:nil];

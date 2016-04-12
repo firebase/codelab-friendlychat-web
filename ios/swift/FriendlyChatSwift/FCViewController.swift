@@ -14,14 +14,22 @@
 //  limitations under the License.
 //
 
-import UIKit
 import Photos
+import UIKit
 
-import FirebaseDatabase
-import FirebaseApp
 import FirebaseAuth
-import Firebase.AdMob
-import Firebase.Core
+import FirebaseCrashReporting
+import FirebaseDatabase
+import FirebaseRemoteConfig
+import FirebaseStorage
+import GoogleMobileAds
+
+/**
+ * AdMob ad unit IDs are not currently stored inside the google-services.plist file. Developers
+ * using AdMob can store them as custom values in another plist, or simply use constants. Note that
+ * these ad units are configured to return only test ads, and should not be used outside this sample.
+ */
+let kBannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
 
 @objc(FCViewController)
 class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
@@ -33,7 +41,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   var ref: FIRDatabaseReference!
   var messages: [FIRDataSnapshot]! = []
   var msglength: NSNumber = 10
-  private var _refHandle: FirebaseHandle!
+  private var _refHandle: FIRDatabaseHandle!
 
   var storageRef: FIRStorageReference!
   var remoteConfig: FIRRemoteConfig!
@@ -46,10 +54,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   @IBAction func didPressCrash(sender: AnyObject) {
-    withVaList([]) {
-      FCRLogv("Cause Crash button clicked", $0)
-    }
-    fatalError()
+    FIRCrashMessage("Cause Crash button clicked")
   }
 
   @IBAction func didPressFreshConfig(sender: AnyObject) {
@@ -59,9 +64,9 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    ref = FIRDatabase.database().reference
+    ref = FIRDatabase.database().reference()
 
-    remoteConfig = FIRRemoteConfig()
+    remoteConfig = FIRRemoteConfig.remoteConfig()
     // Create Remote Config Setting to enable developer mode.
     // Fetching configs from the server is normally limited to 5 requests per hour.
     // Enabling developer mode allows many more requests to be made per hour, so developers
@@ -75,16 +80,11 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     fetchConfig()
     configureStorage()
 
-    // Log that the view did load, FCRNSLogv is used here so the log message will be
-    // shown in the console output. If FCRLogv is used the message is not shown in
-    // the console output.
-    withVaList([]) {
-      FCRNSLogv("View loaded", $0)
-    }
+    FIRCrashMessage("View loaded")
   }
 
   func loadAd() {
-    self.banner.adUnitID = FIRContext.sharedInstance().adUnitIDForBannerTest
+    self.banner.adUnitID = kBannerAdUnitID
     self.banner.rootViewController = self
     self.banner.loadRequest(GADRequest())
   }
@@ -115,8 +115,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func configureStorage() {
-    let app = FIRFirebaseApp.app()
-    storageRef = FIRStorage.storage(app: app!).reference
+    storageRef = FIRStorage.storage().reference()
   }
 
   func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
@@ -129,7 +128,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   override func viewWillAppear(animated: Bool) {
     self.messages.removeAll()
     // Listen for new messages in the Firebase database
-    _refHandle = self.ref.childByAppendingPath("messages").observeEventType(.ChildAdded, withBlock: { (snapshot) -> Void in
+    _refHandle = self.ref.child("messages").observeEventType(.ChildAdded, withBlock: { (snapshot) -> Void in
       self.messages.append(snapshot)
       self.clientTable.insertRowsAtIndexPaths([NSIndexPath(forRow: self.messages.count-1, inSection: 0)], withRowAnimation: .Automatic)
     })
@@ -153,7 +152,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     let name = message[Constants.MessageFields.name] as String!
     if let imageUrl = message[Constants.MessageFields.imageUrl] {
       if imageUrl.hasPrefix("gs://") {
-        FIRStorage.storage(app: FIRFirebaseApp.app()!).referenceForURL(imageUrl).dataWithCompletion(){ (data, error) in
+        FIRStorage.storage().referenceForURL(imageUrl).dataWithMaxSize(INT64_MAX){ (data, error) in
           if let error = error {
             print("Error downloading: \(error)")
             return
@@ -189,7 +188,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       mdata[Constants.MessageFields.photoUrl] = photoUrl.absoluteString
     }
     // Push data to Firebase Database
-    self.ref.childByAppendingPath("messages").childByAutoId().setValue(mdata)
+    self.ref.child("messages").childByAutoId().setValue(mdata)
   }
 
   // MARK: - Image Picker
@@ -214,17 +213,17 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       let assets = PHAsset.fetchAssetsWithALAssetURLs([referenceUrl], options: nil)
       let asset = assets.firstObject
       asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
-        let imageFile = contentEditingInput?.fullSizeImageURL?.absoluteString
+        let imageFile = contentEditingInput?.fullSizeImageURL
         let filePath = "\(FIRAuth.auth()?.currentUser?.uid)/\(Int(NSDate.timeIntervalSinceReferenceDate() * 1000))/\(referenceUrl.lastPathComponent!)"
         let metadata = FIRStorageMetadata()
         metadata.contentType = "image/jpeg"
-        self.storageRef.childByAppendingPath(filePath)
+        self.storageRef.child(filePath)
           .putFile(imageFile!, metadata: metadata) { (metadata, error) in
             if let error = error {
               print("Error uploading: \(error.description)")
               return
             }
-            self.sendMessage([Constants.MessageFields.imageUrl: self.storageRef.childByAppendingPath((metadata?.path)!).description])
+            self.sendMessage([Constants.MessageFields.imageUrl: self.storageRef.child((metadata?.path)!).description])
           }
       })
   }

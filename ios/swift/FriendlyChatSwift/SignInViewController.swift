@@ -17,7 +17,6 @@
 import UIKit
 
 import FirebaseAuth
-import Firebase.Core
 
 @objc(SignInViewController)
 class SignInViewController: UIViewController {
@@ -58,13 +57,13 @@ class SignInViewController: UIViewController {
   func setDisplayName(user: FIRUser) {
     let changeRequest = user.profileChangeRequest()
     changeRequest.displayName = user.email!.componentsSeparatedByString("@")[0]
-    changeRequest.commitChangesWithCallback({ (error) in
+    changeRequest.commitChangesWithCompletion(){ (error) in
       if let error = error {
         print(error.localizedDescription)
         return
       }
       self.signedIn(FIRAuth.auth()?.currentUser)
-    })
+    }
   }
 
   @IBAction func didRequestPasswordReset(sender: AnyObject) {
