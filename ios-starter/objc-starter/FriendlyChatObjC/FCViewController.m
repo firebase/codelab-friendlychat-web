@@ -147,8 +147,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   PHAsset *asset = [assets firstObject];
   [asset requestContentEditingInputWithOptions:nil
                              completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
-                               NSString *imageFile = [contentEditingInput.fullSizeImageURL absoluteString];
-                               NSString *fileName = [[AppState sharedInstance].displayName stringByAppendingString:[referenceUrl lastPathComponent]];
+                               NSURL *imageFile = contentEditingInput.fullSizeImageURL;
+                               NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceUrl lastPathComponent]];
                              }
    ];
 }

@@ -137,7 +137,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       let asset = assets.firstObject
       asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
         let imageFile = contentEditingInput?.fullSizeImageURL
-        let fileName = AppState.sharedInstance.displayName! + referenceUrl.lastPathComponent!
+        let filePath = "\(FIRAuth.auth()?.currentUser?.uid)/\(Int(NSDate.timeIntervalSinceReferenceDate() * 1000))/\(referenceUrl.lastPathComponent!)"
       })
   }
 
