@@ -19,26 +19,27 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.FirebaseUser;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "SignInActivity";
     private EditText mEmailField;
     private EditText mPasswordField;
     private Button mSignInButton;
     private Button mSignUpButton;
 
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mFirebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,23 +56,25 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         mSignInButton.setOnClickListener(this);
         mSignUpButton.setOnClickListener(this);
 
-        // Initialize FirebaseApp
-        FirebaseApp.initializeApp(this, getString(R.string.google_app_id),
-                new FirebaseOptions.Builder(getString(R.string.google_api_key)).build());
-
         // Initialize FirebaseAuth
-        mAuth = FirebaseAuth.getAuth();
+        mFirebaseAuth = FirebaseAuth.getInstance();
     }
 
     public void onSignInClicked() {
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
 
-        mAuth.signInWithEmailAndPassword(email, password).setResultCallback(
-                new ResultCallback<AuthResult>() {
+        mFirebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
-                    public void onResult(@NonNull AuthResult authResult) {
+                    public void onSuccess(AuthResult authResult) {
                         handleFirebaseAuthResult(authResult);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Throwable throwable) {
+                        Log.w(TAG, "Unable to sign in with email and password");
                     }
                 });
     }
@@ -80,28 +83,29 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
 
-        mAuth.createUserWithEmailAndPassword(email, password).setResultCallback(
-                new ResultCallback<AuthResult>() {
+        mFirebaseAuth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
-                    public void onResult(@NonNull AuthResult authResult) {
+                    public void onSuccess(AuthResult authResult) {
                         handleFirebaseAuthResult(authResult);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Throwable throwable) {
+                        Log.w(TAG, "Unable to create user with email and password");
                     }
                 });
     }
 
     private void handleFirebaseAuthResult(AuthResult authResult) {
-        if (authResult.getStatus().isSuccess()) {
+        if (authResult != null) {
             // Welcome the user
             FirebaseUser user = authResult.getUser();
             Toast.makeText(this, "Welcome " + user.getEmail(), Toast.LENGTH_SHORT).show();
 
             // Go back to the main activity
             startActivity(new Intent(this, MainActivity.class));
-        } else {
-            // Display an error message
-            Toast.makeText(this,
-                    "Authentication Error: " + authResult.getStatus().getStatusMessage(),
-                    Toast.LENGTH_SHORT).show();
         }
     }
 

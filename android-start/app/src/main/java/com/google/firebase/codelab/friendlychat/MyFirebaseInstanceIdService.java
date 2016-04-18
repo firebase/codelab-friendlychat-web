@@ -15,29 +15,21 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
-import android.app.IntentService;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmPubSub;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.io.IOException;
+public class MyFirebaseInstanceIdService {
 
-public class RegistrationIntentService extends IntentService {
+    private static final String TAG = "MyFirebaseIIDService";
+    private static final String FRIENDLY_ENGAGE_TOPIC = "friendly_engage";
 
-    public static final String TAG = "RegIntentService";
-    private static final String[] TOPICS = {"friendly_engage"};
-
-    public RegistrationIntentService() {
-        super(TAG);
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
+    /**
+     * The Application's current Instance ID token is no longer valid and thus a new one must be requested.
+     */
+    public void onTokenRefresh() {
     }
 
 }

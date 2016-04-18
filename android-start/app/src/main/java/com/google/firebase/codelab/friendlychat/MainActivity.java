@@ -37,22 +37,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.firebase.ui.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.config.FirebaseRemoteConfig;
-import com.google.android.gms.config.FirebaseRemoteConfigException;
-import com.google.android.gms.config.FirebaseRemoteConfigFetchCallback;
-import com.google.android.gms.config.FirebaseRemoteConfigSettings;
-import com.google.android.gms.crash.Crash;
-import com.google.android.gms.measurement.AppMeasurement;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.FirebaseUser;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,11 +87,11 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayoutManager mLinearLayoutManager;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
-    private DatabaseReference mFirebaseDatabase;
+    private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private EditText mMessageEditText;
-    private AppMeasurement mAppMeasurement;
+    private FirebaseAnalytics mFirebaseAnalytics;
     private AdView mAdView;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
@@ -104,12 +102,6 @@ public class MainActivity extends AppCompatActivity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         // Set default username is anonymous.
         mUsername = ANONYMOUS;
-
-        // Initialize FirebaseApp.
-        // TODO: Add code to initialize Firebase.
-
-        // Check if user is signed in.
-        // TODO: Add code to check if user is signed in.
 
         // Initialize ProgressBar and RecyclerView.
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -154,6 +146,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        // Check if user is signed in.
+        // TODO: Add code to check if user is signed in.
     }
 
     @Override

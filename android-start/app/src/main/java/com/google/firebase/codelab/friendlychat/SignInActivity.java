@@ -19,17 +19,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.FirebaseUser;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -54,9 +54,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         // Set click listeners
         mSignInButton.setOnClickListener(this);
         mSignUpButton.setOnClickListener(this);
-
-        // Initialize FirebaseApp
-        // TODO
 
         // Initialize FirebaseAuth
         // TODO

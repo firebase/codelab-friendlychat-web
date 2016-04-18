@@ -14,16 +14,20 @@
  * limitations under the License.
  */package com.google.firebase.codelab.friendlychat;
 
-import android.os.Bundle;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmListenerService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 
-public class MyGcmListenerService extends GcmListenerService {
+public class MyFirebaseMessagingService extends FirebaseMessagingService {
+
+    private static final String TAG = "MyFMService";
+
     @Override
-    public void onMessageReceived(String from, Bundle data) {
-        // Handle data payload of GCM messages. This codelab does not send GCM messages with data payloads so no
-        // code is necessary here.
-        Log.d("MyListenerService", data.toString());
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        // Handle data payload of FCM messages.
+        Log.d(TAG, "FCM Message Id: " + remoteMessage.getMessageId());
+        Log.d(TAG, "FCM Notification Message: " + remoteMessage.getNotification());
+        Log.d(TAG, "FCM Data Message: " + remoteMessage.getData());
     }
 }

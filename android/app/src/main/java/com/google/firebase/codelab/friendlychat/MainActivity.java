@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,22 +38,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.firebase.ui.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.config.FirebaseRemoteConfig;
-import com.google.android.gms.config.FirebaseRemoteConfigException;
-import com.google.android.gms.config.FirebaseRemoteConfigFetchCallback;
-import com.google.android.gms.config.FirebaseRemoteConfigSettings;
-import com.google.android.gms.crash.Crash;
-import com.google.android.gms.measurement.AppMeasurement;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.FirebaseUser;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,11 +88,11 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayoutManager mLinearLayoutManager;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
-    private DatabaseReference mFirebaseDatabase;
+    private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
+    private FirebaseAnalytics mFirebaseAnalytics;
     private EditText mMessageEditText;
-    private AppMeasurement mAppMeasurement;
     private AdView mAdView;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
@@ -102,33 +101,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize FirebaseApp, this allows database calls on behalf of the signed in user.
-        FirebaseApp.initializeApp(this, getString(R.string.google_app_id),
-                new FirebaseOptions.Builder(getString(R.string.google_api_key)).build());
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
 
         // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getAuth();
+        mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-
-        // Check if the InstanceID token, required to receive GCM messages has been retrieved, start registration
-        // service if not yet retrieved.
-        if (!mSharedPreferences.getBoolean(CodelabPreferences.INSTANCE_ID_TOKEN_RETRIEVED, false)) {
-            startService(new Intent(this, RegistrationIntentService.class));
-        }
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
 
-        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
                         FriendlyMessage.class,
                         R.layout.item_message,
                         MessageViewHolder.class,
-                        mFirebaseDatabase.child(MESSAGES_CHILD)) {
+                        mFirebaseDatabaseReference.child(MESSAGES_CHILD)) {
 
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
@@ -170,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         mAdView.loadAd(adRequest);
 
         // Initialize Firebase Measurement.
-        mAppMeasurement = AppMeasurement.getInstance(this);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Initialize Firebase Remote Config.
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
@@ -221,9 +211,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername,
                         mPhotoUrl);
-                mFirebaseDatabase.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
+                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                 mMessageEditText.setText("");
-                mAppMeasurement.logEvent(MESSAGE_SENT_EVENT, null);
+                mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
             }
         });
     }
@@ -279,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                 sendInvitation();
                 return true;
             case R.id.crash_menu:
-                Crash.log(Log.ERROR, TAG, "crash caused");
+                FirebaseCrash.logcat(Log.ERROR, TAG, "crash caused");
                 causeCrash();
                 return true;
             case R.id.sign_out_menu:
@@ -315,21 +305,23 @@ public class MainActivity extends AppCompatActivity {
         if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
             cacheExpiration = 0;
         }
-        mFirebaseRemoteConfig.fetch(cacheExpiration, new FirebaseRemoteConfigFetchCallback() {
-            @Override
-            public void onSuccess() {
-                // Make the fetched config available via FirebaseRemoteConfig get<type> calls.
-                mFirebaseRemoteConfig.activateFetched();
-                applyRetrievedLengthLimit();
-            }
-
-            @Override
-            public void onFailure(FirebaseRemoteConfigException e) {
-                // There has been an error fetching the config
-                Log.w(TAG, "Error fetching config: " + e);
-                applyRetrievedLengthLimit();
-            }
-        });
+        mFirebaseRemoteConfig.fetch(cacheExpiration)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Make the fetched config available via FirebaseRemoteConfig get<type> calls.
+                        mFirebaseRemoteConfig.activateFetched();
+                        applyRetrievedLengthLimit();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Throwable throwable) {
+                        // There has been an error fetching the config
+                        Log.w(TAG, "Error fetching config: " + throwable.getMessage());
+                        applyRetrievedLengthLimit();
+                    }
+                });
     }
 
     @Override
@@ -341,8 +333,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Use Firebase Measurement to log that invitation was sent.
                 Bundle payload = new Bundle();
-                payload.putString(AppMeasurement.Param.VALUE, "inv_sent");
-                mAppMeasurement.logEvent(AppMeasurement.Event.SHARE, payload);
+                payload.putString(FirebaseAnalytics.Param.VALUE, "inv_sent");
 
                 // Check how many invitations were sent and log.
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
@@ -350,8 +341,8 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 // Use Firebase Measurement to log that invitation was not sent
                 Bundle payload = new Bundle();
-                payload.putString(AppMeasurement.Param.VALUE, "inv_not_sent");
-                mAppMeasurement.logEvent(AppMeasurement.Event.SHARE, payload);
+                payload.putString(FirebaseAnalytics.Param.VALUE, "inv_not_sent");
+                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
 
                 // Sending failed or it was canceled, show failure message to the user
                 Log.d(TAG, "Failed to send invitation.");

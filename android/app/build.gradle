@@ -35,21 +35,22 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+
     compile 'com.android.support:design:23.1.1'
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'de.hdodenhof:circleimageview:1.3.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
 
     // Firebase
-    compile 'com.google.android.gms:firebase-database:8.5.4'
-    compile 'com.google.android.gms:firebase-auth:8.5.4'
-    compile 'com.google.android.gms:firebase-config:8.5.4'
-    compile 'com.google.android.gms:firebase-appinvites:8.5.4'
-    compile 'com.google.android.gms:firebase-gcm:8.5.4'
-    compile 'com.google.android.gms:play-services-ads:8.5.4'
-    compile 'com.google.android.gms:firebase-crash:8.5.4'
-    compile project(':firebaseui')
-
+    compile 'com.google.firebase:firebase-database:8.5.6'
+    compile 'com.google.firebase:firebase-auth:8.5.6'
+    compile 'com.google.firebase:firebase-config:8.5.6'
+    compile 'com.google.android.gms:play-services-appinvite:8.5.6'
+    compile 'com.google.firebase:firebase-messaging:8.5.6'
+    compile 'com.google.android.gms:play-services-ads:8.5.6'
+    compile 'com.google.firebase:firebase-crash:8.5.6'
+    // Firebase UI
+    compile 'com.firebaseui:firebase-ui-database:1.0.0-beta1'
 
     // Testing dependencies
     androidTestCompile 'junit:junit:4.12'
