@@ -49,6 +49,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:8.5.6'
     compile 'com.google.android.gms:play-services-ads:8.5.6'
     compile 'com.google.firebase:firebase-crash:8.5.6'
+    compile 'com.google.firebase:firebase-measurement:8.5.6'
     // Firebase UI
     compile 'com.firebaseui:firebase-ui-database:1.0.0-beta1'
 

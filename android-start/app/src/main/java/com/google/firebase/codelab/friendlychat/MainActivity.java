@@ -85,15 +85,10 @@ public class MainActivity extends AppCompatActivity {
     private Button mSendButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
-    private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
-    private DatabaseReference mFirebaseDatabaseReference;
-    private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
     private EditText mMessageEditText;
-    private FirebaseAnalytics mFirebaseAnalytics;
-    private AdView mAdView;
-    private FirebaseRemoteConfig mFirebaseRemoteConfig;
+
+    // Firebase instance variables
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
