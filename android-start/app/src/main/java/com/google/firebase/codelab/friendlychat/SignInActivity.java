@@ -38,7 +38,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     private Button mSignInButton;
     private Button mSignUpButton;
 
-    private FirebaseAuth mAuth;
+    // Firebase instance variables
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

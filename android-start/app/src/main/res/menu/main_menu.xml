@@ -13,4 +13,7 @@
         android:id="@+id/invite_menu"
         android:title="@string/invite_menu_label"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/crash_menu"
+        android:title="@string/cause_crash"/>
 </menu>
