@@ -11,8 +11,5 @@ pod 'Firebase/CrashReporting'
 pod 'Firebase/Database'
 pod 'Firebase/RemoteConfig'
 
-# If using CocoaPods 1.0.0+, use the new target syntax.
-# target 'FriendlyChatSwift'
-
-# and delete the link_with command.
-link_with 'FriendlyChatSwift'
+target 'FriendlyChatSwift' do
+end
