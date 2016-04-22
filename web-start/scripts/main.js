@@ -50,7 +50,7 @@ function FriendlyChat() {
   this.loadMessages();
 }
 
-// Initializes Firebase.
+// Sets up pointers to Firebase features.
 FriendlyChat.prototype.initFirebase = function() {
   // TODO(DEVELOPER): Initialize Firebase.
 };
@@ -63,9 +63,7 @@ FriendlyChat.prototype.loadMessages = function() {
 // Saves a new message on the Firebase DB.
 FriendlyChat.prototype.saveMessage = function(e) {
   e.preventDefault();
-  if (this.messageInput.value) {
-    // TODO(DEVELOPER): push new message to Firebase.
-  }
+  // TODO(DEVELOPER): push new message to Firebase.
 };
 
 // Sets the URL of the given img element with the URL of the image stored in Firebase Storage.

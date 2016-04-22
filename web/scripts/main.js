@@ -50,7 +50,7 @@ function FriendlyChat() {
   this.loadMessages();
 }
 
-// Initializes Firebase.
+// Sets up pointers to Firebase features.
 FriendlyChat.prototype.initFirebase = function() {
   this.app = firebase.app();
   this.databaseRef = this.app.database().ref();
@@ -70,19 +70,22 @@ FriendlyChat.prototype.loadMessages = function() {
     this.displayMessage(data.key, val.name, val.text, val.photoUrl, val.imageUrl);
   }.bind(this);
   this.messagesDbRef.limitToLast(12).on('child_added', setMessage);
-  this.messagesDbRef.on('child_changed', setMessage);
+  this.messagesDbRef.limitToLast(12).on('child_changed', setMessage);
 };
 
 // Saves a new message on the Firebase DB.
 FriendlyChat.prototype.saveMessage = function(e) {
   e.preventDefault();
+  // Check that the user entered a message and is signed in.
   if (this.messageInput.value && this.checkSignedInWithMessage()) {
     var currentUser = this.app.auth().currentUser;
+    // Add a new message entry to the Firebase Database.
     this.messagesDbRef.push({
-      name: currentUser ? currentUser.displayName : 'Anonymous',
+      name: currentUser.displayName,
       text: this.messageInput.value,
-      photoUrl: currentUser ? currentUser.photoURL : null
+      photoUrl: currentUser.photoURL
     }).then(function() {
+      // Clear message text field and SEND button state.
       FriendlyChat.resetMaterialTextfield(this.messageInput);
       this.toggleButton();
     }.bind(this)).catch(function(error) {
