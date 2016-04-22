@@ -24,6 +24,7 @@ function FriendlyChat() {
   this.messageInput = document.getElementById('message');
   this.submitButton = document.getElementById('submit');
   this.submitImageButton = document.getElementById('submitImage');
+  this.imageForm = document.getElementById('image-form');
   this.mediaCapture = document.getElementById('mediaCapture');
   this.userPic = document.getElementById('user-pic');
   this.userName = document.getElementById('user-name');
@@ -111,6 +112,9 @@ FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
 // This first saves the image in Firebase storage.
 FriendlyChat.prototype.saveImageMessage = function(event) {
   var file = event.target.files[0];
+
+  // Clear the selection in the file picker input.
+  this.imageForm.reset();
 
   // Check if the file is an image.
   if (!file.type.match('image.*')) {
