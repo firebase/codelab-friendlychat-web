@@ -48,7 +48,6 @@ function FriendlyChat() {
   this.mediaCapture.addEventListener('change', this.saveImageMessage.bind(this));
 
   this.initFirebase();
-  this.loadMessages();
 }
 
 // Sets up pointers to Firebase features.
