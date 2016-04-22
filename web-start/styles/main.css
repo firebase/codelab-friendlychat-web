@@ -103,12 +103,19 @@ main, #messages-card {
 #message-form {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  width: calc(100% - 48px);
+  float: left;
+}
+#image-form {
+  display: flex;
+  flex-direction: row;
+  width: 48px;
+  float: right;
 }
 #message-form .mdl-textfield {
   width: calc(100% - 100px);
 }
-#message-form button {
+#message-form button, #image-form button {
   width: 100px;
   margin: 15px 0 0 10px;
 }
@@ -147,12 +154,12 @@ main, #messages-card {
   padding-right: 10px;
   padding-left: 20px;
 }
-#message-form #submitImage {
+#image-form #submitImage {
   width: auto;
   padding: 0 6px 0 1px;
   min-width: 0;
 }
-#message-form #submitImage .material-icons {
+#image-form #submitImage .material-icons {
   top: -1px;
 }
 .message img {
