@@ -18,7 +18,7 @@ import Photos
 import UIKit
 
 import FirebaseAuth
-import FirebaseCrashReporting
+import FirebaseCrash
 import FirebaseDatabase
 import FirebaseRemoteConfig
 import FirebaseStorage
