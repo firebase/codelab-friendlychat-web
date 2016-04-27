@@ -21,7 +21,7 @@
 @import Photos;
 
 @import FirebaseAuth;
-@import FirebaseCrashReporting;
+@import FirebaseCrash;
 @import FirebaseDatabase;
 @import FirebaseRemoteConfig;
 @import FirebaseStorage;
@@ -78,9 +78,8 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   // Fetching configs from the server is normally limited to 5 requests per hour.
   // Enabling developer mode allows many more requests to be made per hour, so developers
   // can test different config values during development.
-  FIRRemoteConfigSettings *remoteConfigSettings = [[FIRRemoteConfigSettings alloc] init];
-  remoteConfigSettings.developerModeEnabled = YES;
-  _remoteConfig.configSettings = remoteConfigSettings;
+  FIRRemoteConfigSettings *remoteConfigSettings = [[FIRRemoteConfigSettings alloc] initWithDeveloperModeEnabled:YES];
+  self.remoteConfig.configSettings = remoteConfigSettings;
 
   _msglength = 10;
   _messages = [[NSMutableArray alloc] init];
@@ -106,7 +105,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   long expirationDuration = 3600;
   // If in developer mode cacheExpiration is set to 0 so each fetch will retrieve values from
   // the server.
-  if (self.remoteConfig.configSettings.developerModeEnabled) {
+  if (self.remoteConfig.configSettings.isDeveloperModeEnabled) {
     expirationDuration = 0;
   }
 

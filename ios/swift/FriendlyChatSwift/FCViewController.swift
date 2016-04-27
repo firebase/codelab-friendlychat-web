@@ -18,7 +18,7 @@ import Photos
 import UIKit
 
 import FirebaseAuth
-import FirebaseCrashReporting
+import FirebaseCrash
 import FirebaseDatabase
 import FirebaseRemoteConfig
 import FirebaseStorage
@@ -71,9 +71,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     // Fetching configs from the server is normally limited to 5 requests per hour.
     // Enabling developer mode allows many more requests to be made per hour, so developers
     // can test different config values during development.
-    let remoteConfigSettings = FIRRemoteConfigSettings()
-    remoteConfigSettings.developerModeEnabled = true
-    remoteConfig.configSettings = remoteConfigSettings
+    let remoteConfigSettings = FIRRemoteConfigSettings(developerModeEnabled: true)
+    remoteConfig.configSettings = remoteConfigSettings!
 
     loadAd()
     self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
@@ -93,7 +92,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     var expirationDuration: Double = 3600
     // If in developer mode cacheExpiration is set to 0 so each fetch will retrieve values from
     // the server.
-    if (self.remoteConfig.configSettings.developerModeEnabled) {
+    if (self.remoteConfig.configSettings.isDeveloperModeEnabled) {
       expirationDuration = 0
     }
 
