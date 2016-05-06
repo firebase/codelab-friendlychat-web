@@ -32,12 +32,15 @@
 }
 
 - (IBAction)didTapSignIn:(id)sender {
+  [self signedIn:nil];
 }
 
 - (IBAction)didTapSignUp:(id)sender {
+  [self setDisplayName:nil];
 }
 
 - (void)setDisplayName:(FIRUser *)user {
+  [self signedIn:nil];
 }
 
 - (IBAction)didRequestPasswordReset:(id)sender {
