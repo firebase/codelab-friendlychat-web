@@ -188,3 +188,9 @@ main, #messages-card {
     background-size: 33px;
   }
 }
+.mdl-textfield__label:after {
+    background-color: #0288D1;
+}
+.mdl-textfield--floating-label.is-focused .mdl-textfield__label {
+    color: #0288D1;
+}
