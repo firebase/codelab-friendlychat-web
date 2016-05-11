@@ -53,7 +53,7 @@
 <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
   <!-- Header section containing logo -->
-  <header class="mdl-layout__header mdl-color-text--white mdl-color--primary">
+  <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
     <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
       <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
         <h3><i class="material-icons">chat_bubble_outline</i> Friendly Chat</h3>
@@ -64,7 +64,9 @@
         <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
           Sign-out
         </button>
-        <div id="sign-in" class="g-signin2" data-onsuccess="signIn" data-theme="dark"></div>
+        <button hidden id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+          Sign-in with Google
+        </button>
       </div>
     </div>
   </header>
@@ -83,13 +85,13 @@
               <input class="mdl-textfield__input" type="text" id="message">
               <label class="mdl-textfield__label" for="message">Message...</label>
             </div>
-            <button id="submit" disabled type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+            <button id="submit" disabled type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--amber-400 mdl-color-text--white">
               Send
             </button>
           </form>
           <form id="image-form" action="#">
             <input id="mediaCapture" type="file" accept="image/*,capture=camera">
-            <button id="submitImage" title="Add an image" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+            <button id="submitImage" title="Add an image" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--amber-400 mdl-color-text--white">
               <i class="material-icons">image</i>
             </button>
           </form>
