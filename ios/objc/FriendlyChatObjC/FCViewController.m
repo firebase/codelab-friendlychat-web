@@ -71,7 +71,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  _ref = [FIRDatabase database].reference;
+  _ref = [[FIRDatabase database] reference];
 
   _remoteConfig = [FIRRemoteConfig remoteConfig];
   // Create Remote Config Setting to enable developer mode.
