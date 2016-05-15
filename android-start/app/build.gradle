@@ -9,7 +9,7 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "com.google.firebase.codelab.friendlychat"
@@ -41,22 +41,25 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:1.3.0'
     compile 'com.android.support:appcompat-v7:23.1.1'
 
+    // Google
+    compile 'com.google.android.gms:play-services-auth:9.0.0'
+
     // Firebase
-    compile 'com.google.firebase:firebase-database:8.5.6'
-    compile 'com.google.firebase:firebase-auth:8.5.6'
-    compile 'com.google.firebase:firebase-config:8.5.6'
-    compile 'com.google.android.gms:play-services-appinvite:8.5.6'
-    compile 'com.google.firebase:firebase-messaging:8.5.6'
-    compile 'com.google.android.gms:play-services-ads:8.5.6'
-    compile 'com.google.firebase:firebase-crash:8.5.6'
+    compile 'com.google.firebase:firebase-database:9.0.0'
+    compile 'com.google.firebase:firebase-auth:9.0.0'
+    compile 'com.google.firebase:firebase-config:9.0.0'
+    compile 'com.google.android.gms:play-services-appinvite:9.0.0'
+    compile 'com.google.firebase:firebase-messaging:9.0.0'
+    compile 'com.google.android.gms:play-services-ads:9.0.0'
+    compile 'com.google.firebase:firebase-crash:9.0.0'
     // Firebase UI
-    compile 'com.firebaseui:firebase-ui-database:1.0.0-beta1'
+    compile 'com.firebaseui:firebase-ui-database:1.0.0'
 
     // Testing dependencies
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     androidTestCompile 'com.android.support.test:runner:0.4.1'
-    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile 'com.android.support:support-annotations:23.2.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
