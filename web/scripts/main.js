@@ -55,10 +55,9 @@ function FriendlyChat() {
 // Sets up shortcuts to Firebase features and initiate firebase auth.
 FriendlyChat.prototype.initFirebase = function() {
   // Shortcuts to Firebase SDK features.
-  this.app = firebase.app();
-  this.auth = this.app.auth();
-  this.databaseRef = this.app.database().ref();
-  this.storageRef = this.app.storage().ref();
+  this.auth = firebase.auth();
+  this.database = firebase.database();
+  this.storage = firebase.storage();
   // Initiates Firebase auth and listen to auth state changes.
   this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
 };
@@ -66,17 +65,17 @@ FriendlyChat.prototype.initFirebase = function() {
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
   // Reference to the /messages/ database path.
-  this.messagesDbRef = this.databaseRef.child('messages');
+  this.messagesRef = this.database.ref('messages');
   // Make sure we remove all previous listeners.
-  this.messagesDbRef.off();
+  this.messagesRef.off();
 
   // Loads the last 12 messages and listen for new ones.
   var setMessage = function(data) {
     var val = data.val();
     this.displayMessage(data.key, val.name, val.text, val.photoUrl, val.imageUrl);
   }.bind(this);
-  this.messagesDbRef.limitToLast(12).on('child_added', setMessage);
-  this.messagesDbRef.limitToLast(12).on('child_changed', setMessage);
+  this.messagesRef.limitToLast(12).on('child_added', setMessage);
+  this.messagesRef.limitToLast(12).on('child_changed', setMessage);
 };
 
 // Saves a new message on the Firebase DB.
@@ -86,7 +85,7 @@ FriendlyChat.prototype.saveMessage = function(e) {
   if (this.messageInput.value && this.checkSignedInWithMessage()) {
     var currentUser = this.auth.currentUser;
     // Add a new message entry to the Firebase Database.
-    this.messagesDbRef.push({
+    this.messagesRef.push({
       name: currentUser.displayName,
       text: this.messageInput.value,
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
@@ -105,7 +104,7 @@ FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
   // If the image is a Firebase Storage URI we fetch the URL.
   if (imageUri.startsWith('gs://')) {
     imgElement.src = FriendlyChat.LOADING_IMAGE_URL; // Display a loading image first.
-    this.app.storage().refFromURL(imageUri).getMetadata().then(function(metadata) {
+    this.storage.refFromURL(imageUri).getMetadata().then(function(metadata) {
       imgElement.src = metadata.downloadURLs[0];
     });
   } else {
@@ -136,14 +135,14 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 
     // We add a message with a loading icon that will get updated with the shared image.
     var currentUser = this.auth.currentUser;
-    this.messagesDbRef.push({
+    this.messagesRef.push({
       name: currentUser.displayName,
       imageUrl: FriendlyChat.LOADING_IMAGE_URL,
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
     }).then(function(data) {
 
       // Upload the image to Firebase Storage.
-      var uploadTask = this.storageRef.child(currentUser.uid + '/' + Date.now() + '/' + file.name)
+      var uploadTask = this.storage.ref(currentUser.uid + '/' + Date.now() + '/' + file.name)
           .put(file, {'contentType': file.type});
       // Listen for upload completion.
       uploadTask.on('state_changed', null, function(error) {
@@ -152,7 +151,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 
         // Get the file's Storage URI and update the chat message placeholder.
         var filePath = uploadTask.snapshot.metadata.fullPath;
-        data.update({imageUrl: this.storageRef.child(filePath).toString()});
+        data.update({imageUrl: this.storage.ref(filePath).toString()});
       }.bind(this));
     }.bind(this));
   }
