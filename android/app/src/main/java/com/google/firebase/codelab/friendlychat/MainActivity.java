@@ -43,6 +43,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -93,8 +94,8 @@ public class MainActivity extends AppCompatActivity implements
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
     private DatabaseReference mFirebaseDatabaseReference;
-    private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
     private FirebaseAnalytics mFirebaseAnalytics;
     private EditText mMessageEditText;
     private AdView mAdView;
@@ -110,15 +111,23 @@ public class MainActivity extends AppCompatActivity implements
         mUsername = ANONYMOUS;
 
         // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        if (mUser == null) {
+        if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
+            finish();
+            return;
         } else {
-            mUsername = mUser.getEmail();
+            mUsername = mFirebaseUser.getDisplayName();
+            mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
         }
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .build();
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
@@ -228,11 +237,6 @@ public class MainActivity extends AppCompatActivity implements
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
             }
         });
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(AppInvite.API)
-                .build();
     }
 
     @Override
@@ -277,8 +281,11 @@ public class MainActivity extends AppCompatActivity implements
                 causeCrash();
                 return true;
             case R.id.sign_out_menu:
-                mAuth.signOut();
+                mFirebaseAuth.signOut();
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+                mFirebaseUser = null;
                 mUsername = ANONYMOUS;
+                mPhotoUrl = null;
                 startActivity(new Intent(this, SignInActivity.class));
                 return true;
             case R.id.fresh_config_menu:
@@ -320,9 +327,9 @@ public class MainActivity extends AppCompatActivity implements
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onFailure(@NonNull Throwable throwable) {
+                    public void onFailure(@NonNull Exception e) {
                         // There has been an error fetching the config
-                        Log.w(TAG, "Error fetching config: " + throwable.getMessage());
+                        Log.w(TAG, "Error fetching config: " + e.getMessage());
                         applyRetrievedLengthLimit();
                     }
                 });
