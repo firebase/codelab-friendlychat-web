@@ -12,7 +12,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "com.google.firebase.codelab.friendlychatdev"
+        applicationId "com.google.firebase.codelab.friendlychat"
         minSdkVersion 9
         targetSdkVersion 23
         versionCode 1
