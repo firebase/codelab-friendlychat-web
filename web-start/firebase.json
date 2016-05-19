@@ -1,2 +1,10 @@
 {
+  "hosting": {
+    "public": "./",
+    "ignore": [
+      "firebase.json",
+      "database-rules.json",
+      "storage.rules"
+    ]
+  }
 }
