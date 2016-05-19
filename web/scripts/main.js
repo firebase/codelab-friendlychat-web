@@ -282,7 +282,7 @@ FriendlyChat.prototype.toggleButton = function() {
 
 // Checks that the Firebase SDK has been correctly setup and configured.
 FriendlyChat.prototype.checkSetup = function() {
-  if (!firebase || !(firebase.app instanceof Function) || !config) {
+  if (!window.firebase || !(firebase.app instanceof Function) || !window.config) {
     window.alert('You have not configured and imported the Firebase SDK. ' +
         'Make sure you go through the codelab setup instructions.');
   } else if (config.storageBucket === '') {
@@ -293,4 +293,6 @@ FriendlyChat.prototype.checkSetup = function() {
   }
 };
 
-window.friendlyChat = new FriendlyChat();
+window.onload = function() {
+  window.friendlyChat = new FriendlyChat();
+};
