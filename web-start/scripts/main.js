@@ -82,7 +82,7 @@ FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
 
 // Saves a new message containing an image URI in Firebase.
 // This first saves the image in Firebase storage.
-FriendlyChat.prototype.saveImageMessage = function(e) {
+FriendlyChat.prototype.saveImageMessage = function(event) {
   var file = event.target.files[0];
 
   // Clear the selection in the file picker input.
