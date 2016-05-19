@@ -127,7 +127,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 }
 
 - (void)configureStorage {
-  self.storageRef = [[FIRStorage storage] reference];
+  self.storageRef = [[FIRStorage storage] referenceForURL:@"gs://<your-firebase-storage-bucket>"];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(nonnull NSString *)string {

@@ -114,7 +114,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func configureStorage() {
-    storageRef = FIRStorage.storage().reference()
+    storageRef = FIRStorage.storage().referenceForURL("gs://<your-firebase-storage-bucket>")
   }
 
   func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
