@@ -19,7 +19,7 @@
 #import "MeasurementHelper.h"
 #import "SignInViewController.h"
 
-@import FirebaseAuth;
+@import Firebase;
 
 @interface SignInViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *emailField;

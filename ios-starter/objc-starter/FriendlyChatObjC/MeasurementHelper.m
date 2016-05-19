@@ -16,7 +16,7 @@
 
 #import "MeasurementHelper.h"
 
-@import FirebaseAnalytics;
+@import Firebase;
 
 @implementation MeasurementHelper
 

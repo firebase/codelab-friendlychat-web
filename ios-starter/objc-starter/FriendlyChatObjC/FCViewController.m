@@ -20,11 +20,7 @@
 
 @import Photos;
 
-@import FirebaseAuth;
-@import FirebaseCrash;
-@import FirebaseDatabase;
-@import FirebaseRemoteConfig;
-@import FirebaseStorage;
+@import Firebase;
 @import GoogleMobileAds;
 
 /**
