@@ -17,11 +17,7 @@
 import Photos
 import UIKit
 
-import FirebaseAuth
-import FirebaseCrash
-import FirebaseDatabase
-import FirebaseRemoteConfig
-import FirebaseStorage
+import Firebase
 import GoogleMobileAds
 
 /**
