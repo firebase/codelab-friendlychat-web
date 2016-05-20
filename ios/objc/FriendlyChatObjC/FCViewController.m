@@ -20,7 +20,7 @@
 
 @import Photos;
 
-@import Firebase
+@import Firebase;
 @import GoogleMobileAds;
 
 /**
