@@ -51,6 +51,40 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 
 @implementation FCViewController
 
+- (void)viewDidLoad {
+  [super viewDidLoad];
+
+  _msglength = 10;
+  _messages = [[NSMutableArray alloc] init];
+  [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
+
+  [self configureDatabase];
+  [self configureStorage];
+  [self configureRemoteConfig];
+  [self fetchConfig];
+  [self loadAd];
+  [self logViewLoaded];
+}
+
+- (void)dealloc {
+}
+
+- (void)configureDatabase {
+}
+
+- (void)configureStorage {
+}
+
+- (void)configureRemoteConfig {
+}
+
+- (void)fetchConfig {
+}
+
+- (IBAction)didPressFreshConfig:(id)sender {
+  [self fetchConfig];
+}
+
 - (IBAction)didSendMessage:(UIButton *)sender {
   [self textFieldShouldReturn:_textField];
 }
@@ -59,29 +93,10 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   assert(NO);
 }
 
-- (IBAction)didPressFreshConfig:(id)sender {
-  [self fetchConfig];
-}
-
-- (void)viewDidLoad {
-  [super viewDidLoad];
-
-  _msglength = 10;
-  _messages = [[NSMutableArray alloc] init];
-
-  [self loadAd];
-  [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
-  [self fetchConfig];
-  [self configureStorage];
+- (void)logViewLoaded {
 }
 
 - (void)loadAd {
-}
-
-- (void)fetchConfig {
-}
-
-- (void)configureStorage {
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(nonnull NSString *)string {
@@ -139,14 +154,23 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   [picker dismissViewControllerAnimated:YES completion:NULL];
 
   NSURL *referenceUrl = info[UIImagePickerControllerReferenceURL];
-  PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceUrl] options:nil];
-  PHAsset *asset = [assets firstObject];
-  [asset requestContentEditingInputWithOptions:nil
-                             completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
-                               NSURL *imageFile = contentEditingInput.fullSizeImageURL;
-                               NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceUrl lastPathComponent]];
+  if (referenceUrl) {
+    PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceUrl] options:nil];
+    PHAsset *asset = [assets firstObject];
+    [asset requestContentEditingInputWithOptions:nil
+                               completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
+                                 NSURL *imageFile = contentEditingInput.fullSizeImageURL;
+                                 NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceUrl lastPathComponent]];
                              }
    ];
+  } else {
+    UIImage *image = info[UIImagePickerControllerOriginalImage];
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.8);
+    NSString *imagePath =
+    [NSString stringWithFormat:@"%@/%lld.jpg",
+     [FIRAuth auth].currentUser.uid,
+     (long long)([[NSDate date] timeIntervalSince1970] * 1000.0)];
+  }
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
@@ -155,7 +179,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (IBAction)signOut:(UIButton *)sender {
   [AppState sharedInstance].signedIn = false;
-  [self performSegueWithIdentifier:SeguesFpToSignIn sender:nil];
+  [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (void)showAlert:(NSString *)title message:(NSString *)message {

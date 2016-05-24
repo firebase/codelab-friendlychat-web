@@ -45,6 +45,39 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
 
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
+
+    configureDatabase()
+    configureStorage()
+    configureRemoteConfig()
+    fetchConfig()
+    loadAd()
+    logViewLoaded()
+  }
+
+  deinit {
+  }
+
+  func configureDatabase() {
+  }
+
+  func configureStorage() {
+  }
+
+  func configureRemoteConfig() {
+  }
+
+  func fetchConfig() {
+  }
+
+  @IBAction func didPressFreshConfig(sender: AnyObject) {
+    fetchConfig()
+  }
+
   @IBAction func didSendMessage(sender: UIButton) {
     textFieldShouldReturn(textField)
   }
@@ -53,26 +86,10 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     fatalError()
   }
 
-  @IBAction func didPressFreshConfig(sender: AnyObject) {
-    fetchConfig()
-  }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    loadAd()
-    self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
-    fetchConfig()
-    configureStorage()
+  func logViewLoaded() {
   }
 
   func loadAd() {
-  }
-
-  func fetchConfig() {
-  }
-
-  func configureStorage() {
   }
 
   func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
@@ -80,12 +97,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
     let newLength = text.utf16.count + string.utf16.count - range.length
     return newLength <= self.msglength.integerValue // Bool
-  }
-
-  override func viewWillAppear(animated: Bool) {
-  }
-
-  override func viewWillDisappear(animated: Bool) {
   }
 
   // UITableViewDataSource protocol methods
@@ -128,13 +139,20 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     didFinishPickingMediaWithInfo info: [String : AnyObject]) {
       picker.dismissViewControllerAnimated(true, completion:nil)
 
-      let referenceUrl = info[UIImagePickerControllerReferenceURL] as! NSURL
+    // if it's a photo from the library, not an image from the camera
+    if #available(iOS 8.0, *), let referenceUrl = info[UIImagePickerControllerReferenceURL] {
       let assets = PHAsset.fetchAssetsWithALAssetURLs([referenceUrl], options: nil)
       let asset = assets.firstObject
       asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
         let imageFile = contentEditingInput?.fullSizeImageURL
         let filePath = "\(FIRAuth.auth()?.currentUser?.uid)/\(Int(NSDate.timeIntervalSinceReferenceDate() * 1000))/\(referenceUrl.lastPathComponent!)"
       })
+    } else {
+      let image = info[UIImagePickerControllerOriginalImage] as! UIImage
+      let imageData = UIImageJPEGRepresentation(image, 0.8)
+      let imagePath = FIRAuth.auth()!.currentUser!.uid +
+        "/\(Int(NSDate.timeIntervalSinceReferenceDate() * 1000)).jpg"
+    }
   }
 
   func imagePickerControllerDidCancel(picker: UIImagePickerController) {
@@ -143,7 +161,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   @IBAction func signOut(sender: UIButton) {
     AppState.sharedInstance.signedIn = false
-    performSegueWithIdentifier(Constants.Segues.FpToSignIn, sender: nil)
+    dismissViewControllerAnimated(true, completion: nil)
   }
 
   func showAlert(title:String, message:String) {
