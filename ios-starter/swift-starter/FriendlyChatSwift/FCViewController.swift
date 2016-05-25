@@ -119,6 +119,11 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func sendMessage(data: [String: String]) {
+    var mdata = data
+    mdata[Constants.MessageFields.name] = AppState.sharedInstance.displayName
+    if let photoUrl = AppState.sharedInstance.photoUrl {
+      mdata[Constants.MessageFields.photoUrl] = photoUrl.absoluteString
+    }
   }
 
   // MARK: - Image Picker
