@@ -133,6 +133,12 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 }
 
 - (void)sendMessage:(NSDictionary *)data {
+  NSMutableDictionary *mdata = [data mutableCopy];
+  mdata[MessageFieldsname] = [AppState sharedInstance].displayName;
+  NSURL *photoUrl = AppState.sharedInstance.photoUrl;
+  if (photoUrl) {
+    mdata[MessageFieldsphotoUrl] = [photoUrl absoluteString];
+  }
 }
 
 # pragma mark - Image Picker
