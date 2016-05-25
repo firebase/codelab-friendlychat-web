@@ -99,7 +99,7 @@ main, #messages-card {
   color: #bbb;
   font-style: italic;
   font-size: 12px;
-  box-sixing: border-box;
+  box-sizing: border-box;
 }
 #message-form {
   display: flex;

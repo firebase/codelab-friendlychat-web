@@ -235,4 +235,6 @@ FriendlyChat.prototype.checkSetup = function() {
   }
 };
 
-window.friendlyChat = new FriendlyChat();
+window.onload = function() {
+  window.friendlyChat = new FriendlyChat();
+};
