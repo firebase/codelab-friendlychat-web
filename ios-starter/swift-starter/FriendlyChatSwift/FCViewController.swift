@@ -146,7 +146,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
     // if it's a photo from the library, not an image from the camera
     if #available(iOS 8.0, *), let referenceUrl = info[UIImagePickerControllerReferenceURL] {
-      let assets = PHAsset.fetchAssetsWithALAssetURLs([referenceUrl], options: nil)
+      let assets = PHAsset.fetchAssetsWithALAssetURLs([referenceUrl as! NSURL], options: nil)
       let asset = assets.firstObject
       asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
         let imageFile = contentEditingInput?.fullSizeImageURL
