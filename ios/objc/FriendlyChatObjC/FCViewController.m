@@ -109,8 +109,11 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
     if (status == FIRRemoteConfigFetchStatusSuccess) {
       NSLog(@"Config fetched!");
       [_remoteConfig activateFetched];
-      _msglength = _remoteConfig[@"friendly_msg_length"].numberValue.intValue;
-      NSLog(@"Friendly msg length config: %d", _msglength);
+      FIRRemoteConfigValue *friendlyMsgLength = _remoteConfig[@"friendly_msg_length"];
+      if (friendlyMsgLength.source != FIRRemoteConfigSourceStatic) {
+        _msglength = friendlyMsgLength.numberValue.intValue;
+        NSLog(@"Friendly msg length config: %d", _msglength);
+      }
     } else {
       NSLog(@"Config not fetched");
       NSLog(@"Error %@", error);
