@@ -14,6 +14,8 @@
 //  limitations under the License.
 //
 
+let currentTime = NSDate().timeIntervalSince1970
+
 struct Constants {
 
   struct NotificationKeys {
