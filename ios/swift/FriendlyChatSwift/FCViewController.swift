@@ -187,6 +187,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func sendMessage(data: [String: String]) {
+    var timeSent = ["timeSent": currentTime]
     var mdata = data
     mdata[Constants.MessageFields.name] = AppState.sharedInstance.displayName
     if let photoUrl = AppState.sharedInstance.photoUrl {
@@ -194,6 +195,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     }
     // Push data to Firebase Database
     self.ref.child("messages").childByAutoId().setValue(mdata)
+    self.ref.child("messages").setValue(timeSent)
   }
 
   // MARK: - Image Picker
