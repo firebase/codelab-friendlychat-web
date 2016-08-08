@@ -34,6 +34,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   // Instance variables
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var sendButton: UIButton!
+  @IBOutlet weak var timeStampLbl: UILabel!
+ 
   var ref: FIRDatabaseReference!
   var messages: [FIRDataSnapshot]! = []
   var msglength: NSNumber = 10
@@ -187,7 +189,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func sendMessage(data: [String: String]) {
-    var timeSent = ["timeSent": currentTime]
+    var timeStamp = NSDate().timeIntervalSince1970
+    var timeSent = ["timeSent": timeStamp]
     var mdata = data
     mdata[Constants.MessageFields.name] = AppState.sharedInstance.displayName
     if let photoUrl = AppState.sharedInstance.photoUrl {
