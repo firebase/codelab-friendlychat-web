@@ -106,7 +106,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 };
 
 // Signs-in Friendly Chat.
-FriendlyChat.prototype.signIn = function(googleUser) {
+FriendlyChat.prototype.signIn = function() {
   // TODO(DEVELOPER): Sign in Firebase with credential from the Google user.
 };
 
