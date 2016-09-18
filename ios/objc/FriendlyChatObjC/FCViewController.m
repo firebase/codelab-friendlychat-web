@@ -20,11 +20,7 @@
 
 @import Photos;
 
-@import FirebaseAuth;
-@import FirebaseCrash;
-@import FirebaseDatabase;
-@import FirebaseRemoteConfig;
-@import FirebaseStorage;
+@import Firebase;
 @import GoogleMobileAds;
 
 /**
@@ -55,24 +51,39 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 
 @implementation FCViewController
 
-- (IBAction)didSendMessage:(UIButton *)sender {
-  [self textFieldShouldReturn:_textField];
-}
-
-- (IBAction)didPressCrash:(id)sender {
-  FIRCrashLog(@"Cause Crash button clicked");
-  assert(NO);
-}
-
-- (IBAction)didPressFreshConfig:(id)sender {
-  [self fetchConfig];
-}
-
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  _ref = [[FIRDatabase database] reference];
+  _msglength = 10;
+  _messages = [[NSMutableArray alloc] init];
+  [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
 
+  [self configureDatabase];
+  [self configureStorage];
+  [self configureRemoteConfig];
+  [self fetchConfig];
+  [self loadAd];
+  [self logViewLoaded];
+}
+
+- (void)dealloc {
+  [[_ref child:@"messages"] removeObserverWithHandle:_refHandle];
+}
+
+- (void)configureDatabase {
+  _ref = [[FIRDatabase database] reference];
+  // Listen for new messages in the Firebase database
+  _refHandle = [[_ref child:@"messages"] observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+    [_messages addObject:snapshot];
+    [_clientTable insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_messages.count-1 inSection:0]] withRowAnimation: UITableViewRowAnimationAutomatic];
+  }];
+}
+
+- (void)configureStorage {
+  self.storageRef = [[FIRStorage storage] referenceForURL:@"gs://<your-firebase-storage-bucket>"];
+}
+
+- (void)configureRemoteConfig {
   _remoteConfig = [FIRRemoteConfig remoteConfig];
   // Create Remote Config Setting to enable developer mode.
   // Fetching configs from the server is normally limited to 5 requests per hour.
@@ -80,25 +91,6 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   // can test different config values during development.
   FIRRemoteConfigSettings *remoteConfigSettings = [[FIRRemoteConfigSettings alloc] initWithDeveloperModeEnabled:YES];
   self.remoteConfig.configSettings = remoteConfigSettings;
-
-  _msglength = 10;
-  _messages = [[NSMutableArray alloc] init];
-
-  [self loadAd];
-  [_clientTable registerClass:UITableViewCell.self forCellReuseIdentifier:@"tableViewCell"];
-  [self fetchConfig];
-  [self configureStorage];
-
-  // Log that the view did load, FIRCrashNSLog is used here so the log message will be
-  // shown in the console output. If FIRCrashLog is used the message is not shown in
-  // the console output.
-  FIRCrashNSLog(@"View loaded");
-}
-
-- (void)loadAd {
-  self.banner.adUnitID = kBannerAdUnitID;
-  self.banner.rootViewController = self;
-  [self.banner loadRequest:[GADRequest request]];
 }
 
 - (void)fetchConfig {
@@ -117,8 +109,11 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
     if (status == FIRRemoteConfigFetchStatusSuccess) {
       NSLog(@"Config fetched!");
       [_remoteConfig activateFetched];
-      _msglength = _remoteConfig[@"friendly_msg_length"].numberValue.intValue;
-      NSLog(@"Friendly msg length config: %d", _msglength);
+      FIRRemoteConfigValue *friendlyMsgLength = _remoteConfig[@"friendly_msg_length"];
+      if (friendlyMsgLength.source != FIRRemoteConfigSourceStatic) {
+        _msglength = friendlyMsgLength.numberValue.intValue;
+        NSLog(@"Friendly msg length config: %d", _msglength);
+      }
     } else {
       NSLog(@"Config not fetched");
       NSLog(@"Error %@", error);
@@ -126,8 +121,30 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   }];
 }
 
-- (void)configureStorage {
-  self.storageRef = [[FIRStorage storage] reference];
+- (IBAction)didPressFreshConfig:(id)sender {
+  [self fetchConfig];
+}
+
+- (IBAction)didSendMessage:(UIButton *)sender {
+  [self textFieldShouldReturn:_textField];
+}
+
+- (IBAction)didPressCrash:(id)sender {
+  FIRCrashLog(@"Cause Crash button clicked");
+  assert(NO);
+}
+
+- (void)logViewLoaded {
+  // Log that the view did load, FIRCrashNSLog is used here so the log message will be
+  // shown in the console output. If FIRCrashLog is used the message is not shown in
+  // the console output.
+  FIRCrashNSLog(@"View loaded");
+}
+
+- (void)loadAd {
+  self.banner.adUnitID = kBannerAdUnitID;
+  self.banner.rootViewController = self;
+  [self.banner loadRequest:[GADRequest request]];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(nonnull NSString *)string {
@@ -137,19 +154,6 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   }
   long newLength = text.length + string.length - range.length;
   return (newLength <= _msglength);
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-  [_messages removeAllObjects];
-  // Listen for new messages in the Firebase database
-  _refHandle = [[_ref child:@"messages"] observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
-    [_messages addObject:snapshot];
-    [_clientTable insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_messages.count-1 inSection:0]] withRowAnimation: UITableViewRowAnimationAutomatic];
-  }];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-  [_ref removeObserverWithHandle:_refHandle];
 }
 
 // UITableViewDataSource protocol methods
@@ -236,26 +240,46 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   [picker dismissViewControllerAnimated:YES completion:NULL];
 
   NSURL *referenceUrl = info[UIImagePickerControllerReferenceURL];
-  PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceUrl] options:nil];
-  PHAsset *asset = [assets firstObject];
-  [asset requestContentEditingInputWithOptions:nil
-                             completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
-                               NSURL *imageFile = contentEditingInput.fullSizeImageURL;
-                               NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceUrl lastPathComponent]];
-                               FIRStorageMetadata *metadata = [FIRStorageMetadata new];
-                               metadata.contentType = @"image/jpeg";
-                               [[_storageRef child:filePath]
-                                           putFile:imageFile metadata:metadata
-                                        completion:^(FIRStorageMetadata *metadata, NSError *error) {
-                                      if (error) {
-                                        NSLog(@"Error uploading: %@", error);
-                                        return;
-                                      }
-                                      [self sendMessage:@{MessageFieldsimageUrl:
-                                      [_storageRef child:metadata.path].description}];
+  // if it's a photo from the library, not an image from the camera
+  if (referenceUrl) {
+    PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceUrl] options:nil];
+    PHAsset *asset = [assets firstObject];
+    [asset requestContentEditingInputWithOptions:nil
+                               completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
+                                 NSURL *imageFile = contentEditingInput.fullSizeImageURL;
+                                 NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@",
+                                                       [FIRAuth auth].currentUser.uid,
+                                                       (long long)([[NSDate date] timeIntervalSince1970] * 1000.0),
+                                                       [referenceUrl lastPathComponent]];
+                                 [[_storageRef child:filePath]
+                                            putFile:imageFile metadata:nil
+                                          completion:^(FIRStorageMetadata *metadata, NSError *error) {
+                                            if (error) {
+                                              NSLog(@"Error uploading: %@", error);
+                                              return;
+                                            }
+                                            [self sendMessage:@{MessageFieldsimageUrl:[_storageRef child:metadata.path].description}];
                                     }
                                 ];
                              }];
+  } else {
+    UIImage *image = info[UIImagePickerControllerOriginalImage];
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.8);
+    NSString *imagePath =
+    [NSString stringWithFormat:@"%@/%lld.jpg",
+     [FIRAuth auth].currentUser.uid,
+     (long long)([[NSDate date] timeIntervalSince1970] * 1000.0)];
+    FIRStorageMetadata *metadata = [FIRStorageMetadata new];
+    metadata.contentType = @"image/jpeg";
+    [[_storageRef child:imagePath] putData:imageData metadata:metadata
+                                completion:^(FIRStorageMetadata * _Nullable metadata, NSError * _Nullable error) {
+                                  if (error) {
+                                    NSLog(@"Error uploading: %@", error);
+                                    return;
+                                  }
+                                  [self sendMessage:@{MessageFieldsimageUrl:[_storageRef child:metadata.path].description}];
+                                }];
+  }
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
@@ -271,7 +295,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     return;
   }
   [AppState sharedInstance].signedIn = false;
-  [self performSegueWithIdentifier:SeguesFpToSignIn sender:nil];
+  [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)showAlert:(NSString *)title message:(NSString *)message {

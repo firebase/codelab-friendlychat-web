@@ -11,7 +11,6 @@
 		107960881C6130EF003DB6CC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960871C6130EF003DB6CC /* AppDelegate.m */; };
 		1079608B1C6130EF003DB6CC /* FCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1079608A1C6130EF003DB6CC /* FCViewController.m */; };
 		107960A91C6131B6003DB6CC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 107960A81C6131B6003DB6CC /* Main.storyboard */; };
-		107960AB1C6131E4003DB6CC /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 107960AA1C6131E4003DB6CC /* Info.plist */; };
 		107960AE1C613207003DB6CC /* MeasurementHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960AD1C613207003DB6CC /* MeasurementHelper.m */; };
 		107960B11C61321D003DB6CC /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B01C61321D003DB6CC /* Constants.m */; };
 		107960B31C613231003DB6CC /* shared in Resources */ = {isa = PBXBuildFile; fileRef = 107960B21C613231003DB6CC /* shared */; };
@@ -123,7 +122,7 @@
 		107960781C6130EF003DB6CC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = "Ibrahim Ulukaya";
 				TargetAttributes = {
 					1079607F1C6130EF003DB6CC = {
@@ -155,7 +154,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				107960B31C613231003DB6CC /* shared in Resources */,
-				107960AB1C6131E4003DB6CC /* Info.plist in Resources */,
 				107960A91C6131B6003DB6CC /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
