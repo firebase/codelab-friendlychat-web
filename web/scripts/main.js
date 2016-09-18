@@ -140,19 +140,16 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
       imageUrl: FriendlyChat.LOADING_IMAGE_URL,
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
     }).then(function(data) {
-
       // Upload the image to Firebase Storage.
-      var uploadTask = this.storage.ref(currentUser.uid + '/' + Date.now() + '/' + file.name)
-          .put(file, {'contentType': file.type});
-      // Listen for upload completion.
-      uploadTask.on('state_changed', null, function(error) {
-        console.error('There was an error uploading a file to Firebase Storage:', error);
-      }, function() {
-
-        // Get the file's Storage URI and update the chat message placeholder.
-        var filePath = uploadTask.snapshot.metadata.fullPath;
-        data.update({imageUrl: this.storage.ref(filePath).toString()});
-      }.bind(this));
+      this.storage.ref(currentUser.uid + '/' + Date.now() + '/' + file.name)
+          .put(file, {contentType: file.type})
+          .then(function(snapshot) {
+            // Get the file's Storage URI and update the chat message placeholder.
+            var filePath = snapshot.metadata.fullPath;
+            data.update({imageUrl: this.storage.ref(filePath).toString()});
+          }.bind(this)).catch(function(error) {
+            console.error('There was an error uploading a file to Firebase Storage:', error);
+          });
     }.bind(this));
   }
 };
