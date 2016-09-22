@@ -49,14 +49,12 @@ main, #messages-card {
   width: auto;
   height: 100%;
   padding-top: 0;
+  padding-bottom: 0;
 }
 #messages {
   overflow-y: auto;
   margin-bottom: 10px;
-  height: calc(100% - 90px);
-  flex: 1 1 auto;
-  flex-direction: column;
-  display: flex;
+  height: calc(100% - 80px);
 }
 #message-filler {
   flex-grow: 1;
