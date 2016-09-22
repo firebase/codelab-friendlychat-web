@@ -69,14 +69,14 @@ class SignInViewController: UIViewController {
   @IBAction func didRequestPasswordReset(sender: AnyObject) {
     let prompt = UIAlertController.init(title: nil, message: "Email:", preferredStyle: UIAlertControllerStyle.Alert)
     let okAction = UIAlertAction.init(title: "OK", style: UIAlertActionStyle.Default) { (action) in
-      let userInput = prompt.textFields![0].text
-      if (userInput!.isEmpty) {
-        return
-      }
-      FIRAuth.auth()?.sendPasswordResetWithEmail(userInput!) { (error) in
-        if let error = error {
-          print(error.localizedDescription)
-          return
+      _ = prompt.textFields![0].text.map{ userInput in
+        if (!userInput.isEmpty) {
+          FIRAuth.auth()?.sendPasswordResetWithEmail(userInput) { (error) in
+            if let error = error {
+              print(error.localizedDescription)
+              return
+            }
+          }
         }
       }
     }
