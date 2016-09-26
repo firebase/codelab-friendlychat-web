@@ -24,30 +24,31 @@ class SignInViewController: UIViewController {
   @IBOutlet weak var emailField: UITextField!
   @IBOutlet weak var passwordField: UITextField!
 
-  override func viewDidAppear(animated: Bool) {
+  override func viewDidAppear(_ animated: Bool) {
   }
 
-  @IBAction func didTapSignIn(sender: AnyObject) {
+  @IBAction func didTapSignIn(_ sender: AnyObject) {
     signedIn(nil)
   }
 
-  @IBAction func didTapSignUp(sender: AnyObject) {
+  @IBAction func didTapSignUp(_ sender: AnyObject) {
     setDisplayName(nil)
   }
 
-  func setDisplayName(user: FIRUser?) {
+  func setDisplayName(_ user: FIRUser?) {
     signedIn(nil)
   }
 
-  @IBAction func didRequestPasswordReset(sender: AnyObject) {
+  @IBAction func didRequestPasswordReset(_ sender: AnyObject) {
   }
 
-  func signedIn(user: FIRUser?) {
+  func signedIn(_ user: FIRUser?) {
     MeasurementHelper.sendLoginEvent()
 
     AppState.sharedInstance.signedIn = true
-    NSNotificationCenter.defaultCenter().postNotificationName(Constants.NotificationKeys.SignedIn, object: nil, userInfo: nil)
-    performSegueWithIdentifier(Constants.Segues.SignInToFp, sender: nil)
+    let notificationName = Notification.Name(rawValue: Constants.NotificationKeys.SignedIn)
+    NotificationCenter.default.post(name: notificationName, object: nil, userInfo: nil)
+    performSegue(withIdentifier: Constants.Segues.SignInToFp, sender: nil)
   }
 
 }

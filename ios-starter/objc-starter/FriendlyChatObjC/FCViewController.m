@@ -135,9 +135,9 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 - (void)sendMessage:(NSDictionary *)data {
   NSMutableDictionary *mdata = [data mutableCopy];
   mdata[MessageFieldsname] = [AppState sharedInstance].displayName;
-  NSURL *photoUrl = AppState.sharedInstance.photoUrl;
-  if (photoUrl) {
-    mdata[MessageFieldsphotoUrl] = [photoUrl absoluteString];
+  NSURL *photoURL = AppState.sharedInstance.photoURL;
+  if (photoURL) {
+    mdata[MessageFieldsphotoURL] = [photoURL absoluteString];
   }
 }
 
@@ -159,14 +159,14 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 didFinishPickingMediaWithInfo:(NSDictionary *)info {
   [picker dismissViewControllerAnimated:YES completion:NULL];
 
-  NSURL *referenceUrl = info[UIImagePickerControllerReferenceURL];
-  if (referenceUrl) {
-    PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceUrl] options:nil];
+  NSURL *referenceURL = info[UIImagePickerControllerReferenceURL];
+  if (referenceURL) {
+    PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceURL] options:nil];
     PHAsset *asset = [assets firstObject];
     [asset requestContentEditingInputWithOptions:nil
                                completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
                                  NSURL *imageFile = contentEditingInput.fullSizeImageURL;
-                                 NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceUrl lastPathComponent]];
+                                 NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceURL lastPathComponent]];
                              }
    ];
   } else {

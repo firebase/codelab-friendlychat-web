@@ -22,6 +22,6 @@
 
 @property (nonatomic) BOOL signedIn;
 @property (nonatomic, retain) NSString *displayName;
-@property (nonatomic, retain) NSURL *photoUrl;
+@property (nonatomic, retain) NSURL *photoURL;
 
 @end

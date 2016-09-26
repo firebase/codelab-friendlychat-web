@@ -37,7 +37,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   var ref: FIRDatabaseReference!
   var messages: [FIRDataSnapshot]! = []
   var msglength: NSNumber = 10
-  private var _refHandle: FIRDatabaseHandle!
+  fileprivate var _refHandle: FIRDatabaseHandle!
 
   var storageRef: FIRStorageReference!
   var remoteConfig: FIRRemoteConfig!
@@ -49,7 +49,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.clientTable.registerClass(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
+    self.clientTable.register(UITableViewCell.self, forCellReuseIdentifier: "tableViewCell")
 
     configureDatabase()
     configureStorage()
@@ -74,15 +74,15 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   func fetchConfig() {
   }
 
-  @IBAction func didPressFreshConfig(sender: AnyObject) {
+  @IBAction func didPressFreshConfig(_ sender: AnyObject) {
     fetchConfig()
   }
 
-  @IBAction func didSendMessage(sender: UIButton) {
+  @IBAction func didSendMessage(_ sender: UIButton) {
     textFieldShouldReturn(textField)
   }
 
-  @IBAction func didPressCrash(sender: AnyObject) {
+  @IBAction func didPressCrash(_ sender: AnyObject) {
     fatalError()
   }
 
@@ -92,90 +92,91 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   func loadAd() {
   }
 
-  func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
     guard let text = textField.text else { return true }
 
-    let newLength = text.utf16.count + string.utf16.count - range.length
-    return newLength <= self.msglength.integerValue // Bool
+    let newLength = text.characters.count + string.characters.count - range.length
+    return newLength <= self.msglength.intValue // Bool
   }
 
   // UITableViewDataSource protocol methods
-  func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return messages.count
   }
 
-  func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     // Dequeue cell
-    let cell: UITableViewCell! = self.clientTable.dequeueReusableCellWithIdentifier("tableViewCell", forIndexPath: indexPath)
+    let cell = self.clientTable.dequeueReusableCell(withIdentifier: "tableViewCell", for: indexPath)
 
-    return cell!
+    return cell
   }
 
   // UITextViewDelegate protocol methods
-  func textFieldShouldReturn(textField: UITextField) -> Bool {
-    let data = [Constants.MessageFields.text: textField.text! as String]
-    sendMessage(data)
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    guard let text = textField.text else { return true }
+    let data = [Constants.MessageFields.text: text]
+    sendMessage(withData: data)
     return true
   }
 
-  func sendMessage(data: [String: String]) {
+  func sendMessage(withData data: [String: String]) {
     var mdata = data
     mdata[Constants.MessageFields.name] = AppState.sharedInstance.displayName
-    if let photoUrl = AppState.sharedInstance.photoUrl {
-      mdata[Constants.MessageFields.photoUrl] = photoUrl.absoluteString
+    if let photoURL = AppState.sharedInstance.photoURL {
+      mdata[Constants.MessageFields.photoURL] = photoURL.absoluteString
     }
   }
 
   // MARK: - Image Picker
 
-  @IBAction func didTapAddPhoto(sender: AnyObject) {
+  @IBAction func didTapAddPhoto(_ sender: AnyObject) {
     let picker = UIImagePickerController()
     picker.delegate = self
-    if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)) {
-      picker.sourceType = UIImagePickerControllerSourceType.Camera
+    if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera)) {
+      picker.sourceType = UIImagePickerControllerSourceType.camera
     } else {
-      picker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+      picker.sourceType = UIImagePickerControllerSourceType.photoLibrary
     }
 
-    presentViewController(picker, animated: true, completion:nil)
+    present(picker, animated: true, completion:nil)
   }
 
-  func imagePickerController(picker: UIImagePickerController,
-    didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-      picker.dismissViewControllerAnimated(true, completion:nil)
+  func imagePickerController(_ picker: UIImagePickerController,
+    didFinishPickingMediaWithInfo info: [String : Any]) {
+      picker.dismiss(animated: true, completion:nil)
 
     // if it's a photo from the library, not an image from the camera
-    if #available(iOS 8.0, *), let referenceUrl = info[UIImagePickerControllerReferenceURL] {
-      let assets = PHAsset.fetchAssetsWithALAssetURLs([referenceUrl as! NSURL], options: nil)
+    if #available(iOS 8.0, *), let referenceURL = info[UIImagePickerControllerReferenceURL] {
+      let assets = PHAsset.fetchAssets(withALAssetURLs: [referenceURL as! URL], options: nil)
       let asset = assets.firstObject
-      asset?.requestContentEditingInputWithOptions(nil, completionHandler: { (contentEditingInput, info) in
+      asset?.requestContentEditingInput(with: nil, completionHandler: { (contentEditingInput, info) in
         let imageFile = contentEditingInput?.fullSizeImageURL
-        let filePath = "\(FIRAuth.auth()?.currentUser?.uid)/\(Int(NSDate.timeIntervalSinceReferenceDate() * 1000))/\(referenceUrl.lastPathComponent!)"
+        let filePath = "\(FIRAuth.auth()?.currentUser?.uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000))/\((referenceURL as AnyObject).lastPathComponent!)"
       })
     } else {
-      let image = info[UIImagePickerControllerOriginalImage] as! UIImage
+      guard let image = info[UIImagePickerControllerOriginalImage] as! UIImage? else { return }
       let imageData = UIImageJPEGRepresentation(image, 0.8)
-      let imagePath = FIRAuth.auth()!.currentUser!.uid +
-        "/\(Int(NSDate.timeIntervalSinceReferenceDate() * 1000)).jpg"
+      guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+      let imagePath = uid + "/\(Int(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
     }
   }
 
-  func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-    picker.dismissViewControllerAnimated(true, completion:nil)
+  func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+    picker.dismiss(animated: true, completion:nil)
   }
 
-  @IBAction func signOut(sender: UIButton) {
+  @IBAction func signOut(_ sender: UIButton) {
     AppState.sharedInstance.signedIn = false
-    dismissViewControllerAnimated(true, completion: nil)
+    dismiss(animated: true, completion: nil)
   }
 
-  func showAlert(title:String, message:String) {
-    dispatch_async(dispatch_get_main_queue()) {
+  func showAlert(withTitle title:String, message:String) {
+    DispatchQueue.main.async {
         let alert = UIAlertController(title: title,
-            message: message, preferredStyle: .Alert)
-        let dismissAction = UIAlertAction(title: "Dismiss", style: .Destructive, handler: nil)
+            message: message, preferredStyle: .alert)
+        let dismissAction = UIAlertAction(title: "Dismiss", style: .destructive, handler: nil)
         alert.addAction(dismissAction)
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
   }
 

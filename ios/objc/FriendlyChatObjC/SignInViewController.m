@@ -112,7 +112,7 @@
   [MeasurementHelper sendLoginEvent];
 
   [AppState sharedInstance].displayName = user.displayName.length > 0 ? user.displayName : user.email;
-  [AppState sharedInstance].photoUrl = user.photoURL;
+  [AppState sharedInstance].photoURL = user.photoURL;
   [AppState sharedInstance].signedIn = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:NotificationKeysSignedIn
                                                       object:nil userInfo:nil];

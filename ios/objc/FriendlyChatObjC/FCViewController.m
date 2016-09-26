@@ -169,10 +169,10 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   FIRDataSnapshot *messageSnapshot = _messages[indexPath.row];
   NSDictionary<NSString *, NSString *> *message = messageSnapshot.value;
   NSString *name = message[MessageFieldsname];
-  NSString *imageUrl = message[MessageFieldsimageUrl];
-  if (imageUrl) {
-    if ([imageUrl hasPrefix:@"gs://"]) {
-      [[[FIRStorage storage] referenceForURL:imageUrl] dataWithMaxSize:INT64_MAX
+  NSString *imageURL = message[MessageFieldsimageURL];
+  if (imageURL) {
+    if ([imageURL hasPrefix:@"gs://"]) {
+      [[[FIRStorage storage] referenceForURL:imageURL] dataWithMaxSize:INT64_MAX
                                                             completion:^(NSData *data, NSError *error) {
         if (error) {
           NSLog(@"Error downloading: %@", error);
@@ -181,18 +181,18 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
         cell.imageView.image = [UIImage imageWithData:data];
       }];
     } else {
-      cell.imageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]]];
+      cell.imageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageURL]]];
     }
     cell.textLabel.text = [NSString stringWithFormat:@"sent by: %@", name];
   } else {
     NSString *text = message[MessageFieldstext];
     cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", name, text];
     cell.imageView.image = [UIImage imageNamed: @"ic_account_circle"];
-    NSString *photoUrl = message[MessageFieldsphotoUrl];
-    if (photoUrl) {
-      NSURL *url = [NSURL URLWithString:photoUrl];
-      if (url) {
-        NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *photoURL = message[MessageFieldsphotoURL];
+    if (photoURL) {
+      NSURL *URL = [NSURL URLWithString:photoURL];
+      if (URL) {
+        NSData *data = [NSData dataWithContentsOfURL:URL];
         if (data) {
           cell.imageView.image = [UIImage imageWithData:data];
         }
@@ -212,9 +212,9 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 - (void)sendMessage:(NSDictionary *)data {
   NSMutableDictionary *mdata = [data mutableCopy];
   mdata[MessageFieldsname] = [AppState sharedInstance].displayName;
-  NSURL *photoUrl = AppState.sharedInstance.photoUrl;
-  if (photoUrl) {
-    mdata[MessageFieldsphotoUrl] = [photoUrl absoluteString];
+  NSURL *photoURL = AppState.sharedInstance.photoURL;
+  if (photoURL) {
+    mdata[MessageFieldsphotoURL] = [photoURL absoluteString];
   }
 
   // Push data to Firebase Database
@@ -239,10 +239,10 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 didFinishPickingMediaWithInfo:(NSDictionary *)info {
   [picker dismissViewControllerAnimated:YES completion:NULL];
 
-  NSURL *referenceUrl = info[UIImagePickerControllerReferenceURL];
+  NSURL *referenceURL = info[UIImagePickerControllerReferenceURL];
   // if it's a photo from the library, not an image from the camera
-  if (referenceUrl) {
-    PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceUrl] options:nil];
+  if (referenceURL) {
+    PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceURL] options:nil];
     PHAsset *asset = [assets firstObject];
     [asset requestContentEditingInputWithOptions:nil
                                completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
@@ -250,7 +250,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
                                  NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@",
                                                        [FIRAuth auth].currentUser.uid,
                                                        (long long)([[NSDate date] timeIntervalSince1970] * 1000.0),
-                                                       [referenceUrl lastPathComponent]];
+                                                       [referenceURL lastPathComponent]];
                                  [[_storageRef child:filePath]
                                             putFile:imageFile metadata:nil
                                           completion:^(FIRStorageMetadata *metadata, NSError *error) {
@@ -258,7 +258,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
                                               NSLog(@"Error uploading: %@", error);
                                               return;
                                             }
-                                            [self sendMessage:@{MessageFieldsimageUrl:[_storageRef child:metadata.path].description}];
+                                            [self sendMessage:@{MessageFieldsimageURL:[_storageRef child:metadata.path].description}];
                                     }
                                 ];
                              }];
@@ -277,7 +277,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
                                     NSLog(@"Error uploading: %@", error);
                                     return;
                                   }
-                                  [self sendMessage:@{MessageFieldsimageUrl:[_storageRef child:metadata.path].description}];
+                                  [self sendMessage:@{MessageFieldsimageURL:[_storageRef child:metadata.path].description}];
                                 }];
   }
 }
