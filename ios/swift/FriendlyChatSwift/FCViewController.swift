@@ -125,6 +125,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   @IBAction func didPressCrash(_ sender: AnyObject) {
     FIRCrashMessage("Cause Crash button clicked")
+    fatalError()
   }
 
   func logViewLoaded() {
@@ -215,6 +216,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   func imagePickerController(_ picker: UIImagePickerController,
     didFinishPickingMediaWithInfo info: [String : Any]) {
       picker.dismiss(animated: true, completion:nil)
+    guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
 
     // if it's a photo from the library, not an image from the camera
     if #available(iOS 8.0, *), let referenceURL = info[UIImagePickerControllerReferenceURL] {
@@ -222,7 +224,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       let asset = assets.firstObject
       asset?.requestContentEditingInput(with: nil, completionHandler: { [weak self] (contentEditingInput, info) in
         let imageFile = contentEditingInput?.fullSizeImageURL
-        let filePath = "\(FIRAuth.auth()?.currentUser?.uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000))/\((referenceURL as AnyObject).lastPathComponent!)"
+        let filePath = "\(uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000))/\((referenceURL as AnyObject).lastPathComponent!)"
         guard let strongSelf = self else { return }
         strongSelf.storageRef.child(filePath)
           .putFile(imageFile!, metadata: nil) { (metadata, error) in
@@ -237,8 +239,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     } else {
       guard let image = info[UIImagePickerControllerOriginalImage] as! UIImage? else { return }
       let imageData = UIImageJPEGRepresentation(image, 0.8)
-      guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
-      let imagePath = uid + "/\(Int(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
+      let imagePath = "\(uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
       let metadata = FIRStorageMetadata()
       metadata.contentType = "image/jpeg"
       self.storageRef.child(imagePath)
