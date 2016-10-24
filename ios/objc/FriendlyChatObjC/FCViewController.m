@@ -80,7 +80,8 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 }
 
 - (void)configureStorage {
-  self.storageRef = [[FIRStorage storage] referenceForURL:@"gs://<your-firebase-storage-bucket>"];
+  NSString *storageUrl = [FIRApp defaultApp].options.storageBucket;
+  self.storageRef = [[FIRStorage storage] referenceForURL:[NSString stringWithFormat:@"gs://%@", storageUrl]];
 }
 
 - (void)configureRemoteConfig {
