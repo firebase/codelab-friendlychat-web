@@ -15,7 +15,10 @@
 		107960B11C61321D003DB6CC /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B01C61321D003DB6CC /* Constants.m */; };
 		107960B61C613263003DB6CC /* SignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B51C613263003DB6CC /* SignInViewController.m */; };
 		107960B91C6156B3003DB6CC /* AppState.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B81C6156B3003DB6CC /* AppState.m */; };
-		10D6028B1D5A2FBB004530C6 /* shared in Resources */ = {isa = PBXBuildFile; fileRef = 10D6028A1D5A2FBB004530C6 /* shared */; };
+		10AF4CC71DD237AD0096D192 /* logo1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 10AF4CC31DD237AD0096D192 /* logo1024.png */; };
+		10AF4CC81DD237AD0096D192 /* Bladefile in Resources */ = {isa = PBXBuildFile; fileRef = 10AF4CC41DD237AD0096D192 /* Bladefile */; };
+		10AF4CC91DD237AD0096D192 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 10AF4CC51DD237AD0096D192 /* Images.xcassets */; };
+		10AF4CCA1DD237AD0096D192 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10AF4CC61DD237AD0096D192 /* LaunchScreen.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,7 +38,10 @@
 		107960B51C613263003DB6CC /* SignInViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignInViewController.m; sourceTree = "<group>"; };
 		107960B71C6156B3003DB6CC /* AppState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppState.h; sourceTree = "<group>"; };
 		107960B81C6156B3003DB6CC /* AppState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppState.m; sourceTree = "<group>"; };
-		10D6028A1D5A2FBB004530C6 /* shared */ = {isa = PBXFileReference; lastKnownFileType = folder; path = shared; sourceTree = "<group>"; };
+		10AF4CC31DD237AD0096D192 /* logo1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo1024.png; sourceTree = "<group>"; };
+		10AF4CC41DD237AD0096D192 /* Bladefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Bladefile; sourceTree = "<group>"; };
+		10AF4CC51DD237AD0096D192 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		10AF4CC61DD237AD0096D192 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,7 +58,7 @@
 		107960771C6130EF003DB6CC = {
 			isa = PBXGroup;
 			children = (
-				10D6028A1D5A2FBB004530C6 /* shared */,
+				10AF4CC11DD237AD0096D192 /* shared */,
 				107960821C6130EF003DB6CC /* FriendlyChatObjC */,
 				107960811C6130EF003DB6CC /* Products */,
 			);
@@ -96,6 +102,25 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		10AF4CC11DD237AD0096D192 /* shared */ = {
+			isa = PBXGroup;
+			children = (
+				10AF4CC21DD237AD0096D192 /* assets */,
+				10AF4CC41DD237AD0096D192 /* Bladefile */,
+				10AF4CC51DD237AD0096D192 /* Images.xcassets */,
+				10AF4CC61DD237AD0096D192 /* LaunchScreen.xib */,
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
+		10AF4CC21DD237AD0096D192 /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				10AF4CC31DD237AD0096D192 /* logo1024.png */,
+			);
+			path = assets;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -122,7 +147,7 @@
 		107960781C6130EF003DB6CC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = "Ibrahim Ulukaya";
 				TargetAttributes = {
 					1079607F1C6130EF003DB6CC = {
@@ -153,8 +178,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10AF4CCA1DD237AD0096D192 /* LaunchScreen.xib in Resources */,
+				10AF4CC81DD237AD0096D192 /* Bladefile in Resources */,
+				10AF4CC91DD237AD0096D192 /* Images.xcassets in Resources */,
 				107960A91C6131B6003DB6CC /* Main.storyboard in Resources */,
-				10D6028B1D5A2FBB004530C6 /* shared in Resources */,
+				10AF4CC71DD237AD0096D192 /* logo1024.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,6 +293,8 @@
 		107960A31C6130EF003DB6CC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				INFOPLIST_FILE = FriendlyChatObjC/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.codelab.FriendlyChatObjC;
@@ -275,6 +305,8 @@
 		107960A41C6130EF003DB6CC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				INFOPLIST_FILE = FriendlyChatObjC/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.codelab.FriendlyChatObjC;
