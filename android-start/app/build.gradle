@@ -42,16 +42,16 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.0'
 
     // Google
-    compile 'com.google.android.gms:play-services-auth:9.8.0'
+    compile 'com.google.android.gms:play-services-auth:10.0.0'
 
     // Firebase
-    compile 'com.google.firebase:firebase-database:9.8.0'
-    compile 'com.google.firebase:firebase-auth:9.8.0'
-    compile 'com.google.firebase:firebase-config:9.8.0'
-    compile 'com.google.android.gms:play-services-appinvite:9.8.0'
-    compile 'com.google.firebase:firebase-messaging:9.8.0'
-    compile 'com.google.android.gms:play-services-ads:9.8.0'
-    compile 'com.google.firebase:firebase-crash:9.8.0'
+    compile 'com.google.firebase:firebase-database:10.0.0'
+    compile 'com.google.firebase:firebase-auth:10.0.0'
+    compile 'com.google.firebase:firebase-config:10.0.0'
+    compile 'com.google.android.gms:play-services-appinvite:10.0.0'
+    compile 'com.google.firebase:firebase-messaging:10.0.0'
+    compile 'com.google.android.gms:play-services-ads:10.0.0'
+    compile 'com.google.firebase:firebase-crash:10.0.0'
     // Firebase UI
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
 
