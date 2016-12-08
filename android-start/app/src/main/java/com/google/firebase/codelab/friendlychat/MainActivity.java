@@ -57,6 +57,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.google.firebase.appindexing.Action;
+import com.google.firebase.appindexing.FirebaseAppIndex;
+import com.google.firebase.appindexing.FirebaseUserActions;
+import com.google.firebase.appindexing.Indexable;
+import com.google.firebase.appindexing.builders.Indexables;
+import com.google.firebase.appindexing.builders.PersonBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,6 +95,7 @@ public class MainActivity extends AppCompatActivity
     private String mPhotoUrl;
     private SharedPreferences mSharedPreferences;
     private GoogleApiClient mGoogleApiClient;
+    private static final String MESSAGE_URL = "http://friendlychat.firebase.google.com/message/";
 
     private Button mSendButton;
     private RecyclerView mMessageRecyclerView;
