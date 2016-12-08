@@ -55,6 +55,10 @@ public class FriendlyMessage {
         return photoUrl;
     }
 
+    public String getText() {
+        return text;
+    }
+
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
