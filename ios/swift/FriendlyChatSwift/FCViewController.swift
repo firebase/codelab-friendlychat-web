@@ -157,7 +157,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     // Unpack message from Firebase DataSnapshot
     let messageSnapshot: FIRDataSnapshot! = self.messages[indexPath.row]
     let message = messageSnapshot.value as! Dictionary<String, String>
-    let name = message[Constants.MessageFields.name] as String!
+    let name = message[Constants.MessageFields.name] ?? ""
     if let imageURL = message[Constants.MessageFields.imageURL] {
       if imageURL.hasPrefix("gs://") {
         FIRStorage.storage().reference(forURL: imageURL).data(withMaxSize: INT64_MAX){ (data, error) in
@@ -173,8 +173,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       }
       cell.textLabel?.text = "sent by: \(name)"
     } else {
-      let text = message[Constants.MessageFields.text] as String!
-      cell.textLabel?.text = name! + ": " + text!
+      let text = message[Constants.MessageFields.text] ?? ""
+      cell.textLabel?.text = name + ": " + text
       cell.imageView?.image = UIImage(named: "ic_account_circle")
       if let photoURL = message[Constants.MessageFields.photoURL], let URL = URL(string: photoURL), let data = try? Data(contentsOf: URL) {
         cell.imageView?.image = UIImage(data: data)
