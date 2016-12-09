@@ -114,6 +114,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   // UITextViewDelegate protocol methods
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     guard let text = textField.text else { return true }
+    textField.text = ""
+    view.endEditing(true)
     let data = [Constants.MessageFields.text: text]
     sendMessage(withData: data)
     return true
