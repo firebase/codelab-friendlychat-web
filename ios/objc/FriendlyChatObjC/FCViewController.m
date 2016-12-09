@@ -180,6 +180,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
           return;
         }
         cell.imageView.image = [UIImage imageWithData:data];
+        [tableView reloadData];
       }];
     } else {
       cell.imageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageURL]]];

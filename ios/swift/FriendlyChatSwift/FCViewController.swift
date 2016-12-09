@@ -166,6 +166,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
             return
           }
           cell.imageView?.image = UIImage.init(data: data!)
+          tableView.reloadData()
         }
       } else if let URL = URL(string: imageURL), let data = try? Data(contentsOf: URL) {
         cell.imageView?.image = UIImage.init(data: data)
