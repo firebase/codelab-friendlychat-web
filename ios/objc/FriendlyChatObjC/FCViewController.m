@@ -207,6 +207,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
   [self sendMessage:@{MessageFieldstext: textField.text}];
   textField.text = @"";
+  [self.view endEditing:YES];
   return YES;
 }
 
