@@ -25,6 +25,7 @@ public class FriendlyMessage {
     private String id;
     private String text;
     private String name;
+    private String roomId;
     private String photoUrl;
 
     public FriendlyMessage() {
