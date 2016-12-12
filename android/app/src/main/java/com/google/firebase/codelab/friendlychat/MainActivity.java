@@ -271,10 +271,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 // custom dialog
                 final Dialog dialog = new Dialog(MainActivity.this);
                 dialog.setContentView(R.layout.dialog_create_room);
-                dialog.setTitle("Title...");
+                dialog.setTitle("Create new room");
 
                 // set the custom dialog components - text, image and button
-                EditText editText = (EditText) dialog.findViewById(R.id.text);
+                final EditText editText = (EditText) dialog.findViewById(R.id.newRoomName);
                 ImageView image = (ImageView) dialog.findViewById(R.id.image);
                 image.setImageResource(R.mipmap.ic_launcher);
 
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 dialogButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Room room = new Room(editText.getText().toString(), mUsername, mPhotoUrl);
+                        Room room = new Room(editText.getText().toString(),"");
                         mFirebaseDatabaseReference.child(ROOMS).push().setValue(room);
                         mFirebaseAnalytics.logEvent(ROOM_CREATED, null);
                         dialog.dismiss();
