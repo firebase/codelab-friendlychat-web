@@ -26,12 +26,6 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                    android:host="friendlychat.firebase.google.com"
-                    android:pathPrefix="/message"
-                    android:scheme="http"
-                    />
-
-                <data
                     android:host="www.friendlychat.com"
                     android:scheme="http"/>
 

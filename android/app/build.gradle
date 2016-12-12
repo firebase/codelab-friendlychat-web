@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
 
 repositories {
     mavenLocal()
@@ -8,7 +9,6 @@ repositories {
 }
 
 android {
-
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
@@ -24,7 +24,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            }
+        }
     }
 
     packagingOptions {
@@ -37,7 +37,6 @@ allprojects {
     afterEvaluate { project ->
         def propsFile = rootProject.file('keystore.properties')
         def configName = 'debug'
-
         if (propsFile.exists() && android.signingConfigs.hasProperty(configName)) {
             def props = new Properties()
             props.load(new FileInputStream(propsFile))
@@ -75,6 +74,9 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support:support-annotations:25.0.1'
+
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
