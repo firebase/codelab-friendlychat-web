@@ -70,6 +70,7 @@ dependencies {
     compile 'com.google.firebase:firebase-analytics:10.0.1'
     // Firebase UI
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.18.0'
     // Testing dependencies
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
