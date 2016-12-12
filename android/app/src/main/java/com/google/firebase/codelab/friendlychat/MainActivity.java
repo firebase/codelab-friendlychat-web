@@ -24,22 +24,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
@@ -49,8 +43,6 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseAppIndex;
@@ -197,14 +189,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
 
             @Override
-            protected void populateViewHolder(RoomViewHolder viewHolder, Room room, int position) {
+            protected void populateViewHolder(RoomViewHolder viewHolder, final Room room, int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
                 viewHolder.roomName.setText(room.getName());
                 viewHolder.lastMessage.setText(room.getLastMessage());
                 viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this,ChatActivity.class);
+                        Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                        intent.putExtra(Constants.ROOM_NAME, room.getId());
                         startActivity(intent);
                     }
                 });
@@ -429,6 +422,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         }
     }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 

@@ -28,8 +28,7 @@ public class FriendlyMessage {
     private String roomId;
     private String photoUrl;
 
-    public FriendlyMessage() {
-    }
+    public FriendlyMessage() {}
 
     public FriendlyMessage(String text, String name, String photoUrl) {
         this.text = text;

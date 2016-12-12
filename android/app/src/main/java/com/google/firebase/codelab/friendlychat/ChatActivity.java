@@ -64,6 +64,7 @@ import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -180,12 +181,13 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
 
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD);
+        Query query = mFirebaseDatabaseReference.equalTo(getIntent().getStringExtra(Constants.ROOM_NAME),"roomId");
         mChatAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
                 FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD)) {
+                query) {
 
             @Override
             protected FriendlyMessage parseSnapshot(DataSnapshot snapshot) {
