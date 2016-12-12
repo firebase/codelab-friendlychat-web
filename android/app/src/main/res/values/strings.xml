@@ -14,4 +14,5 @@
     <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
     <string name="create_room">Create</string>
     <string name="insert_room_name">Please enter room name</string>
+    <string name="facebook_app_id"  translatable="false">795391437280178</string>
 </resources>

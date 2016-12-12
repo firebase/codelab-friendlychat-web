@@ -37,6 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.facebook.login.LoginManager;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInvite;
@@ -378,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             case R.id.sign_out_menu:
                 mFirebaseAuth.signOut();
                 Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+                LoginManager.getInstance().logOut();
                 mFirebaseUser = null;
                 mUsername = ANONYMOUS;
                 mPhotoUrl = null;
