@@ -23,16 +23,17 @@ import lombok.Setter;
 public class FriendlyMessage {
 
     private String id;
-    private String text;
     private String name;
-    private String roomId;
     private String photoUrl;
+    private String roomId;
+    private String text;
 
     public FriendlyMessage() {}
 
-    public FriendlyMessage(String text, String name, String photoUrl) {
+    public FriendlyMessage(String roomId,String text, String name, String photoUrl) {
         this.text = text;
         this.name = name;
+        this.roomId = roomId;
         this.photoUrl = photoUrl;
     }
 }

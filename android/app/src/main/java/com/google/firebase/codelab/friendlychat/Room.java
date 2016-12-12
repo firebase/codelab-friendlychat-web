@@ -15,12 +15,14 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class Room {
+public class Room implements Serializable{
 
     private String id;
     private String name;

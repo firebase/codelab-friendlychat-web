@@ -77,6 +77,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
+    private Room room;
+
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.messageTextView) public TextView messageTextView;
         @BindView(R.id.messengerTextView) public TextView messengerTextView;
@@ -180,9 +182,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
-
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD);
-        Query query = mFirebaseDatabaseReference.equalTo(getIntent().getStringExtra(Constants.ROOM_NAME),"roomId");
+        room = (Room) getIntent().getSerializableExtra(Constants.ROOM);
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        Query query = mFirebaseDatabaseReference.child(MESSAGES_CHILD).orderByChild("roomId").equalTo(room.getId());
         mChatAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
                 FriendlyMessage.class,
                 R.layout.item_message,
@@ -338,10 +340,16 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername, mPhotoUrl);
+                String lastMessage = mMessageEditText.getText().toString();
+                FriendlyMessage friendlyMessage = new FriendlyMessage(room.getId(),lastMessage, mUsername, mPhotoUrl);
                 mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
-                mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+                room.setLastMessage(lastMessage);
+                mMessageEditText.setText("");
+                HashMap<String, Object> result = new HashMap<>();
+                result.put("roomId", room.getId());
+                result.put("lastMessage", room.getLastMessage());
+                mFirebaseDatabaseReference.child(ROOMS).child(room.getId()).updateChildren(result);
             }
         });
     }
