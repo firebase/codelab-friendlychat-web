@@ -277,9 +277,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
-        Room friendlyMessage = new Room("חדר ראשון", "הודעה אחרונה");
-        mFirebaseDatabaseReference.child(ROOMS).push().setValue(friendlyMessage);
-
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
         mMessageRecyclerView.setAdapter(mRoomAdapter);
 //        mMessageRecyclerView.setAdapter(mChatAdapter);
