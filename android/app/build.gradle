@@ -33,7 +33,6 @@ android {
         exclude 'META-INF/NOTICE'
     }
 }
-
 allprojects {
     afterEvaluate { project ->
         def propsFile = rootProject.file('keystore.properties')
