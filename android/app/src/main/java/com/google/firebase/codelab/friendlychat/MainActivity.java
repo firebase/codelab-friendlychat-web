@@ -30,6 +30,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -263,7 +266,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 // custom dialog
                 final Dialog dialog = new Dialog(MainActivity.this);
                 dialog.setContentView(R.layout.dialog_create_room);
-                dialog.setTitle("Title...");
+                dialog.setTitle("Create new room");
+
+                // set the custom dialog components - text, image and button
+                final EditText editText = (EditText) dialog.findViewById(R.id.newRoomName);
+                ImageView image = (ImageView) dialog.findViewById(R.id.image);
+                image.setImageResource(R.mipmap.ic_launcher);
+
+                Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+                // if button is clicked, close the custom dialog
+                dialogButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Room room = new Room(editText.getText().toString(),"");
+                        mFirebaseDatabaseReference.child(ROOMS).push().setValue(room);
+                        mFirebaseAnalytics.logEvent(ROOM_CREATED, null);
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
             }
         });
     }
