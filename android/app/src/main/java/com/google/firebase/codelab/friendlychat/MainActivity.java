@@ -63,6 +63,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -197,12 +200,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             protected void populateViewHolder(RoomViewHolder viewHolder, final Room room, int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
                 viewHolder.roomName.setText(room.getName());
-                viewHolder.lastMessage.setText(room.getLastMessage());
+
+
+                DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                String requiredDate = df.format(new Date(room.getTimestamp())).toString();
+
+
+                viewHolder.lastMessage.setText(requiredDate + ", " + room.getLastMessage());
                 viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this,ChatActivity.class);
-                        intent.putExtra(Constants.ROOM,room);
+                        Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                        intent.putExtra(Constants.ROOM, room);
                         startActivity(intent);
                     }
                 });
@@ -278,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 dialogButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Room room = new Room(editText.getText().toString(),"");
+                        Room room = new Room(editText.getText().toString(), "", 0);
                         mFirebaseDatabaseReference.child(ROOMS).push().setValue(room);
                         mFirebaseAnalytics.logEvent(ROOM_CREATED, null);
                         dialog.dismiss();
@@ -429,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         }
     }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
