@@ -15,6 +15,7 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 10;
     public static final String ANONYMOUS = "anonymous";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
+    private static final String ROOM_CREATED = "room_created";
     private static final String MESSAGE_URL = "http://friendlychat.firebase.google.com/message/";
 
     private String mUsername;
@@ -265,6 +268,29 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // custom dialog
+                final Dialog dialog = new Dialog(MainActivity.this);
+                dialog.setContentView(R.layout.dialog_create_room);
+                dialog.setTitle("Title...");
+
+                // set the custom dialog components - text, image and button
+                EditText editText = (EditText) dialog.findViewById(R.id.text);
+                ImageView image = (ImageView) dialog.findViewById(R.id.image);
+                image.setImageResource(R.mipmap.ic_launcher);
+
+                Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+                // if button is clicked, close the custom dialog
+                dialogButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Room room = new Room(editText.getText().toString(), mUsername, mPhotoUrl);
+                        mFirebaseDatabaseReference.child(ROOMS).push().setValue(room);
+                        mFirebaseAnalytics.logEvent(ROOM_CREATED, null);
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
 //                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername, mPhotoUrl);
 //                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
 //                mMessageEditText.setText("");
@@ -385,23 +411,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
             cacheExpiration = 0;
         }
-//        mFirebaseRemoteConfig.fetch(cacheExpiration)
-//                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        // Make the fetched config available via FirebaseRemoteConfig get<type> calls.
-//                        mFirebaseRemoteConfig.activateFetched();
-//                        applyRetrievedLengthLimit();
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        // There has been an error fetching the config
-//                        Log.w(TAG, "Error fetching config: " + e.getMessage());
-//                        applyRetrievedLengthLimit();
-//                    }
-//                });
     }
 
     @Override
