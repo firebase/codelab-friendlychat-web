@@ -8,9 +8,9 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.0"
 
+    compileSdkVersion 25
+    buildToolsVersion "25.0.1"
     defaultConfig {
         applicationId "com.google.firebase.codelab.friendlychat"
         minSdkVersion 9
@@ -19,12 +19,14 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+            }
     }
+
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE-FIREBASE.txt'
@@ -34,7 +36,7 @@ android {
 allprojects {
     afterEvaluate { project ->
         def propsFile = rootProject.file('keystore.properties')
-        def configName = 'release'
+        def configName = 'debug'
 
         if (propsFile.exists() && android.signingConfigs.hasProperty(configName)) {
             def props = new Properties()
@@ -46,38 +48,33 @@ allprojects {
         }
     }
 }
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-
-    compile 'com.android.support:design:25.0.0'
+    compile 'com.android.support:design:25.0.1'
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'de.hdodenhof:circleimageview:1.3.0'
-    compile 'com.android.support:appcompat-v7:25.0.0'
-
+    compile 'com.android.support:appcompat-v7:25.0.1'
     // Google
-    compile 'com.google.android.gms:play-services-auth:10.0.0'
-
+    compile 'com.google.android.gms:play-services-auth:10.0.1'
     // Firebase
     compile 'com.google.firebase:firebase-database:10.0.0'
     compile 'com.google.firebase:firebase-auth:10.0.0'
     compile 'com.google.firebase:firebase-config:10.0.0'
-    compile 'com.google.android.gms:play-services-appinvite:10.0.0'
+    compile 'com.google.android.gms:play-services-appinvite:10.0.1'
     compile 'com.google.firebase:firebase-messaging:10.0.0'
-    compile 'com.google.android.gms:play-services-ads:10.0.0'
+    compile 'com.google.android.gms:play-services-ads:10.0.1'
     compile 'com.google.firebase:firebase-appindexing:10.0.0'
     compile 'com.google.firebase:firebase-crash:10.0.0'
     compile 'com.google.firebase:firebase-analytics:10.0.0'
-
     // Firebase UI
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
-
     // Testing dependencies
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support:support-annotations:25.0.0'
-
+    androidTestCompile 'com.android.support:support-annotations:25.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
