@@ -75,8 +75,11 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support:support-annotations:25.0.1'
 
+    provided 'org.glassfish:javax.annotation:10.0-b28'
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    provided 'org.projectlombok:lombok:1.16.10'
+    apt 'org.projectlombok:lombok:1.16.10'
 }
 
 apply plugin: 'com.google.gms.google-services'

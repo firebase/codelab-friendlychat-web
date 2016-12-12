@@ -20,19 +20,17 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FriendlyMessage {
+public class Room {
 
     private String id;
-    private String text;
     private String name;
-    private String photoUrl;
+    private String lastMessage;
 
-    public FriendlyMessage() {
+    public Room() {
     }
 
-    public FriendlyMessage(String text, String name, String photoUrl) {
-        this.text = text;
+    public Room(String name, String lastMessage) {
         this.name = name;
-        this.photoUrl = photoUrl;
+        this.lastMessage = lastMessage;
     }
 }

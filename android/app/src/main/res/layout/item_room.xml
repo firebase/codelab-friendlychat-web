@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/messageTextView"
+        android:id="@+id/roomName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0"

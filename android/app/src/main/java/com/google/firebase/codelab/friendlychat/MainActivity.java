@@ -70,26 +70,36 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import java.util.HashMap;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        public TextView messageTextView;
-        public TextView messengerTextView;
-        public CircleImageView messengerImageView;
+        @BindView(R.id.messageTextView) public TextView messageTextView;
+        @BindView(R.id.messengerTextView) public TextView messengerTextView;
+        @BindView(R.id.messengerImageView) public CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
             super(v);
-            messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
-            messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
-            messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
+            ButterKnife.bind(this, v);
+        }
+    }
+
+    public static class RoomViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.roomName) public TextView roomName;
+        @BindView(R.id.lastMessage) public TextView lastMessage;
+
+        public RoomViewHolder(View v) {
+            super(v);
+            ButterKnife.bind(this, v);
         }
     }
 
     private static final String TAG = "MainActivity";
     public static final String MESSAGES_CHILD = "messages";
+    public static final String ROOMS = "rooms";
     private static final int REQUEST_INVITE = 1;
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 10;
     public static final String ANONYMOUS = "anonymous";
@@ -103,7 +113,8 @@ public class MainActivity extends AppCompatActivity implements
     private Button mSendButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
-    private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
+    private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mChatAdapter;
+    private FirebaseRecyclerAdapter<Room, RoomViewHolder> mRoomAdapter;
     private ProgressBar mProgressBar;
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
@@ -170,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements
         mLinearLayoutManager.setStackFromEnd(true);
 
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
+        mChatAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
                 FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
@@ -207,11 +218,40 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
-        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+        mRoomAdapter = new FirebaseRecyclerAdapter<Room, RoomViewHolder>(
+                Room.class,
+                R.layout.item_room,
+                RoomViewHolder.class,
+                mFirebaseDatabaseReference.child(ROOMS)) {
+
+            @Override
+            protected Room parseSnapshot(DataSnapshot snapshot) {
+                Room friendlyMessage = super.parseSnapshot(snapshot);
+                if (friendlyMessage != null) {
+                    friendlyMessage.setId(snapshot.getKey());
+                }
+                return friendlyMessage;
+            }
+
+            @Override
+            protected void populateViewHolder(RoomViewHolder viewHolder, Room room, int position) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                viewHolder.roomName.setText(room.getName());
+                viewHolder.lastMessage.setText(room.getLastMessage());
+
+                // write this message to the on-device index
+                FirebaseAppIndex.getInstance().update(getMessageIndexable(room));
+
+                // log a view action on it
+                FirebaseUserActions.getInstance().end(getMessageViewAction(room));
+            }
+        };
+
+        mChatAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
+                int friendlyMessageCount = mChatAdapter.getItemCount();
                 int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
                 // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
                 // to the bottom of the list to show the newly added message.
@@ -222,8 +262,27 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+        mRoomAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int friendlyMessageCount = mRoomAdapter.getItemCount();
+                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+                // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
+                // to the bottom of the list to show the newly added message.
+                if (lastVisiblePosition == -1 ||
+                        (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                    mMessageRecyclerView.scrollToPosition(positionStart);
+                }
+            }
+        });
+
+        Room friendlyMessage = new Room("חדר ראשון", "הודעה אחרונה");
+        mFirebaseDatabaseReference.child(ROOMS).push().setValue(friendlyMessage);
+
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mMessageRecyclerView.setAdapter(mFirebaseAdapter);
+        mMessageRecyclerView.setAdapter(mRoomAdapter);
+//        mMessageRecyclerView.setAdapter(mChatAdapter);
 
         // Initialize and request AdMob ad.
         mAdView = (AdView) findViewById(R.id.adView);
@@ -239,8 +298,8 @@ public class MainActivity extends AppCompatActivity implements
         // Define Firebase Remote Config Settings.
         FirebaseRemoteConfigSettings firebaseRemoteConfigSettings =
                 new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(true)
-                .build();
+                        .setDeveloperModeEnabled(true)
+                        .build();
 
         // Define default config values. Defaults are used when fetched config values are not
         // available. Eg: if an error occurred fetching values from the server.
@@ -280,8 +339,7 @@ public class MainActivity extends AppCompatActivity implements
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername,
-                        mPhotoUrl);
+                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername, mPhotoUrl);
                 mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                 mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
@@ -292,6 +350,13 @@ public class MainActivity extends AppCompatActivity implements
     private Action getMessageViewAction(FriendlyMessage friendlyMessage) {
         return new Action.Builder(Action.Builder.VIEW_ACTION)
                 .setObject(friendlyMessage.getName(), MESSAGE_URL.concat(friendlyMessage.getId()))
+                .setMetadata(new Action.Metadata.Builder().setUpload(false))
+                .build();
+    }
+
+    private Action getMessageViewAction(Room room) {
+        return new Action.Builder(Action.Builder.VIEW_ACTION)
+                .setObject(room.getName(), MESSAGE_URL.concat(room.getId()))
                 .setMetadata(new Action.Metadata.Builder().setUpload(false))
                 .build();
     }
@@ -309,6 +374,26 @@ public class MainActivity extends AppCompatActivity implements
         Indexable messageToIndex = Indexables.messageBuilder()
                 .setName(friendlyMessage.getText())
                 .setUrl(MESSAGE_URL.concat(friendlyMessage.getId()))
+                .setSender(sender)
+                .setRecipient(recipient)
+                .build();
+
+        return messageToIndex;
+    }
+
+    private Indexable getMessageIndexable(Room room) {
+        PersonBuilder sender = Indexables.personBuilder()
+                .setIsSelf(mUsername == room.getName())
+                .setName(room.getName())
+                .setUrl(MESSAGE_URL.concat(room.getId() + "/sender"));
+
+        PersonBuilder recipient = Indexables.personBuilder()
+                .setName(mUsername)
+                .setUrl(MESSAGE_URL.concat(room.getId() + "/recipient"));
+
+        Indexable messageToIndex = Indexables.messageBuilder()
+                .setName(room.getName())
+                .setUrl(MESSAGE_URL.concat(room.getId()))
                 .setSender(sender)
                 .setRecipient(recipient)
                 .build();
