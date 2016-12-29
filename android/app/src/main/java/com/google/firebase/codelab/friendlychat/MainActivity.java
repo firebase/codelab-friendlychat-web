@@ -25,6 +25,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -204,6 +205,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         Intent intent = new Intent(MainActivity.this,ChatActivity.class);
                         intent.putExtra(Constants.ROOM,room);
                         startActivity(intent);
+                    }
+                });
+                viewHolder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                        sharingIntent.setType("text/plain");
+                        String subject = getResources().getString(R.string.app_name);
+                        String body = "";
+                        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+                        String url= "https://p82x9.app.goo.gl/?link=http://www.friendlychat.com/%scheck&apn=com.google.firebase.codelab.friendlychat";
+                        body = String.format(url, room.getId());
+                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
+                        startActivity(Intent.createChooser(sharingIntent, getResources()
+                                .getString(R.string.share_using)));
+                        return true;
                     }
                 });
 
