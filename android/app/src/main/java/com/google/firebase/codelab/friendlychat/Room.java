@@ -27,12 +27,14 @@ public class Room implements Serializable{
     private String id;
     private String name;
     private String lastMessage;
+    private long timestamp;
 
     public Room() {
     }
 
-    public Room(String name, String lastMessage) {
+    public Room(String name, String lastMessage,long timestamp) {
         this.name = name;
         this.lastMessage = lastMessage;
+        this.timestamp = timestamp;
     }
 }

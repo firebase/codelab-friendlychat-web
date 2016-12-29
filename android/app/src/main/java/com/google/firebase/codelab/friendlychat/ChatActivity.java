@@ -68,6 +68,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -340,15 +341,16 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                long time = new Date().getTime();
                 String lastMessage = mMessageEditText.getText().toString();
-                FriendlyMessage friendlyMessage = new FriendlyMessage(room.getId(),lastMessage, mUsername, mPhotoUrl);
+                FriendlyMessage friendlyMessage = new FriendlyMessage(room.getId(), lastMessage, mUsername, mPhotoUrl, time);
                 mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
                 room.setLastMessage(lastMessage);
                 mMessageEditText.setText("");
                 HashMap<String, Object> result = new HashMap<>();
-                result.put("roomId", room.getId());
                 result.put("lastMessage", room.getLastMessage());
+                result.put("timestamp", time);
                 mFirebaseDatabaseReference.child(ROOMS).child(room.getId()).updateChildren(result);
             }
         });

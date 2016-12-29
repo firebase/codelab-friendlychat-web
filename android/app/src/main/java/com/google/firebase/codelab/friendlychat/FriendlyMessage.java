@@ -27,13 +27,15 @@ public class FriendlyMessage {
     private String photoUrl;
     private String roomId;
     private String text;
+    private long timestamp;
 
     public FriendlyMessage() {}
 
-    public FriendlyMessage(String roomId,String text, String name, String photoUrl) {
+    public FriendlyMessage(String roomId,String text, String name, String photoUrl,long timestamp) {
         this.text = text;
         this.name = name;
         this.roomId = roomId;
         this.photoUrl = photoUrl;
+        this.timestamp = timestamp;
     }
 }
