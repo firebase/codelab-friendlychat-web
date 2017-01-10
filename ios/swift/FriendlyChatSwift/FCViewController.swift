@@ -99,14 +99,15 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     // fetched and cached config would be considered expired because it would have been fetched
     // more than cacheExpiration seconds ago. Thus the next fetch would go to the server unless
     // throttling is in progress. The default expiration duration is 43200 (12 hours).
-    remoteConfig.fetch(withExpirationDuration: expirationDuration) { (status, error) in
+    remoteConfig.fetch(withExpirationDuration: expirationDuration) { [weak self] (status, error) in
       if status == .success {
         print("Config fetched!")
-        self.remoteConfig.activateFetched()
-        let friendlyMsgLength = self.remoteConfig["friendly_msg_length"]
+        guard let strongSelf = self else { return }
+        strongSelf.remoteConfig.activateFetched()
+        let friendlyMsgLength = strongSelf.remoteConfig["friendly_msg_length"]
         if friendlyMsgLength.source != .static {
-          self.msglength = friendlyMsgLength.numberValue!
-          print("Friendly msg length config: \(self.msglength)")
+          strongSelf.msglength = friendlyMsgLength.numberValue!
+          print("Friendly msg length config: \(strongSelf.msglength)")
         }
       } else {
         print("Config not fetched")
