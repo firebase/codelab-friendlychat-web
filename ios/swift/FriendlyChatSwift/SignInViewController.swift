@@ -55,7 +55,7 @@ class SignInViewController: UIViewController {
   func setDisplayName(_ user: FIRUser) {
     let changeRequest = user.profileChangeRequest()
     changeRequest.displayName = user.email!.components(separatedBy: "@")[0]
-    changeRequest.commitChanges(){ (error) in
+    changeRequest.commitChanges() {(error) in
       if let error = error {
         print(error.localizedDescription)
         return
@@ -67,11 +67,8 @@ class SignInViewController: UIViewController {
   @IBAction func didRequestPasswordReset(_ sender: AnyObject) {
     let prompt = UIAlertController.init(title: nil, message: "Email:", preferredStyle: .alert)
     let okAction = UIAlertAction.init(title: "OK", style: .default) { (action) in
-      let userInput = prompt.textFields![0].text
-      if (userInput!.isEmpty) {
-        return
-      }
-      FIRAuth.auth()?.sendPasswordReset(withEmail: userInput!) { (error) in
+      guard let userInput = prompt.textFields![0].text, !userInput.isEmpty else { return }
+      FIRAuth.auth()?.sendPasswordReset(withEmail: userInput) { (error) in
         if let error = error {
           print(error.localizedDescription)
           return
@@ -80,7 +77,7 @@ class SignInViewController: UIViewController {
     }
     prompt.addTextField(configurationHandler: nil)
     prompt.addAction(okAction)
-    present(prompt, animated: true, completion: nil);
+    present(prompt, animated: true, completion: nil)
   }
 
   func signedIn(_ user: FIRUser?) {

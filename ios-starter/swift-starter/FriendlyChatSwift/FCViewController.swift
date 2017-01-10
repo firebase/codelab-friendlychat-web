@@ -45,7 +45,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
 
-
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -79,7 +78,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   @IBAction func didSendMessage(_ sender: UIButton) {
-    textFieldShouldReturn(textField)
+    _ = textFieldShouldReturn(textField)
   }
 
   @IBAction func didPressCrash(_ sender: AnyObject) {
@@ -134,7 +133,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBAction func didTapAddPhoto(_ sender: AnyObject) {
     let picker = UIImagePickerController()
     picker.delegate = self
-    if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera)) {
+    if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
       picker.sourceType = UIImagePickerControllerSourceType.camera
     } else {
       picker.sourceType = UIImagePickerControllerSourceType.photoLibrary
@@ -149,15 +148,15 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
 
     // if it's a photo from the library, not an image from the camera
-    if #available(iOS 8.0, *), let referenceURL = info[UIImagePickerControllerReferenceURL] {
-      let assets = PHAsset.fetchAssets(withALAssetURLs: [referenceURL as! URL], options: nil)
+    if #available(iOS 8.0, *), let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL {
+      let assets = PHAsset.fetchAssets(withALAssetURLs: [referenceURL], options: nil)
       let asset = assets.firstObject
       asset?.requestContentEditingInput(with: nil, completionHandler: { (contentEditingInput, info) in
         let imageFile = contentEditingInput?.fullSizeImageURL
         let filePath = "\(uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000))/\((referenceURL as AnyObject).lastPathComponent!)"
       })
     } else {
-      guard let image = info[UIImagePickerControllerOriginalImage] as! UIImage? else { return }
+      guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else { return }
       let imageData = UIImageJPEGRepresentation(image, 0.8)
       guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
       let imagePath = "\(uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
@@ -173,7 +172,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     dismiss(animated: true, completion: nil)
   }
 
-  func showAlert(withTitle title:String, message:String) {
+  func showAlert(withTitle title: String, message: String) {
     DispatchQueue.main.async {
         let alert = UIAlertController(title: title,
             message: message, preferredStyle: .alert)

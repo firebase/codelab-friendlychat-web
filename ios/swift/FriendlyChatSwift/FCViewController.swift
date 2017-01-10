@@ -45,7 +45,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
 
-
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -92,7 +91,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     var expirationDuration: Double = 3600
     // If in developer mode cacheExpiration is set to 0 so each fetch will retrieve values from
     // the server.
-    if (self.remoteConfig.configSettings.isDeveloperModeEnabled) {
+    if self.remoteConfig.configSettings.isDeveloperModeEnabled {
       expirationDuration = 0
     }
 
@@ -100,14 +99,15 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     // fetched and cached config would be considered expired because it would have been fetched
     // more than cacheExpiration seconds ago. Thus the next fetch would go to the server unless
     // throttling is in progress. The default expiration duration is 43200 (12 hours).
-    remoteConfig.fetch(withExpirationDuration: expirationDuration) { (status, error) in
-      if (status == .success) {
+    remoteConfig.fetch(withExpirationDuration: expirationDuration) { [weak self] (status, error) in
+      if status == .success {
         print("Config fetched!")
-        self.remoteConfig.activateFetched()
-        let friendlyMsgLength = self.remoteConfig["friendly_msg_length"]
-        if (friendlyMsgLength.source != .static) {
-          self.msglength = friendlyMsgLength.numberValue!
-          print("Friendly msg length config: \(self.msglength)")
+        guard let strongSelf = self else { return }
+        strongSelf.remoteConfig.activateFetched()
+        let friendlyMsgLength = strongSelf.remoteConfig["friendly_msg_length"]
+        if friendlyMsgLength.source != .static {
+          strongSelf.msglength = friendlyMsgLength.numberValue!
+          print("Friendly msg length config: \(strongSelf.msglength)")
         }
       } else {
         print("Config not fetched")
@@ -121,7 +121,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   @IBAction func didSendMessage(_ sender: UIButton) {
-    textFieldShouldReturn(textField)
+    _ = textFieldShouldReturn(textField)
   }
 
   @IBAction func didPressCrash(_ sender: AnyObject) {
@@ -156,11 +156,11 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     let cell = self.clientTable .dequeueReusableCell(withIdentifier: "tableViewCell", for: indexPath)
     // Unpack message from Firebase DataSnapshot
     let messageSnapshot: FIRDataSnapshot! = self.messages[indexPath.row]
-    let message = messageSnapshot.value as! Dictionary<String, String>
+    guard let message = messageSnapshot.value as? [String:String] else { return cell }
     let name = message[Constants.MessageFields.name] ?? ""
     if let imageURL = message[Constants.MessageFields.imageURL] {
       if imageURL.hasPrefix("gs://") {
-        FIRStorage.storage().reference(forURL: imageURL).data(withMaxSize: INT64_MAX){ (data, error) in
+        FIRStorage.storage().reference(forURL: imageURL).data(withMaxSize: INT64_MAX) {(data, error) in
           if let error = error {
             print("Error downloading: \(error)")
             return
@@ -176,7 +176,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       let text = message[Constants.MessageFields.text] ?? ""
       cell.textLabel?.text = name + ": " + text
       cell.imageView?.image = UIImage(named: "ic_account_circle")
-      if let photoURL = message[Constants.MessageFields.photoURL], let URL = URL(string: photoURL), let data = try? Data(contentsOf: URL) {
+      if let photoURL = message[Constants.MessageFields.photoURL], let URL = URL(string: photoURL),
+          let data = try? Data(contentsOf: URL) {
         cell.imageView?.image = UIImage(data: data)
       }
     }
@@ -208,7 +209,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   @IBAction func didTapAddPhoto(_ sender: AnyObject) {
     let picker = UIImagePickerController()
     picker.delegate = self
-    if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera)) {
+    if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
       picker.sourceType = .camera
     } else {
       picker.sourceType = .photoLibrary
@@ -223,8 +224,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
 
     // if it's a photo from the library, not an image from the camera
-    if #available(iOS 8.0, *), let referenceURL = info[UIImagePickerControllerReferenceURL] {
-      let assets = PHAsset.fetchAssets(withALAssetURLs: [referenceURL as! URL], options: nil)
+    if #available(iOS 8.0, *), let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL {
+      let assets = PHAsset.fetchAssets(withALAssetURLs: [referenceURL], options: nil)
       let asset = assets.firstObject
       asset?.requestContentEditingInput(with: nil, completionHandler: { [weak self] (contentEditingInput, info) in
         let imageFile = contentEditingInput?.fullSizeImageURL
@@ -241,7 +242,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
           }
       })
     } else {
-      guard let image = info[UIImagePickerControllerOriginalImage] as! UIImage? else { return }
+      guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else { return }
       let imageData = UIImageJPEGRepresentation(image, 0.8)
       let imagePath = "\(uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
       let metadata = FIRStorageMetadata()
@@ -273,7 +274,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     }
   }
 
-  func showAlert(withTitle title:String, message:String) {
+  func showAlert(withTitle title: String, message: String) {
     DispatchQueue.main.async {
         let alert = UIAlertController(title: title,
             message: message, preferredStyle: .alert)
