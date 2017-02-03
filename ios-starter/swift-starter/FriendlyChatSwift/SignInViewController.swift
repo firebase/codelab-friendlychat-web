@@ -17,38 +17,19 @@
 import UIKit
 
 import Firebase
+import GoogleSignIn
 
 @objc(SignInViewController)
-class SignInViewController: UIViewController {
+class SignInViewController: UIViewController, GIDSignInUIDelegate {
+  @IBOutlet weak var signInButton: GIDSignInButton!
+  var handle: FIRAuthStateDidChangeListenerHandle?
 
-  @IBOutlet weak var emailField: UITextField!
-  @IBOutlet weak var passwordField: UITextField!
-
-  override func viewDidAppear(_ animated: Bool) {
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    GIDSignIn.sharedInstance().uiDelegate = self
+    GIDSignIn.sharedInstance().signInSilently()
   }
 
-  @IBAction func didTapSignIn(_ sender: AnyObject) {
-    signedIn(nil)
+  deinit {
   }
-
-  @IBAction func didTapSignUp(_ sender: AnyObject) {
-    setDisplayName(nil)
-  }
-
-  func setDisplayName(_ user: FIRUser?) {
-    signedIn(nil)
-  }
-
-  @IBAction func didRequestPasswordReset(_ sender: AnyObject) {
-  }
-
-  func signedIn(_ user: FIRUser?) {
-    MeasurementHelper.sendLoginEvent()
-
-    AppState.sharedInstance.signedIn = true
-    let notificationName = Notification.Name(rawValue: Constants.NotificationKeys.SignedIn)
-    NotificationCenter.default.post(name: notificationName, object: nil, userInfo: nil)
-    performSegue(withIdentifier: Constants.Segues.SignInToFp, sender: nil)
-  }
-
 }

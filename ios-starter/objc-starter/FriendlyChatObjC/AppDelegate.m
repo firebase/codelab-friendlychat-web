@@ -17,12 +17,42 @@
 #import "AppDelegate.h"
 
 @import Firebase;
+@import GoogleSignIn;
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application
 didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  [GIDSignIn sharedInstance].clientID = @"";
+  [GIDSignIn sharedInstance].delegate = self;
   return YES;
+}
+
+- (BOOL)application:(nonnull UIApplication *)application
+            openURL:(nonnull NSURL *)url
+            options:(nonnull NSDictionary<NSString *, id> *)options {
+  return [self application:application
+                   openURL:url
+         sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
+                annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
+}
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+  return [[GIDSignIn sharedInstance] handleURL:url
+                             sourceApplication:sourceApplication
+                                    annotation:annotation];
+}
+
+- (void)signIn:(GIDSignIn *)signIn
+didSignInForUser:(GIDGoogleUser *)user
+     withError:(NSError *)error {
+  if (error == nil) {
+  } else {
+    NSLog(@"Error %@", error.localizedDescription);
+  }
 }
 
 @end

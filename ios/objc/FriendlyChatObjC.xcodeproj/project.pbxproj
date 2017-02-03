@@ -14,7 +14,6 @@
 		107960AE1C613207003DB6CC /* MeasurementHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960AD1C613207003DB6CC /* MeasurementHelper.m */; };
 		107960B11C61321D003DB6CC /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B01C61321D003DB6CC /* Constants.m */; };
 		107960B61C613263003DB6CC /* SignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B51C613263003DB6CC /* SignInViewController.m */; };
-		107960B91C6156B3003DB6CC /* AppState.m in Sources */ = {isa = PBXBuildFile; fileRef = 107960B81C6156B3003DB6CC /* AppState.m */; };
 		10AF4CC71DD237AD0096D192 /* logo1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 10AF4CC31DD237AD0096D192 /* logo1024.png */; };
 		10AF4CC81DD237AD0096D192 /* Bladefile in Resources */ = {isa = PBXBuildFile; fileRef = 10AF4CC41DD237AD0096D192 /* Bladefile */; };
 		10AF4CC91DD237AD0096D192 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 10AF4CC51DD237AD0096D192 /* Images.xcassets */; };
@@ -36,8 +35,6 @@
 		107960B01C61321D003DB6CC /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		107960B41C613263003DB6CC /* SignInViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignInViewController.h; sourceTree = "<group>"; };
 		107960B51C613263003DB6CC /* SignInViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignInViewController.m; sourceTree = "<group>"; };
-		107960B71C6156B3003DB6CC /* AppState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppState.h; sourceTree = "<group>"; };
-		107960B81C6156B3003DB6CC /* AppState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppState.m; sourceTree = "<group>"; };
 		10AF4CC31DD237AD0096D192 /* logo1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo1024.png; sourceTree = "<group>"; };
 		10AF4CC41DD237AD0096D192 /* Bladefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Bladefile; sourceTree = "<group>"; };
 		10AF4CC51DD237AD0096D192 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -83,8 +80,6 @@
 				107960AD1C613207003DB6CC /* MeasurementHelper.m */,
 				107960B41C613263003DB6CC /* SignInViewController.h */,
 				107960B51C613263003DB6CC /* SignInViewController.m */,
-				107960B71C6156B3003DB6CC /* AppState.h */,
-				107960B81C6156B3003DB6CC /* AppState.m */,
 				107960AF1C61321D003DB6CC /* Constants.h */,
 				107960B01C61321D003DB6CC /* Constants.m */,
 				107960831C6130EF003DB6CC /* Supporting Files */,
@@ -194,7 +189,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				107960B11C61321D003DB6CC /* Constants.m in Sources */,
-				107960B91C6156B3003DB6CC /* AppState.m in Sources */,
 				107960AE1C613207003DB6CC /* MeasurementHelper.m in Sources */,
 				1079608B1C6130EF003DB6CC /* FCViewController.m in Sources */,
 				107960881C6130EF003DB6CC /* AppDelegate.m in Sources */,
