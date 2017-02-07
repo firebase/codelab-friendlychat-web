@@ -18,6 +18,7 @@ import Photos
 import UIKit
 
 import Firebase
+import GoogleSignIn
 import GoogleMobileAds
 
 /**
@@ -29,7 +30,7 @@ let kBannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
 
 @objc(FCViewController)
 class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
-    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FIRInviteDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
@@ -37,7 +38,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   var ref: FIRDatabaseReference!
   var messages: [FIRDataSnapshot]! = []
   var msglength: NSNumber = 10
-  fileprivate var _refHandle: FIRDatabaseHandle!
+  fileprivate var _refHandle: FIRDatabaseHandle?
 
   var storageRef: FIRStorageReference!
   var remoteConfig: FIRRemoteConfig!
@@ -59,7 +60,9 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   deinit {
-    self.ref.child("messages").removeObserver(withHandle: _refHandle)
+    if let refHandle = _refHandle  {
+      self.ref.child("messages").removeObserver(withHandle: refHandle)
+    }
   }
 
   func configureDatabase() {
@@ -129,6 +132,33 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     fatalError()
   }
 
+  @IBAction func inviteTapped(_ sender: AnyObject) {
+    if let invite = FIRInvites.inviteDialog() {
+      invite.setInviteDelegate(self)
+
+      // NOTE: You must have the App Store ID set in your developer console project
+      // in order for invitations to successfully be sent.
+
+      // A message hint for the dialog. Note this manifests differently depending on the
+      // received invitation type. For example, in an email invite this appears as the subject.
+      invite.setMessage("Try this out!\n -\(FIRAuth.auth()?.currentUser?.displayName)")
+      // Title for the dialog, this is what the user sees before sending the invites.
+      invite.setTitle("FriendlyChat")
+      invite.setDeepLink("app_url")
+      invite.setCallToActionText("Install!")
+      invite.setCustomImage("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png")
+      invite.open()
+    }
+  }
+
+  func inviteFinished(withInvitations invitationIds: [Any], error: Error?) {
+    if let error = error {
+      print("Failed: " + error.localizedDescription)
+    } else {
+      print("Invitations sent")
+    }
+  }
+
   func logViewLoaded() {
     FIRCrashMessage("View loaded")
   }
@@ -196,10 +226,11 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   func sendMessage(withData data: [String: String]) {
     var mdata = data
-    mdata[Constants.MessageFields.name] = AppState.sharedInstance.displayName
-    if let photoURL = AppState.sharedInstance.photoURL {
+    mdata[Constants.MessageFields.name] = FIRAuth.auth()?.currentUser?.displayName
+    if let photoURL = FIRAuth.auth()?.currentUser?.photoURL {
       mdata[Constants.MessageFields.photoURL] = photoURL.absoluteString
     }
+
     // Push data to Firebase Database
     self.ref.child("messages").childByAutoId().setValue(mdata)
   }
@@ -267,7 +298,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     let firebaseAuth = FIRAuth.auth()
     do {
       try firebaseAuth?.signOut()
-      AppState.sharedInstance.signedIn = false
       dismiss(animated: true, completion: nil)
     } catch let signOutError as NSError {
       print ("Error signing out: \(signOutError.localizedDescription)")

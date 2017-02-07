@@ -14,7 +14,6 @@
 //  limitations under the License.
 //
 
-#import "AppState.h"
 #import "Constants.h"
 #import "FCViewController.h"
 
@@ -31,7 +30,7 @@
 static NSString* const kBannerAdUnitID = @"ca-app-pub-3940256099942544/2934735716";
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
-UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
+UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FIRInviteDelegate> {
   int _msglength;
   FIRDatabaseHandle _refHandle;
 }
@@ -135,6 +134,39 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   assert(NO);
 }
 
+- (IBAction)inviteTapped:(id)sender {
+  id<FIRInviteBuilder> inviteDialog = [FIRInvites inviteDialog];
+  [inviteDialog setInviteDelegate:self];
+
+  // NOTE: You must have the App Store ID set in your developer console project
+  // in order for invitations to successfully be sent.
+  NSString *message =
+  [NSString stringWithFormat:@"Try this out!\n -%@",
+   [FIRAuth auth].currentUser.displayName];
+
+  // A message hint for the dialog. Note this manifests differently depending on the
+  // received invitation type. For example, in an email invite this appears as the subject.
+  [inviteDialog setMessage:message];
+
+  // Title for the dialog, this is what the user sees before sending the invites.
+  [inviteDialog setTitle:@"FriendlyChat"];
+  [inviteDialog setDeepLink:@"app_url"];
+  [inviteDialog setCallToActionText:@"Install!"];
+  [inviteDialog setCustomImage:@"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"];
+  [inviteDialog open];
+}
+
+- (void)inviteFinishedWithInvitations:(NSArray *)invitationIds error:(NSError *)error {
+  NSString *message =
+  error ? error.localizedDescription
+  : [NSString stringWithFormat:@"%lu invites sent", (unsigned long)invitationIds.count];
+  [[[UIAlertView alloc] initWithTitle:@"Done"
+                              message:message
+                             delegate:nil
+                    cancelButtonTitle:@"OK"
+                    otherButtonTitles:nil] show];
+}
+
 - (void)logViewLoaded {
   // Log that the view did load, FIRCrashNSLog is used here so the log message will be
   // shown in the console output. If FIRCrashLog is used the message is not shown in
@@ -214,8 +246,8 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 
 - (void)sendMessage:(NSDictionary *)data {
   NSMutableDictionary *mdata = [data mutableCopy];
-  mdata[MessageFieldsname] = [AppState sharedInstance].displayName;
-  NSURL *photoURL = AppState.sharedInstance.photoURL;
+  mdata[MessageFieldsname] = [FIRAuth auth].currentUser.displayName;
+  NSURL *photoURL = [FIRAuth auth].currentUser.photoURL;
   if (photoURL) {
     mdata[MessageFieldsphotoURL] = [photoURL absoluteString];
   }
@@ -297,7 +329,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     NSLog(@"Error signing out: %@", signOutError);
     return;
   }
-  [AppState sharedInstance].signedIn = false;
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 

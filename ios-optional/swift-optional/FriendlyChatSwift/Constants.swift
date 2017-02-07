@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2016 Google Inc.
+//  Copyright (c) 2015 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -14,14 +14,21 @@
 //  limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
+struct Constants {
 
-@interface AppState : NSObject
+  struct NotificationKeys {
+    static let SignedIn = "onSignInCompleted"
+  }
 
-+ (AppState *)sharedInstance;
+  struct Segues {
+    static let SignInToFp = "SignInToFP"
+    static let FpToSignIn = "FPToSignIn"
+  }
 
-@property (nonatomic) BOOL signedIn;
-@property (nonatomic, retain) NSString *displayName;
-@property (nonatomic, retain) NSURL *photoURL;
-
-@end
+  struct MessageFields {
+    static let name = "name"
+    static let text = "text"
+    static let photoURL = "photoURL"
+    static let imageURL = "imageURL"
+  }
+}

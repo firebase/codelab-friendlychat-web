@@ -14,17 +14,8 @@
 //  limitations under the License.
 //
 
-#import "AppState.h"
+@import UIKit;
 
-@implementation AppState
-
-+ (AppState *)sharedInstance {
-  static AppState *sharedMyInstance = nil;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    sharedMyInstance = [[self alloc] init];
-  });
-  return sharedMyInstance;
-}
+@interface SignInViewController : UIViewController
 
 @end

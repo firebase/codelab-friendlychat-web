@@ -29,7 +29,8 @@ let kBannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
 
 @objc(FCViewController)
 class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
-    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate,
+        FIRInviteDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
@@ -85,6 +86,9 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     fatalError()
   }
 
+  @IBAction func inviteTapped(_ sender: AnyObject) {
+  }
+
   func logViewLoaded() {
   }
 
@@ -121,11 +125,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func sendMessage(withData data: [String: String]) {
-    var mdata = data
-    mdata[Constants.MessageFields.name] = AppState.sharedInstance.displayName
-    if let photoURL = AppState.sharedInstance.photoURL {
-      mdata[Constants.MessageFields.photoURL] = photoURL.absoluteString
-    }
   }
 
   // MARK: - Image Picker

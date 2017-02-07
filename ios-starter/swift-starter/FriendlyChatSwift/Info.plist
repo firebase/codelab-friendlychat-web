@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSContactsUsageDescription</key>
+	<string>Used for Firebase Invites</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Take and upload photos to Firebase Storage</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -33,15 +35,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>REVERSED_CLIENT_ID</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.google.firebase.codelab.FriendlyChatSwift</string>
+				<string>com.googleusercontent.apps.977469784833-jmgqvhoh4hr9nl9cr6g9ag7l3q9okr1v</string>
 			</array>
 		</dict>
 	</array>

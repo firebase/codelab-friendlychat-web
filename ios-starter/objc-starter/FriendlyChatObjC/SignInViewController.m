@@ -14,7 +14,6 @@
 //  limitations under the License.
 //
 
-#import "AppState.h"
 #import "Constants.h"
 #import "MeasurementHelper.h"
 #import "SignInViewController.h"
@@ -22,37 +21,19 @@
 @import Firebase;
 
 @interface SignInViewController ()
-@property (weak, nonatomic) IBOutlet UITextField *emailField;
-@property (weak, nonatomic) IBOutlet UITextField *passwordField;
+@property(weak, nonatomic) IBOutlet GIDSignInButton *signInButton;
+@property(strong, nonatomic) FIRAuthStateDidChangeListenerHandle handle;
 @end
 
 @implementation SignInViewController
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidLoad {
+  [super viewDidLoad];
+  [GIDSignIn sharedInstance].uiDelegate = self;
+  [[GIDSignIn sharedInstance] signInSilently];
 }
 
-- (IBAction)didTapSignIn:(id)sender {
-  [self signedIn:nil];
-}
-
-- (IBAction)didTapSignUp:(id)sender {
-  [self setDisplayName:nil];
-}
-
-- (void)setDisplayName:(FIRUser *)user {
-  [self signedIn:nil];
-}
-
-- (IBAction)didRequestPasswordReset:(id)sender {
-}
-
-- (void)signedIn:(FIRUser *)user {
-  [MeasurementHelper sendLoginEvent];
-
-  [AppState sharedInstance].signedIn = YES;
-  [[NSNotificationCenter defaultCenter] postNotificationName:NotificationKeysSignedIn
-                                                      object:nil userInfo:nil];
-  [self performSegueWithIdentifier:SeguesSignInToFp sender:nil];
+- (void)dealloc {
 }
 
 @end

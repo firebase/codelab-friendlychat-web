@@ -14,7 +14,6 @@
 //  limitations under the License.
 //
 
-#import "AppState.h"
 #import "Constants.h"
 #import "FCViewController.h"
 
@@ -31,7 +30,8 @@
 static NSString* const kBannerAdUnitID = @"ca-app-pub-3940256099942544/2934735716";
 
 @interface FCViewController ()<UITableViewDataSource, UITableViewDelegate,
-UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
+    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate,
+        FIRInviteDelegate> {
   int _msglength;
   FIRDatabaseHandle _refHandle;
 }
@@ -93,6 +93,9 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   assert(NO);
 }
 
+- (IBAction)inviteTapped:(id)sender {
+}
+
 - (void)logViewLoaded {
 }
 
@@ -134,12 +137,6 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 }
 
 - (void)sendMessage:(NSDictionary *)data {
-  NSMutableDictionary *mdata = [data mutableCopy];
-  mdata[MessageFieldsname] = [AppState sharedInstance].displayName;
-  NSURL *photoURL = AppState.sharedInstance.photoURL;
-  if (photoURL) {
-    mdata[MessageFieldsphotoURL] = [photoURL absoluteString];
-  }
 }
 
 # pragma mark - Image Picker
@@ -185,7 +182,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 }
 
 - (IBAction)signOut:(UIButton *)sender {
-  [AppState sharedInstance].signedIn = false;
   [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
