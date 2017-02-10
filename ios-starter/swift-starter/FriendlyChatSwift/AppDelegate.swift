@@ -24,13 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
 
   var window: UIWindow?
 
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions
-      launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-    GIDSignIn.sharedInstance().clientID = ""
-    GIDSignIn.sharedInstance().delegate = self
-    return true
-  }
-
   @available(iOS 9.0, *)
   func application(_ application: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any])
     -> Bool {
@@ -47,5 +40,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
       print("Error \(error)")
       return
     }
+  }
+
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions
+    launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    GIDSignIn.sharedInstance().clientID = ""
+    GIDSignIn.sharedInstance().delegate = self
+    return true
   }
 }

@@ -21,13 +21,6 @@
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application
-didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  [GIDSignIn sharedInstance].clientID = @"";
-  [GIDSignIn sharedInstance].delegate = self;
-  return YES;
-}
-
 - (BOOL)application:(nonnull UIApplication *)application
             openURL:(nonnull NSURL *)url
             options:(nonnull NSDictionary<NSString *, id> *)options {
@@ -53,6 +46,13 @@ didSignInForUser:(GIDGoogleUser *)user
   } else {
     NSLog(@"Error %@", error.localizedDescription);
   }
+}
+
+- (BOOL)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  [GIDSignIn sharedInstance].clientID = @"";
+  [GIDSignIn sharedInstance].delegate = self;
+  return YES;
 }
 
 @end

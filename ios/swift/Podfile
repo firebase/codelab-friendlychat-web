@@ -8,6 +8,7 @@ pod 'Firebase/Auth'
 pod 'Firebase/Crash'
 pod 'Firebase/Database'
 pod 'Firebase/Invites'
+pod 'Firebase/Messaging'
 pod 'Firebase/RemoteConfig'
 pod 'Firebase/Storage'
 
