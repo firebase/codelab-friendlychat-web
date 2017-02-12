@@ -19,21 +19,20 @@
 @import Firebase;
 
 
-////////////////////////////////////////////////////////////////////////////////////
-//                                                                                //
-//       UserNotifications are only required for the optional FCM step            //
-//                                                                                //
-#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0    //
-@import UserNotifications;                                                        //
-#endif                                                                            //
-// Implement UNUserNotificationCenterDelegate to receive display notification     //
-// via APNS for devices running iOS 10 and above. Implement FIRMessagingDelegate  //
-// to receive data message via FCM for devices running iOS 10 and above.          //
-#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0    //
-@interface AppDelegate () <UNUserNotificationCenterDelegate>                      //
-@end                                                                              //
-#endif                                                                            //
-////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//                                                                              //
+//       UserNotifications are only required for the optional FCM step          //
+//                                                                              //
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0  //
+@import UserNotifications;                                                      //
+#endif                                                                          //
+// Implement UNUserNotificationCenterDelegate to receive display notification   //
+// via APNS for devices running iOS 10 and above.                               //
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0  //
+@interface AppDelegate () <UNUserNotificationCenterDelegate>                    //
+@end                                                                            //
+#endif                                                                          //
+//////////////////////////////////////////////////////////////////////////////////
 
 
 @implementation AppDelegate
@@ -111,10 +110,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
   [[UIApplication sharedApplication] registerForRemoteNotifications];
 
-  // Add observer for InstanceID token refresh callback.
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
-                                               name:kFIRInstanceIDTokenRefreshNotification object:nil];
-
   return YES;
 }
 
@@ -157,48 +152,6 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
   completionHandler();
 }
 #endif
-
-- (void)tokenRefreshNotification:(NSNotification *)notification {
-  // Note that this callback will be fired everytime a new token is generated, including the first
-  // time. So if you need to retrieve the token as soon as it is available this is where that
-  // should be done.
-  NSString *refreshedToken = [[FIRInstanceID instanceID] token];
-  NSLog(@"InstanceID token: %@", refreshedToken);
-
-  // Connect to FCM since connection may have failed when attempted before having a token.
-  [self connectToFcm];
-}
-
-- (void)connectToFcm {
-  // Won't connect since there is no token
-  if (![[FIRInstanceID instanceID] token]) {
-    return;
-  }
-
-  // Disconnect previous FCM connection if it exists.
-  [[FIRMessaging messaging] disconnect];
-
-  [[FIRMessaging messaging] connectWithCompletion:^(NSError * _Nullable error) {
-    if (error != nil) {
-      NSLog(@"Unable to connect to FCM. %@", error);
-    } else {
-      NSLog(@"Connected to FCM.");
-    }
-  }];
-}
-
-- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-  NSLog(@"Unable to register for remote notifications: %@", error);
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-  [self connectToFcm];
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-  [[FIRMessaging messaging] disconnect];
-  NSLog(@"Disconnected from FCM");
-}
 
 - (void)showAlert:(NSDictionary *)userInfo {
   NSString *apsKey = @"aps";

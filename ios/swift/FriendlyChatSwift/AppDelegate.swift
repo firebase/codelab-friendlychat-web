@@ -83,11 +83,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
       application.registerUserNotificationSettings(settings)
     }
     application.registerForRemoteNotifications()
-    // Add observer for InstanceID token refresh callback.
-    NotificationCenter.default.addObserver(self,
-                                           selector: #selector(self.tokenRefreshNotification),
-                                           name: .firInstanceIDTokenRefresh,
-                                           object: nil)
     return true
   }
 
@@ -106,46 +101,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     showAlert(withUserInfo: userInfo)
 
     completionHandler(UIBackgroundFetchResult.newData)
-  }
-
-  func tokenRefreshNotification(_ notification: Notification) {
-    if let refreshedToken = FIRInstanceID.instanceID().token() {
-      print("InstanceID token: \(refreshedToken)")
-    }
-
-    // Connect to FCM since connection may have failed when attempted before having a token.
-    connectToFcm()
-  }
-
-  func connectToFcm() {
-    // Won't connect since there is no token
-    guard FIRInstanceID.instanceID().token() != nil else {
-      return;
-    }
-
-    // Disconnect previous FCM connection if it exists.
-    FIRMessaging.messaging().disconnect()
-
-    FIRMessaging.messaging().connect { (error) in
-      if error != nil {
-        print("Unable to connect with FCM. \(error)")
-      } else {
-        print("Connected to FCM.")
-      }
-    }
-  }
-
-  func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-    print("Unable to register for remote notifications: \(error.localizedDescription)")
-  }
-
-  func applicationDidBecomeActive(_ application: UIApplication) {
-    connectToFcm()
-  }
-
-  func applicationDidEnterBackground(_ application: UIApplication) {
-    FIRMessaging.messaging().disconnect()
-    print("Disconnected from FCM.")
   }
 
   func showAlert(withUserInfo userInfo: [AnyHashable : Any]) {
