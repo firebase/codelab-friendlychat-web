@@ -15,27 +15,26 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class FriendlyMessage {
+public class Room implements Serializable{
 
     private String id;
     private String name;
-    private String photoUrl;
-    private String roomId;
-    private String text;
+    private String lastMessage;
     private long timestamp;
 
-    public FriendlyMessage() {}
+    public Room() {
+    }
 
-    public FriendlyMessage(String roomId,String text, String name, String photoUrl,long timestamp) {
-        this.text = text;
+    public Room(String name, String lastMessage,long timestamp) {
         this.name = name;
-        this.roomId = roomId;
-        this.photoUrl = photoUrl;
+        this.lastMessage = lastMessage;
         this.timestamp = timestamp;
     }
 }

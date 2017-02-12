@@ -15,17 +15,18 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,13 +34,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.facebook.login.LoginManager;
+import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
@@ -49,6 +49,8 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseAppIndex;
@@ -62,11 +64,10 @@ import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +76,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class ChatActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+
+    private Room room;
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.messageTextView) public TextView messageTextView;
@@ -91,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public static class RoomViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.roomName) public TextView roomName;
         @BindView(R.id.lastMessage) public TextView lastMessage;
-        @BindView(R.id.room_layout) public LinearLayout linearLayout;
 
         public RoomViewHolder(View v) {
             super(v);
@@ -106,22 +108,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 10;
     public static final String ANONYMOUS = "anonymous";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
-    private static final String ROOM_CREATED = "room_created";
     private static final String MESSAGE_URL = "http://friendlychat.firebase.google.com/message/";
 
     private String mUsername;
     private String mPhotoUrl;
     private SharedPreferences mSharedPreferences;
 
-    private FloatingActionButton mFab;
+    private Button mSendButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
+    private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mChatAdapter;
     private FirebaseRecyclerAdapter<Room, RoomViewHolder> mRoomAdapter;
     private ProgressBar mProgressBar;
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private EditText mMessageEditText;
     private AdView mAdView;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private GoogleApiClient mGoogleApiClient;
@@ -129,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_chat);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
@@ -147,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             mUsername = mFirebaseUser.getDisplayName();
             mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
         }
-
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
@@ -180,8 +182,46 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
         mLinearLayoutManager = new LinearLayoutManager(this);
-
+        mLinearLayoutManager.setStackFromEnd(true);
+        room = (Room) getIntent().getSerializableExtra(Constants.ROOM);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        Query query = mFirebaseDatabaseReference.child(MESSAGES_CHILD).orderByChild("roomId").equalTo(room.getId());
+        mChatAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
+                FriendlyMessage.class,
+                R.layout.item_message,
+                MessageViewHolder.class,
+                query) {
+
+            @Override
+            protected FriendlyMessage parseSnapshot(DataSnapshot snapshot) {
+                FriendlyMessage friendlyMessage = super.parseSnapshot(snapshot);
+                if (friendlyMessage != null) {
+                    friendlyMessage.setId(snapshot.getKey());
+                }
+                return friendlyMessage;
+            }
+
+            @Override
+            protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                viewHolder.messageTextView.setText(friendlyMessage.getText());
+                viewHolder.messengerTextView.setText(friendlyMessage.getName());
+                if (friendlyMessage.getPhotoUrl() == null) {
+                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(ChatActivity.this,
+                            R.drawable.ic_account_circle_black_36dp));
+                } else {
+                    Glide.with(ChatActivity.this)
+                            .load(friendlyMessage.getPhotoUrl())
+                            .into(viewHolder.messengerImageView);
+                }
+
+                // write this message to the on-device index
+                FirebaseAppIndex.getInstance().update(getMessageIndexable(friendlyMessage));
+
+                // log a view action on it
+                FirebaseUserActions.getInstance().end(getMessageViewAction(friendlyMessage));
+            }
+        };
 
         mRoomAdapter = new FirebaseRecyclerAdapter<Room, RoomViewHolder>(
                 Room.class,
@@ -199,49 +239,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
 
             @Override
-            protected void populateViewHolder(RoomViewHolder viewHolder, final Room room, int position) {
+            protected void populateViewHolder(RoomViewHolder viewHolder, Room room, int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
                 viewHolder.roomName.setText(room.getName());
-
-
-                DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                String requiredDate = df.format(new Date(room.getTimestamp())).toString();
-
-
-                viewHolder.lastMessage.setText(requiredDate + ", " + room.getLastMessage());
-                viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                        intent.putExtra(Constants.ROOM, room);
-                        startActivity(intent);
-                    }
-                });
-                viewHolder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                        sharingIntent.setType("text/plain");
-                        String subject = getResources().getString(R.string.app_name);
-                        String body = "";
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
-                        String url= "https://p82x9.app.goo.gl/?link=http://www.friendlychat.com/%scheck&apn=com.google.firebase.codelab.friendlychat";
-                        body = String.format(url, room.getId());
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
-                        startActivity(Intent.createChooser(sharingIntent, getResources()
-                                .getString(R.string.share_using)));
-                        return true;
-                    }
-                });
+                viewHolder.lastMessage.setText(room.getLastMessage());
 
                 // write this message to the on-device index
-                FirebaseAppIndex.getInstance().update(getRoomIndexable(room));
+                FirebaseAppIndex.getInstance().update(getMessageIndexable(room));
 
                 // log a view action on it
                 FirebaseUserActions.getInstance().end(getMessageViewAction(room));
             }
         };
 
+        mChatAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int friendlyMessageCount = mChatAdapter.getItemCount();
+                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+                // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
+                // to the bottom of the list to show the newly added message.
+                if (lastVisiblePosition == -1 ||
+                        (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                    mMessageRecyclerView.scrollToPosition(positionStart);
+                }
+            }
+        });
 
         mRoomAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -259,8 +283,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         });
 
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mMessageRecyclerView.setAdapter(mRoomAdapter);
+        mMessageRecyclerView.setAdapter(mChatAdapter);
 //        mMessageRecyclerView.setAdapter(mChatAdapter);
+
+        // Initialize and request AdMob ad.
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         // Initialize Firebase Measurement.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -286,33 +315,43 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Fetch remote config.
         fetchConfig();
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mFab.setOnClickListener(new View.OnClickListener() {
+        mMessageEditText = (EditText) findViewById(R.id.messageEditText);
+        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(mSharedPreferences
+                .getInt(CodelabPreferences.FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT))});
+        mMessageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.toString().trim().length() > 0) {
+                    mSendButton.setEnabled(true);
+                } else {
+                    mSendButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+        mSendButton = (Button) findViewById(R.id.sendButton);
+        mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // custom dialog
-                final Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.dialog_create_room);
-                dialog.setTitle("Create new room");
-
-                // set the custom dialog components - text, image and button
-                final EditText editText = (EditText) dialog.findViewById(R.id.newRoomName);
-                ImageView image = (ImageView) dialog.findViewById(R.id.image);
-                image.setImageResource(R.mipmap.ic_launcher);
-
-                Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
-                // if button is clicked, close the custom dialog
-                dialogButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Room room = new Room(editText.getText().toString(), "", 0);
-                        mFirebaseDatabaseReference.child(ROOMS).push().setValue(room);
-                        mFirebaseAnalytics.logEvent(ROOM_CREATED, null);
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.show();
+                long time = new Date().getTime();
+                String lastMessage = mMessageEditText.getText().toString();
+                FriendlyMessage friendlyMessage = new FriendlyMessage(room.getId(), lastMessage, mUsername, mPhotoUrl, time);
+                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
+                mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+                room.setLastMessage(lastMessage);
+                mMessageEditText.setText("");
+                HashMap<String, Object> result = new HashMap<>();
+                result.put("lastMessage", room.getLastMessage());
+                result.put("timestamp", time);
+                mFirebaseDatabaseReference.child(ROOMS).child(room.getId()).updateChildren(result);
             }
         });
     }
@@ -331,8 +370,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .build();
     }
 
+    private Indexable getMessageIndexable(FriendlyMessage friendlyMessage) {
+        PersonBuilder sender = Indexables.personBuilder()
+                .setIsSelf(mUsername == friendlyMessage.getName())
+                .setName(friendlyMessage.getName())
+                .setUrl(MESSAGE_URL.concat(friendlyMessage.getId() + "/sender"));
 
-    private Indexable getRoomIndexable(Room room) {
+        PersonBuilder recipient = Indexables.personBuilder()
+                .setName(mUsername)
+                .setUrl(MESSAGE_URL.concat(friendlyMessage.getId() + "/recipient"));
+
+        Indexable messageToIndex = Indexables.messageBuilder()
+                .setName(friendlyMessage.getText())
+                .setUrl(MESSAGE_URL.concat(friendlyMessage.getId()))
+                .setSender(sender)
+                .setRecipient(recipient)
+                .build();
+
+        return messageToIndex;
+    }
+
+    private Indexable getMessageIndexable(Room room) {
         PersonBuilder sender = Indexables.personBuilder()
                 .setIsSelf(mUsername == room.getName())
                 .setName(room.getName())
@@ -396,7 +454,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             case R.id.sign_out_menu:
                 mFirebaseAuth.signOut();
                 Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-                LoginManager.getInstance().logOut();
                 mFirebaseUser = null;
                 mUsername = ANONYMOUS;
                 mPhotoUrl = null;
@@ -430,6 +487,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
             cacheExpiration = 0;
         }
+        mFirebaseRemoteConfig.fetch(cacheExpiration)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Make the fetched config available via FirebaseRemoteConfig get<type> calls.
+                        mFirebaseRemoteConfig.activateFetched();
+                        applyRetrievedLengthLimit();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // There has been an error fetching the config
+                        Log.w(TAG, "Error fetching config: " + e.getMessage());
+                        applyRetrievedLengthLimit();
+                    }
+                });
     }
 
     @Override
@@ -458,8 +532,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+    /**
+     * Apply retrieved length limit to edit text field. This result may be fresh from the server or it may be from
+     * cached values.
+     */
+    private void applyRetrievedLengthLimit() {
+        Long friendly_msg_length = mFirebaseRemoteConfig.getLong("friendly_msg_length");
+        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
+        Log.d(TAG, "FML is: " + friendly_msg_length);
     }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
 }
