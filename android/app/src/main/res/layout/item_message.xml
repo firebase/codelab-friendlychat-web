@@ -30,12 +30,17 @@
                 android:id="@+id/messageTextView"
                 android:layout_weight="0"/>
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/messageImageView"/>
+
+            <TextView
                 android:id="@+id/messengerTextView"
-                android:layout_weight="0"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
         </LinearLayout>
 
     </LinearLayout>

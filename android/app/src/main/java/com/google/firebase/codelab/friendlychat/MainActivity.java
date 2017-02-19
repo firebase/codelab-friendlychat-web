@@ -17,6 +17,7 @@ package com.google.firebase.codelab.friendlychat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -34,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -45,8 +47,10 @@ import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseAppIndex;
@@ -62,6 +66,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,12 +79,14 @@ public class MainActivity extends AppCompatActivity implements
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView;
+        public ImageView messageImageView;
         public TextView messengerTextView;
         public CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
             super(v);
             messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
+            messageImageView = (ImageView) itemView.findViewById(R.id.messageImageView);
             messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
             messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
         }
@@ -159,9 +167,29 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             @Override
-            protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
+            protected void populateViewHolder(final MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                viewHolder.messageTextView.setText(friendlyMessage.getText());
+                if (friendlyMessage.getText() != null) {
+                    viewHolder.messageTextView.setText(friendlyMessage.getText());
+                    viewHolder.messageImageView.setVisibility(ImageView.GONE);
+                } else {
+                    StorageReference imageStorageReference = FirebaseStorage.getInstance()
+                            .getReferenceFromUrl(friendlyMessage.getImageUrl());
+                    imageStorageReference.getDownloadUrl()
+                            .addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                Glide.with(MainActivity.this)
+                                        .load(task.getResult().toString())
+                                        .into(viewHolder.messageImageView);
+                            }
+                        }
+                    });
+                    viewHolder.messageTextView.setVisibility(TextView.GONE);
+                }
+
+
                 viewHolder.messengerTextView.setText(friendlyMessage.getName());
                 if (friendlyMessage.getPhotoUrl() == null) {
                     viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
@@ -172,8 +200,10 @@ public class MainActivity extends AppCompatActivity implements
                             .into(viewHolder.messengerImageView);
                 }
 
-                // write this message to the on-device index
-                FirebaseAppIndex.getInstance().update(getMessageIndexable(friendlyMessage));
+                if (friendlyMessage.getText() != null) {
+                    // write this message to the on-device index
+                    FirebaseAppIndex.getInstance().update(getMessageIndexable(friendlyMessage));
+                }
 
                 // log a view action on it
                 FirebaseUserActions.getInstance().end(getMessageViewAction(friendlyMessage));
@@ -254,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername,
-                        mPhotoUrl);
+                        mPhotoUrl, null);
                 mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                 mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
