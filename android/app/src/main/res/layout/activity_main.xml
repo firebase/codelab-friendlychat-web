@@ -37,6 +37,12 @@
         android:layout_alignParentStart="true"
         android:id="@+id/linearLayout">
 
+        <ImageView
+            android:id="@+id/addMessageImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_add_black_24dp"/>
+
         <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"

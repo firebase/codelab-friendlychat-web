@@ -31,15 +31,15 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class MainActivityEspressoTest {
+public class SignInActivityEspressoTest {
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityRule =
-            new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<SignInActivity> mActivityRule =
+            new ActivityTestRule<>(SignInActivity.class);
 
     @Test
     public void verifySignUpButtonDisplayed() {
-        onView(ViewMatchers.withId(R.id.button_sign_up)).check(matches(isDisplayed()));
+        onView(ViewMatchers.withId(R.id.sign_in_button)).check(matches(isDisplayed()));
     }
 
 }

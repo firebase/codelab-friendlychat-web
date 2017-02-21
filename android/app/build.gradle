@@ -12,7 +12,7 @@ android {
     buildToolsVersion "25.0.0"
 
     defaultConfig {
-        applicationId "com.google.firebase.codelab.friendlychatjuly"
+        applicationId "com.google.firebase.codelab.friendlychat"
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
@@ -46,6 +46,7 @@ dependencies {
 
     // Firebase
     compile 'com.google.firebase:firebase-database:10.2.0'
+    compile 'com.google.firebase:firebase-storage:10.2.0'
     compile 'com.google.firebase:firebase-auth:10.2.0'
     compile 'com.google.firebase:firebase-config:10.2.0'
     compile 'com.google.android.gms:play-services-appinvite:10.2.0'
@@ -54,7 +55,6 @@ dependencies {
     compile 'com.google.firebase:firebase-appindexing:10.2.0'
     compile 'com.google.firebase:firebase-crash:10.2.0'
     compile 'com.google.firebase:firebase-analytics:10.2.0'
-    compile 'com.google.firebase:firebase-storage:10.2.0'
 
     // Firebase UI
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
