@@ -136,6 +136,9 @@ FriendlyChat.prototype.onAuthStateChanged = function(user) {
 
     // We load currently existing chant messages.
     this.loadMessages();
+
+    // We save the Firebase Messaging Device token and enable notifications.
+    this.saveMessagingDeviceToken();
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     this.userName.setAttribute('hidden', 'true');
@@ -158,6 +161,16 @@ FriendlyChat.prototype.checkSignedInWithMessage = function() {
   };
   this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
   return false;
+};
+
+// Saves the messaging device token to the datastore.
+FriendlyChat.prototype.saveMessagingDeviceToken = function() {
+  // TODO(DEVELOPER): Save the device token in the realtime datastore
+};
+
+// Requests permissions to show notifications.
+FriendlyChat.prototype.requestNotificationsPermissions = function() {
+  // TODO(DEVELOPER): Request permissions to send notifications.
 };
 
 // Resets the given MaterialTextField.
