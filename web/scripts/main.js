@@ -140,17 +140,18 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
       imageUrl: FriendlyChat.LOADING_IMAGE_URL,
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
     }).then(function(data) {
+
       // Upload the image to Firebase Storage.
-      this.storage.ref(currentUser.uid + '/' + Date.now() + '/' + file.name)
-          .put(file, {contentType: file.type})
-          .then(function(snapshot) {
-            // Get the file's Storage URI and update the chat message placeholder.
-            var filePath = snapshot.metadata.fullPath;
-            data.update({imageUrl: this.storage.ref(filePath).toString()});
-          }.bind(this)).catch(function(error) {
-            console.error('There was an error uploading a file to Firebase Storage:', error);
-          });
-    }.bind(this));
+      var filePath = currentUser.uid + '/' + data.key + '/' + file.name;
+      return this.storage.ref(filePath).put(file).then(function(snapshot) {
+
+        // Get the file's Storage URI and update the chat message placeholder.
+        var fullPath = snapshot.metadata.fullPath;
+        return data.update({imageUrl: this.storage.ref(fullPath).toString()});
+      }.bind(this));
+    }.bind(this)).catch(function(error) {
+      console.error('There was an error uploading a file to Firebase Storage:', error);
+    });
   }
 };
 
@@ -188,6 +189,9 @@ FriendlyChat.prototype.onAuthStateChanged = function(user) {
 
     // We load currently existing chant messages.
     this.loadMessages();
+
+    // We save the Firebase Messaging Device token and enable notifications.
+    this.saveMessagingDeviceToken();
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     this.userName.setAttribute('hidden', 'true');
@@ -213,6 +217,34 @@ FriendlyChat.prototype.checkSignedInWithMessage = function() {
   };
   this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
   return false;
+};
+
+// Saves the messaging device token to the datastore.
+FriendlyChat.prototype.saveMessagingDeviceToken = function() {
+  firebase.messaging().getToken().then(function(currentToken) {
+    if (currentToken) {
+      console.log('Got FCM device token:', currentToken);
+      // Saving the Device Token to the datastore.
+      firebase.database().ref('/fcmTokens').child(currentToken)
+          .set(firebase.auth().currentUser.uid);
+    } else {
+      // Need to request permissions to show notifications.
+      this.requestNotificationsPermissions();
+    }
+  }.bind(this)).catch(function(error){
+    console.error('Unable to get messaging token.', error);
+  });
+};
+
+// Requests permissions to show notifications.
+FriendlyChat.prototype.requestNotificationsPermissions = function() {
+  console.log('Requesting notifications permission...');
+  firebase.messaging().requestPermission().then(function() {
+    // Notification permission granted.
+    this.saveMessagingDeviceToken();
+  }.bind(this)).catch(function(error) {
+    console.error('Unable to get permission to notify.', error);
+  });
 };
 
 // Resets the given MaterialTextField.
