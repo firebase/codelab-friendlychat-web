@@ -99,9 +99,9 @@ FriendlyChat.prototype.saveMessage = function(e) {
   }
 };
 
-// Sets the URL of the given img element with the URL of the image stored in Firebase Storage.
+// Sets the URL of the given img element with the URL of the image stored in Cloud Storage.
 FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
-  // If the image is a Firebase Storage URI we fetch the URL.
+  // If the image is a Cloud Storage URI we fetch the URL.
   if (imageUri.startsWith('gs://')) {
     imgElement.src = FriendlyChat.LOADING_IMAGE_URL; // Display a loading image first.
     this.storage.refFromURL(imageUri).getMetadata().then(function(metadata) {
@@ -141,7 +141,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
     }).then(function(data) {
 
-      // Upload the image to Firebase Storage.
+      // Upload the image to Cloud Storage.
       var filePath = currentUser.uid + '/' + data.key + '/' + file.name;
       return this.storage.ref(filePath).put(file).then(function(snapshot) {
 
@@ -150,7 +150,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
         return data.update({imageUrl: this.storage.ref(fullPath).toString()});
       }.bind(this));
     }.bind(this)).catch(function(error) {
-      console.error('There was an error uploading a file to Firebase Storage:', error);
+      console.error('There was an error uploading a file to Cloud Storage:', error);
     });
   }
 };
@@ -315,7 +315,7 @@ FriendlyChat.prototype.checkSetup = function() {
     window.alert('You have not configured and imported the Firebase SDK. ' +
         'Make sure you go through the codelab setup instructions.');
   } else if (config.storageBucket === '') {
-    window.alert('Your Firebase Storage bucket has not been enabled. Sorry about that. This is ' +
+    window.alert('Your Cloud Storage bucket has not been enabled. Sorry about that. This is ' +
         'actually a Firebase bug that occurs rarely. ' +
         'Please go and re-generate the Firebase initialisation snippet (step 4 of the codelab) ' +
         'and make sure the storageBucket attribute is not empty. ' +
