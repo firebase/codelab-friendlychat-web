@@ -50,7 +50,6 @@ didSignInForUser:(GIDGoogleUser *)user
 
 - (BOOL)application:(UIApplication *)application
 didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  [GIDSignIn sharedInstance].clientID = @"";
   [GIDSignIn sharedInstance].delegate = self;
   return YES;
 }
