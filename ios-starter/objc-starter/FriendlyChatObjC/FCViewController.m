@@ -119,7 +119,7 @@ static NSString* const kBannerAdUnitID = @"ca-app-pub-3940256099942544/293473571
 
 // UITableViewDataSource protocol methods
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  return [_messages count];
+  return _messages.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -160,11 +160,11 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   NSURL *referenceURL = info[UIImagePickerControllerReferenceURL];
   if (referenceURL) {
     PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceURL] options:nil];
-    PHAsset *asset = [assets firstObject];
+    PHAsset *asset = assets.firstObject;
     [asset requestContentEditingInputWithOptions:nil
                                completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
                                  NSURL *imageFile = contentEditingInput.fullSizeImageURL;
-                                 NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([[NSDate date] timeIntervalSince1970] * 1000.0), [referenceURL lastPathComponent]];
+                                 NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@", [FIRAuth auth].currentUser.uid, (long long)([NSDate date].timeIntervalSince1970 * 1000.0), referenceURL.lastPathComponent];
                              }
    ];
   } else {
@@ -173,7 +173,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     NSString *imagePath =
     [NSString stringWithFormat:@"%@/%lld.jpg",
      [FIRAuth auth].currentUser.uid,
-     (long long)([[NSDate date] timeIntervalSince1970] * 1000.0)];
+     (long long)([NSDate date].timeIntervalSince1970 * 1000.0)];
   }
 }
 

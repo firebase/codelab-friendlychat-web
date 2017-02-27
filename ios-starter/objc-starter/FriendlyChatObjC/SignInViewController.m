@@ -30,7 +30,6 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   [GIDSignIn sharedInstance].uiDelegate = self;
-  [[GIDSignIn sharedInstance] signInSilently];
 }
 
 - (void)dealloc {
