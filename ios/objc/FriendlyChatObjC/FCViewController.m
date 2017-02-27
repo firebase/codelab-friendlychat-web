@@ -79,8 +79,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 }
 
 - (void)configureStorage {
-  NSString *storageUrl = [FIRApp defaultApp].options.storageBucket;
-  self.storageRef = [[FIRStorage storage] referenceForURL:[NSString stringWithFormat:@"gs://%@", storageUrl]];
+    self.storageRef = [[FIRStorage storage] reference];
 }
 
 - (void)configureRemoteConfig {
@@ -191,7 +190,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
 
 // UITableViewDataSource protocol methods
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  return [_messages count];
+  return _messages.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -249,7 +248,7 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
   mdata[MessageFieldsname] = [FIRAuth auth].currentUser.displayName;
   NSURL *photoURL = [FIRAuth auth].currentUser.photoURL;
   if (photoURL) {
-    mdata[MessageFieldsphotoURL] = [photoURL absoluteString];
+    mdata[MessageFieldsphotoURL] = photoURL.absoluteString;
   }
 
   // Push data to Firebase Database
@@ -278,14 +277,14 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   // if it's a photo from the library, not an image from the camera
   if (referenceURL) {
     PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[referenceURL] options:nil];
-    PHAsset *asset = [assets firstObject];
+    PHAsset *asset = assets.firstObject;
     [asset requestContentEditingInputWithOptions:nil
                                completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
                                  NSURL *imageFile = contentEditingInput.fullSizeImageURL;
                                  NSString *filePath = [NSString stringWithFormat:@"%@/%lld/%@",
                                                        [FIRAuth auth].currentUser.uid,
-                                                       (long long)([[NSDate date] timeIntervalSince1970] * 1000.0),
-                                                       [referenceURL lastPathComponent]];
+                                                       (long long)([NSDate date].timeIntervalSince1970 * 1000.0),
+                                                       referenceURL.lastPathComponent];
                                  [[_storageRef child:filePath]
                                             putFile:imageFile metadata:nil
                                           completion:^(FIRStorageMetadata *metadata, NSError *error) {
@@ -303,7 +302,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     NSString *imagePath =
     [NSString stringWithFormat:@"%@/%lld.jpg",
      [FIRAuth auth].currentUser.uid,
-     (long long)([[NSDate date] timeIntervalSince1970] * 1000.0)];
+     (long long)([NSDate date].timeIntervalSince1970 * 1000.0)];
     FIRStorageMetadata *metadata = [FIRStorageMetadata new];
     metadata.contentType = @"image/jpeg";
     [[_storageRef child:imagePath] putData:imageData metadata:metadata

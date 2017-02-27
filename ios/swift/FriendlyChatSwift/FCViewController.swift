@@ -76,8 +76,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func configureStorage() {
-    let storageUrl = FIRApp.defaultApp()?.options.storageBucket
-    storageRef = FIRStorage.storage().reference(forURL: "gs://" + storageUrl!)
+    storageRef = FIRStorage.storage().reference()
   }
 
   func configureRemoteConfig() {
