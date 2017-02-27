@@ -113,7 +113,9 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
         }
       } else {
         print("Config not fetched")
-        print("Error \(error)")
+        if let error = error {
+          print("Error \(error)")
+        }
       }
     }
   }
@@ -140,7 +142,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
       // A message hint for the dialog. Note this manifests differently depending on the
       // received invitation type. For example, in an email invite this appears as the subject.
-      invite.setMessage("Try this out!\n -\(FIRAuth.auth()?.currentUser?.displayName)")
+      invite.setMessage("Try this out!\n -\(FIRAuth.auth()?.currentUser?.displayName ?? "")")
       // Title for the dialog, this is what the user sees before sending the invites.
       invite.setTitle("FriendlyChat")
       invite.setDeepLink("app_url")
@@ -152,7 +154,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   func inviteFinished(withInvitations invitationIds: [Any], error: Error?) {
     if let error = error {
-      print("Failed: " + error.localizedDescription)
+        print("Failed: \(error.localizedDescription)")
     } else {
       print("Invitations sent")
     }
