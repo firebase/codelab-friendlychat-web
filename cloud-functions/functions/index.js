@@ -26,32 +26,38 @@ const exec = require('child-process-promise').exec;
 // Adds a message that welcomes new users into the chat.
 exports.addWelcomeMessages = functions.auth.user().onCreate(event => {
   const user = event.data;
-  console.log('A new user signed-in for the first time.');
-  const fullName = user.displayName;
+  console.log('A new user signed in for the first time.');
+  const fullName = user.displayName || 'Anonymous';
 
-  // Add a message to welcome the new user.
+  // Saves the new welcome message into the database
+  // which then displays it in the FriendlyChat clients.
   return admin.database().ref('messages').push({
     name: 'Firebase Bot',
     photoUrl: '/images/firebase-logo.png', // Firebase logo
-    text: `${fullName} signed-in for the first time! Welcome!`
+    text: `${fullName} signed in for the first time! Welcome!`
   });
 });
 
 // Checks if uploaded images are flagged as Adult or Violence and if so blurs them.
 exports.blurOffensiveImages = functions.storage.object().onChange(event => {
   const object = event.data;
-  // Exit if this is a deletion event.
+  // Exit if this is a deletion or a deploy event.
   if (object.resourceState === 'not_exists') {
     return console.log('This is a deletion event.');
+  } else if (!object.name) {
+    return console.log('This is a deploy event.');
   }
 
   const bucket = gcs.bucket(object.bucket);
-  const file = bucket.file(object.path);
+  const file = bucket.file(object.name);
 
   // Check the image content using the Cloud Vision API.
   return vision.detectSafeSearch(file).then(safeSearchResult => {
     if (safeSearchResult[0].adult || safeSearchResult[0].violence) {
+      console.log('The image', object.name, 'has been detected as inappropriate.');
       return blurImage(object.path, bucket);
+    } else {
+      console.log('The image', object.name,'has been detected as OK.');
     }
   });
 });
@@ -64,15 +70,21 @@ function blurImage(filePath, bucket) {
 
   // Download file from bucket.
   return bucket.file(filePath).download({destination: tempLocalFile})
-      .then(() =>
+      .then(() => {
+        console.log('Image has been downloaded to', tempLocalFile);
         // Blur the image using ImageMagick.
-        exec(`convert ${tempLocalFile} -channel RGBA -blur 0x24 ${tempLocalFile}`))
-      .then(() =>
+        return exec(`convert ${tempLocalFile} -channel RGBA -blur 0x24 ${tempLocalFile}`);
+      }).then(() => {
+        console.log('Image has been blurred');
         // Uploading the Blurred image back into the bucket.
-        bucket.upload(tempLocalFile, {destination: filePath}))
-      .then(() =>
+        return bucket.upload(tempLocalFile, {destination: filePath});
+      }).then(() => {
+        console.log('Blurred image has been uploaded to', filePath);
         // Indicate that the message has been moderated.
-        admin.database().ref(`/messages/${messageId}`).update({moderated: true}));
+        return admin.database().ref(`/messages/${messageId}`).update({moderated: true});
+      }).then(() => {
+        console.log('Marked the image as moderated in the database.');
+      });
 }
 
 // Sends a notifications to all users when a new message is posted.
