@@ -55,7 +55,7 @@ exports.blurOffensiveImages = functions.storage.object().onChange(event => {
   return vision.detectSafeSearch(file).then(safeSearchResult => {
     if (safeSearchResult[0].adult || safeSearchResult[0].violence) {
       console.log('The image', object.name, 'has been detected as inappropriate.');
-      return blurImage(object.path, bucket);
+      return blurImage(object.name, bucket);
     } else {
       console.log('The image', object.name,'has been detected as OK.');
     }
