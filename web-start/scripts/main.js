@@ -73,11 +73,11 @@ FriendlyChat.prototype.saveMessage = function(e) {
   }
 };
 
-// Sets the URL of the given img element with the URL of the image stored in Firebase Storage.
+// Sets the URL of the given img element with the URL of the image stored in Cloud Storage.
 FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
   imgElement.src = imageUri;
 
-  // TODO(DEVELOPER): If image is on Firebase Storage, fetch image URL and set img element's src.
+  // TODO(DEVELOPER): If image is on Cloud Storage, fetch image URL and set img element's src.
 };
 
 // Saves a new message containing an image URI in Firebase.
@@ -241,7 +241,7 @@ FriendlyChat.prototype.checkSetup = function() {
     window.alert('You have not configured and imported the Firebase SDK. ' +
         'Make sure you go through the codelab setup instructions.');
   } else if (config.storageBucket === '') {
-    window.alert('Your Firebase Storage bucket has not been enabled. Sorry about that. This is ' +
+    window.alert('Your Cloud Storage bucket has not been enabled. Sorry about that. This is ' +
         'actually a Firebase bug that occurs rarely. ' +
         'Please go and re-generate the Firebase initialisation snippet (step 4 of the codelab) ' +
         'and make sure the storageBucket attribute is not empty. ' +
