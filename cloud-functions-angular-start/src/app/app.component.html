@@ -31,12 +31,13 @@
                 <div class="pic" [style.background-image]="'url(' + message.photoUrl + ')'"></div>
               </div>
               <div class="message">
-                <span *ngIf="message.text">{{ message.text }}</span>
+                <span *ngIf="message.text" [style]="message.sentiment | stylize">{{ message.text }}</span>
                 <img *ngIf="message.imageUrl" [src]="message.imageUrl">
               </div>
               <div class="name">{{ message.name }}</div>
             </div>
           </div>
+          <div *ngIf="topics"><em>Recent topics: {{ topics }}</em></div>
           <form id="message-form" (submit)="saveMessage($event, box)">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
               <input #box class="mdl-textfield__input" type="text" id="message"

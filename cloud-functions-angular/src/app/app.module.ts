@@ -22,6 +22,7 @@ import { AngularFireModule, AuthProviders, AuthMethods } from 'angularfire2';
 import { MaterialModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
+import { StylizePipe } from './stylize.pipe';
 import { environment } from '../environments/environment';
 
 const configErrMsg = `You have not configured and imported the Firebase SDK.
@@ -43,7 +44,8 @@ if (!environment.firebase) {
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    StylizePipe
   ],
   imports: [
     BrowserModule,

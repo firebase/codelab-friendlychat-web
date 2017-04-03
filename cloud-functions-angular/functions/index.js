@@ -24,6 +24,8 @@ const gcs = require('@google-cloud/storage')();
 const vision = require('@google-cloud/vision')();
 const exec = require('child-process-promise').exec;
 
+const language = require('@google-cloud/language')();
+
 // Adds a message that welcomes new users into the chat.
 exports.addWelcomeMessages = functions.auth.user().onCreate((event) => {
   const user = event.data;
@@ -105,7 +107,7 @@ exports.sendNotifications = functions.database.ref('/messages/{messageId}').onWr
     notification: {
       title: `${snapshot.val().name} posted ${text ? 'a message' : 'an image'}`,
       body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : '',
-      icon: snapshot.val().photoUrl || '/images/profile_placeholder.png',
+      icon: snapshot.val().photoUrl || '/assets/images/profile_placeholder.png',
       click_action: `https://${functions.config().firebase.authDomain}`
     }
   };
@@ -135,4 +137,41 @@ exports.sendNotifications = functions.database.ref('/messages/{messageId}').onWr
       });
     }
   });
+});
+
+// Annotates messages using the Cloud Natural Language API
+exports.annotateMessages = functions.database.ref('/messages/{messageId}').onWrite((event) => {
+  const snapshot = event.data;
+  const messageId = event.params.messageId;
+
+  // Only annotate new text-based messages.
+  if (snapshot.previous.val() || !snapshot.val().text) {
+    return;
+  }
+
+  // Annotation arguments.
+  const text = snapshot.val().text;
+  const options = {
+    entities: true,
+    sentiment: true
+  };
+
+  console.log('Annotating new message.');
+
+  // Detect the sentiment and entities of the new message.
+  return language.annotate(text, options)
+    .then((result) => {
+      console.log('Saving annotations.');
+
+      // Update the message with the results.
+      return admin.database().ref(`/messages/${messageId}`).update({
+        sentiment: result[0].sentiment,
+        entities: result[0].entities.map((entity) => {
+          return {
+            name: entity.name,
+            salience: entity.salience
+          };
+        })
+      });
+    });
 });

@@ -30,6 +30,7 @@ export class AppComponent {
   fbApp: any;
   messages: FirebaseListObservable<any>;
   profilePicStyles: {};
+  topics = '';
   value = '';
 
   constructor(public af: AngularFire, @Inject(FirebaseApp) fbApp: any, public snackBar: MdSnackBar) {
@@ -44,7 +45,31 @@ export class AppComponent {
 
         // We load currently existing chat messages.
         this.messages = this.af.database.list('/messages');
-        this.messages.subscribe(() => {
+        this.messages.subscribe((messages) => {
+          // Calculate list of recently discussed topics
+          const topicsMap = {};
+          const topics = [];
+          let hasEntities = false;
+          messages.forEach((message) => {
+            if (message.entities) {
+              for (let entity of message.entities) {
+                if (!topicsMap.hasOwnProperty(entity.name)) {
+                  topicsMap[entity.name] = 0
+                }
+                topicsMap[entity.name] += entity.salience;
+                hasEntities = true;
+              }
+            }
+          });
+          if (hasEntities) {
+            for (let name in topicsMap) {
+              topics.push({ name, score: topicsMap[name] });
+            }
+            topics.sort((a, b) => b.score - a.score);
+            this.topics = topics.map((topic) => topic.name).join(', ');
+          }
+
+          // Make sure new message scroll into view
           setTimeout(() => {
             const messageList = document.getElementById('messages');
             messageList.scrollTop = messageList.scrollHeight;
@@ -58,6 +83,7 @@ export class AppComponent {
         this.profilePicStyles = {
           'background-image':  PROFILE_PLACEHOLDER_IMAGE_URL
         };
+        this.topics = '';
       }
     });
   }
