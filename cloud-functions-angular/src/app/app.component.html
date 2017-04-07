@@ -32,7 +32,7 @@
               </div>
               <div class="message">
                 <span *ngIf="message.text" [style]="message.sentiment | stylize">{{ message.text }}</span>
-                <img *ngIf="message.imageUrl" [src]="message.imageUrl">
+                <img *ngIf="message.imageUrl" [src]="message.imageUrl + (message.moderated ? '&amp;moderated=1' : '')">
               </div>
               <div class="name">{{ message.name }}</div>
             </div>

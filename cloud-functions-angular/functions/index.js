@@ -51,18 +51,28 @@ exports.blurOffensiveImages = functions.storage.object().onChange((event) => {
     return console.log('This is a deploy event.');
   }
 
+  const messageId = object.name.split('/')[1];
   const bucket = gcs.bucket(object.bucket);
   const file = bucket.file(object.name);
 
-  // Check the image content using the Cloud Vision API.
-  return vision.detectSafeSearch(file).then((safeSearchResult) => {
-    if (safeSearchResult[0].adult || safeSearchResult[0].violence) {
-      console.log('The image', object.name, 'has been detected as inappropriate.');
-      return blurImage(object.name, bucket);
-    } else {
-      console.log('The image', object.name,'has been detected as OK.');
-    }
-  });
+  return admin.database().ref(`/messages/${messageId}/moderated`).once('value')
+    .then((snapshot) => {
+      // The image has already been moderated.
+      if (snapshot.val()) {
+        return;
+      }
+
+      // Check the image content using the Cloud Vision API.
+      return vision.detectSafeSearch(file);
+    })
+    .then((safeSearchResult) => {
+      if (safeSearchResult[0].adult || safeSearchResult[0].violence) {
+        console.log('The image', object.name, 'has been detected as inappropriate.');
+        return blurImage(object.name, bucket);
+      } else {
+        console.log('The image', object.name,'has been detected as OK.');
+      }
+    });
 });
 
 // Blurs the given image located in the given bucket using ImageMagick.

@@ -44,7 +44,11 @@ export class AppComponent {
         };
 
         // We load currently existing chat messages.
-        this.messages = this.af.database.list('/messages');
+        this.messages = this.af.database.list('/messages', {
+          query: {
+            limitToLast: 12
+          }
+        });
         this.messages.subscribe((messages) => {
           // Calculate list of recently discussed topics
           const topicsMap = {};
