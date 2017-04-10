@@ -44,7 +44,8 @@ function FriendlyChat() {
   this.messageInput.addEventListener('change', buttonTogglingHandler);
 
   // Events for image upload.
-  this.submitImageButton.addEventListener('click', function() {
+  this.submitImageButton.addEventListener('click', function(e) {
+    e.preventDefault();
     this.mediaCapture.click();
   }.bind(this));
   this.mediaCapture.addEventListener('change', this.saveImageMessage.bind(this));
@@ -83,6 +84,7 @@ FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
 // Saves a new message containing an image URI in Firebase.
 // This first saves the image in Firebase storage.
 FriendlyChat.prototype.saveImageMessage = function(event) {
+  event.preventDefault();
   var file = event.target.files[0];
 
   // Clear the selection in the file picker input.

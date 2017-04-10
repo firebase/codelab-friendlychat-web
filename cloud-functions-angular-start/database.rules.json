@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "messages": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "fcmTokens": {
+      "$token": {
+        ".read": "data.val() === auth.uid", // Users can only read their own device tokens
+        ".write": "!data.exists() || data.val() === auth.uid", // Users can only write to their own device tokens
+        ".validate": "newData.val() === auth.uid" // value has to be the UID of the user
+      }
+    }
+  }
+}
