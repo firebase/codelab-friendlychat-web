@@ -80,10 +80,10 @@ public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener {
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        public TextView messageTextView;
-        public ImageView messageImageView;
-        public TextView messengerTextView;
-        public CircleImageView messengerImageView;
+        TextView messageTextView;
+        ImageView messageImageView;
+        TextView messengerTextView;
+        CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
             super(v);
@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private Indexable getMessageIndexable(FriendlyMessage friendlyMessage) {
         PersonBuilder sender = Indexables.personBuilder()
-                .setIsSelf(mUsername == friendlyMessage.getName())
+                .setIsSelf(mUsername.equals(friendlyMessage.getName()))
                 .setName(friendlyMessage.getName())
                 .setUrl(MESSAGE_URL.concat(friendlyMessage.getId() + "/sender"));
 
@@ -509,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements
                         if (task.isSuccessful()) {
                             FriendlyMessage friendlyMessage =
                                     new FriendlyMessage(null, mUsername, mPhotoUrl,
-                                            task.getResult().getMetadata().getDownloadUrl()
+                                            task.getResult().getDownloadUrl()
                                                     .toString());
                             mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(key)
                                     .setValue(friendlyMessage);
