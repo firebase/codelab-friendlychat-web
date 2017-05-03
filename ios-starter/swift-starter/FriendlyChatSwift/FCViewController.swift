@@ -30,7 +30,7 @@ let kBannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
 @objc(FCViewController)
 class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
     UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate,
-        FIRInviteDelegate {
+        InviteDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
@@ -41,7 +41,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   fileprivate var _refHandle: FIRDatabaseHandle!
 
   var storageRef: FIRStorageReference!
-  var remoteConfig: FIRRemoteConfig!
+  var remoteConfig: RemoteConfig!
 
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
@@ -144,7 +144,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   func imagePickerController(_ picker: UIImagePickerController,
     didFinishPickingMediaWithInfo info: [String : Any]) {
       picker.dismiss(animated: true, completion:nil)
-    guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+    guard let uid = Auth.auth().currentUser?.uid else { return }
 
     // if it's a photo from the library, not an image from the camera
     if #available(iOS 8.0, *), let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL {
@@ -157,7 +157,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     } else {
       guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else { return }
       let imageData = UIImageJPEGRepresentation(image, 0.8)
-      guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+      guard let uid = Auth.auth().currentUser?.uid else { return }
       let imagePath = "\(uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
     }
   }

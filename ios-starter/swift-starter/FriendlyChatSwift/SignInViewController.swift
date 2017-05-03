@@ -22,7 +22,7 @@ import GoogleSignIn
 @objc(SignInViewController)
 class SignInViewController: UIViewController, GIDSignInUIDelegate {
   @IBOutlet weak var signInButton: GIDSignInButton!
-  var handle: FIRAuthStateDidChangeListenerHandle?
+  var handle: AuthStateDidChangeListenerHandle?
 
   override func viewDidLoad() {
     super.viewDidLoad()

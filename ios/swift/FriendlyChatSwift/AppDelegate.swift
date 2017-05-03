@@ -44,9 +44,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     }
 
     guard let authentication = user.authentication else { return }
-    let credential = FIRGoogleAuthProvider.credential(withIDToken: authentication.idToken,
+    let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
                                                       accessToken: authentication.accessToken)
-    FIRAuth.auth()?.signIn(with: credential) { (user, error) in
+    Auth.auth().signIn(with: credential) { (user, error) in
       if let error = error {
         print("Error \(error)")
         return
@@ -58,8 +58,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
 
-    FIRApp.configure()
-    GIDSignIn.sharedInstance().clientID = FIRApp.defaultApp()?.options.clientID
+    FirebaseApp.configure()
+    GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
     GIDSignIn.sharedInstance().delegate = self
 
 

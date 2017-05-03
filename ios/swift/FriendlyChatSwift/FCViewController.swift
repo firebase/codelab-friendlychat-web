@@ -30,7 +30,7 @@ let kBannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
 
 @objc(FCViewController)
 class FCViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
-    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FIRInviteDelegate {
+    UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, InviteDelegate {
 
   // Instance variables
   @IBOutlet weak var textField: UITextField!
@@ -41,7 +41,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   fileprivate var _refHandle: FIRDatabaseHandle?
 
   var storageRef: FIRStorageReference!
-  var remoteConfig: FIRRemoteConfig!
+  var remoteConfig: RemoteConfig!
 
   @IBOutlet weak var banner: GADBannerView!
   @IBOutlet weak var clientTable: UITableView!
@@ -80,12 +80,12 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func configureRemoteConfig() {
-    remoteConfig = FIRRemoteConfig.remoteConfig()
+    remoteConfig = RemoteConfig.remoteConfig()
     // Create Remote Config Setting to enable developer mode.
     // Fetching configs from the server is normally limited to 5 requests per hour.
     // Enabling developer mode allows many more requests to be made per hour, so developers
     // can test different config values during development.
-    let remoteConfigSettings = FIRRemoteConfigSettings(developerModeEnabled: true)
+    let remoteConfigSettings = RemoteConfigSettings(developerModeEnabled: true)
     remoteConfig.configSettings = remoteConfigSettings!
   }
 
@@ -129,12 +129,12 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   @IBAction func didPressCrash(_ sender: AnyObject) {
-    FIRCrashMessage("Cause Crash button clicked")
+    FirebaseCrashMessage("Cause Crash button clicked")
     fatalError()
   }
 
   @IBAction func inviteTapped(_ sender: AnyObject) {
-    if let invite = FIRInvites.inviteDialog() {
+    if let invite = Invites.inviteDialog() {
       invite.setInviteDelegate(self)
 
       // NOTE: You must have the App Store ID set in your developer console project
@@ -142,7 +142,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
       // A message hint for the dialog. Note this manifests differently depending on the
       // received invitation type. For example, in an email invite this appears as the subject.
-      invite.setMessage("Try this out!\n -\(FIRAuth.auth()?.currentUser?.displayName ?? "")")
+      invite.setMessage("Try this out!\n -\(Auth.auth().currentUser?.displayName ?? "")")
       // Title for the dialog, this is what the user sees before sending the invites.
       invite.setTitle("FriendlyChat")
       invite.setDeepLink("app_url")
@@ -152,7 +152,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     }
   }
 
-  func inviteFinished(withInvitations invitationIds: [Any], error: Error?) {
+  func inviteFinished(withInvitations invitationIds: [String], error: Error?) {
     if let error = error {
         print("Failed: \(error.localizedDescription)")
     } else {
@@ -161,7 +161,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func logViewLoaded() {
-    FIRCrashMessage("View loaded")
+    FirebaseCrashMessage("View loaded")
   }
 
   func loadAd() {
@@ -227,8 +227,8 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
 
   func sendMessage(withData data: [String: String]) {
     var mdata = data
-    mdata[Constants.MessageFields.name] = FIRAuth.auth()?.currentUser?.displayName
-    if let photoURL = FIRAuth.auth()?.currentUser?.photoURL {
+    mdata[Constants.MessageFields.name] = Auth.auth().currentUser?.displayName
+    if let photoURL = Auth.auth().currentUser?.photoURL {
       mdata[Constants.MessageFields.photoURL] = photoURL.absoluteString
     }
 
@@ -253,7 +253,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   func imagePickerController(_ picker: UIImagePickerController,
     didFinishPickingMediaWithInfo info: [String : Any]) {
       picker.dismiss(animated: true, completion:nil)
-    guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+    guard let uid = Auth.auth().currentUser?.uid else { return }
 
     // if it's a photo from the library, not an image from the camera
     if #available(iOS 8.0, *), let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL {
@@ -296,9 +296,9 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   @IBAction func signOut(_ sender: UIButton) {
-    let firebaseAuth = FIRAuth.auth()
+    let firebaseAuth = Auth.auth()
     do {
-      try firebaseAuth?.signOut()
+      try firebaseAuth.signOut()
       dismiss(animated: true, completion: nil)
     } catch let signOutError as NSError {
       print ("Error signing out: \(signOutError.localizedDescription)")

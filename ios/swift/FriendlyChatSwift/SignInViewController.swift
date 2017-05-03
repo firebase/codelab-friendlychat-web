@@ -23,13 +23,13 @@ import GoogleSignIn
 class SignInViewController: UIViewController, GIDSignInUIDelegate {
 
   @IBOutlet weak var signInButton: GIDSignInButton!
-  var handle: FIRAuthStateDidChangeListenerHandle?
+  var handle: AuthStateDidChangeListenerHandle?
 
   override func viewDidLoad() {
     super.viewDidLoad()
     GIDSignIn.sharedInstance().uiDelegate = self
     GIDSignIn.sharedInstance().signInSilently()
-    handle = FIRAuth.auth()?.addStateDidChangeListener() { (auth, user) in
+    handle = Auth.auth().addStateDidChangeListener() { (auth, user) in
       if user != nil {
         MeasurementHelper.sendLoginEvent()
         self.performSegue(withIdentifier: Constants.Segues.SignInToFp, sender: nil)
@@ -39,7 +39,7 @@ class SignInViewController: UIViewController, GIDSignInUIDelegate {
 
   deinit {
     if let handle = handle {
-      FIRAuth.auth()?.removeStateDidChangeListener(handle)
+      Auth.auth().removeStateDidChangeListener(handle)
     }
   }
 }
