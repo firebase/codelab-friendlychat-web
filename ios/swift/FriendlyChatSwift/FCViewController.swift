@@ -35,12 +35,12 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   // Instance variables
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var sendButton: UIButton!
-  var ref: FIRDatabaseReference!
-  var messages: [FIRDataSnapshot]! = []
+  var ref: DatabaseReference!
+  var messages: [DataSnapshot]! = []
   var msglength: NSNumber = 10
-  fileprivate var _refHandle: FIRDatabaseHandle?
+  fileprivate var _refHandle: DatabaseHandle?
 
-  var storageRef: FIRStorageReference!
+  var storageRef: StorageReference!
   var remoteConfig: RemoteConfig!
 
   @IBOutlet weak var banner: GADBannerView!
@@ -66,7 +66,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func configureDatabase() {
-    ref = FIRDatabase.database().reference()
+    ref = Database.database().reference()
     // Listen for new messages in the Firebase database
     _refHandle = self.ref.child("messages").observe(.childAdded, with: { [weak self] (snapshot) -> Void in
       guard let strongSelf = self else { return }
@@ -76,7 +76,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   func configureStorage() {
-    storageRef = FIRStorage.storage().reference()
+    storageRef = Storage.storage().reference()
   }
 
   func configureRemoteConfig() {
@@ -186,12 +186,12 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
     // Dequeue cell
     let cell = self.clientTable .dequeueReusableCell(withIdentifier: "tableViewCell", for: indexPath)
     // Unpack message from Firebase DataSnapshot
-    let messageSnapshot: FIRDataSnapshot! = self.messages[indexPath.row]
+    let messageSnapshot: DataSnapshot! = self.messages[indexPath.row]
     guard let message = messageSnapshot.value as? [String:String] else { return cell }
     let name = message[Constants.MessageFields.name] ?? ""
     if let imageURL = message[Constants.MessageFields.imageURL] {
       if imageURL.hasPrefix("gs://") {
-        FIRStorage.storage().reference(forURL: imageURL).data(withMaxSize: INT64_MAX) {(data, error) in
+        Storage.storage().reference(forURL: imageURL).getData(maxSize: INT64_MAX) {(data, error) in
           if let error = error {
             print("Error downloading: \(error)")
             return
@@ -264,7 +264,7 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
         let filePath = "\(uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000))/\((referenceURL as AnyObject).lastPathComponent!)"
         guard let strongSelf = self else { return }
         strongSelf.storageRef.child(filePath)
-          .putFile(imageFile!, metadata: nil) { (metadata, error) in
+          .putFile(from: imageFile!, metadata: nil) { (metadata, error) in
             if let error = error {
               let nsError = error as NSError
               print("Error uploading: \(nsError.localizedDescription)")
@@ -277,10 +277,10 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
       guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else { return }
       let imageData = UIImageJPEGRepresentation(image, 0.8)
       let imagePath = "\(uid)/\(Int(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
-      let metadata = FIRStorageMetadata()
+      let metadata = StorageMetadata()
       metadata.contentType = "image/jpeg"
       self.storageRef.child(imagePath)
-        .put(imageData!, metadata: metadata) { [weak self] (metadata, error) in
+        .putData(imageData!, metadata: metadata) { [weak self] (metadata, error) in
           if let error = error {
             print("Error uploading: \(error)")
             return

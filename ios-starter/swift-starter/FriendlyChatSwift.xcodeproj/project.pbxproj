@@ -15,7 +15,6 @@
 		2C595F061B34B73A00355AE7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C595F041B34B73A00355AE7 /* Constants.swift */; };
 		2C8E6C2B1B16875B0073CE3D /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8E6C2A1B16875B0073CE3D /* SignInViewController.swift */; };
 		2CA807BC1B21702E009AD7F2 /* MeasurementHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA807BB1B21702E009AD7F2 /* MeasurementHelper.swift */; };
-		2CA807BE1B217B21009AD7F2 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA807BD1B217B21009AD7F2 /* AppState.swift */; };
 		5F5A537E1ADE67D500F81DF0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5A537D1ADE67D500F81DF0 /* AppDelegate.swift */; };
 		5F5A53801ADE67D500F81DF0 /* FCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5A537F1ADE67D500F81DF0 /* FCViewController.swift */; };
 /* End PBXBuildFile section */
@@ -31,7 +30,6 @@
 		2C595F041B34B73A00355AE7 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		2C8E6C2A1B16875B0073CE3D /* SignInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
 		2CA807BB1B21702E009AD7F2 /* MeasurementHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasurementHelper.swift; sourceTree = "<group>"; };
-		2CA807BD1B217B21009AD7F2 /* AppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		5F5A53791ADE67D500F81DF0 /* FriendlyChatSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FriendlyChatSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F5A537D1ADE67D500F81DF0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5F5A537F1ADE67D500F81DF0 /* FCViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCViewController.swift; sourceTree = "<group>"; };
@@ -92,7 +90,6 @@
 				5F5A537F1ADE67D500F81DF0 /* FCViewController.swift */,
 				2CA807BB1B21702E009AD7F2 /* MeasurementHelper.swift */,
 				2C8E6C2A1B16875B0073CE3D /* SignInViewController.swift */,
-				2CA807BD1B217B21009AD7F2 /* AppState.swift */,
 				2C595F041B34B73A00355AE7 /* Constants.swift */,
 				5F5A537B1ADE67D500F81DF0 /* Supporting Files */,
 			);
@@ -196,7 +193,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C8E6C2B1B16875B0073CE3D /* SignInViewController.swift in Sources */,
-				2CA807BE1B217B21009AD7F2 /* AppState.swift in Sources */,
 				5F5A53801ADE67D500F81DF0 /* FCViewController.swift in Sources */,
 				5F5A537E1ADE67D500F81DF0 /* AppDelegate.swift in Sources */,
 				2CA807BC1B21702E009AD7F2 /* MeasurementHelper.swift in Sources */,

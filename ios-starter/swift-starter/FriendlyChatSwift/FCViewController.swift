@@ -35,12 +35,12 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   // Instance variables
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var sendButton: UIButton!
-  var ref: FIRDatabaseReference!
-  var messages: [FIRDataSnapshot]! = []
+  var ref: DatabaseReference!
+  var messages: [DataSnapshot]! = []
   var msglength: NSNumber = 10
-  fileprivate var _refHandle: FIRDatabaseHandle!
+  fileprivate var _refHandle: DatabaseHandle!
 
-  var storageRef: FIRStorageReference!
+  var storageRef: StorageReference!
   var remoteConfig: RemoteConfig!
 
   @IBOutlet weak var banner: GADBannerView!
@@ -167,7 +167,6 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
   }
 
   @IBAction func signOut(_ sender: UIButton) {
-    AppState.sharedInstance.signedIn = false
     dismiss(animated: true, completion: nil)
   }
 
