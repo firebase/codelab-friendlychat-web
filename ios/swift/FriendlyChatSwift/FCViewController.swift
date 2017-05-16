@@ -196,8 +196,10 @@ class FCViewController: UIViewController, UITableViewDataSource, UITableViewDele
             print("Error downloading: \(error)")
             return
           }
-          cell.imageView?.image = UIImage.init(data: data!)
-          tableView.reloadData()
+          DispatchQueue.main.async {
+            cell.imageView?.image = UIImage.init(data: data!)
+            cell.setNeedsLayout()
+          }
         }
       } else if let URL = URL(string: imageURL), let data = try? Data(contentsOf: URL) {
         cell.imageView?.image = UIImage.init(data: data)
