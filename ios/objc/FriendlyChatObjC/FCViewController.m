@@ -210,8 +210,10 @@ UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDele
           NSLog(@"Error downloading: %@", error);
           return;
         }
-        cell.imageView.image = [UIImage imageWithData:data];
-        [tableView reloadData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          cell.imageView.image = [UIImage imageWithData:data];
+          [cell setNeedsLayout];
+        });
       }];
     } else {
       cell.imageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageURL]]];
