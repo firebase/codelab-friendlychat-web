@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 import { Component, Inject } from '@angular/core';
-import { AngularFire, FirebaseApp, FirebaseListObservable, FirebaseAuthState } from 'angularfire2';
+import { Observable } from 'rxjs/Observable';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
 import { MdSnackBar } from '@angular/material';
+import * as firebase from 'firebase';
 
 const LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif';
 const PROFILE_PLACEHOLDER_IMAGE_URL = '/assets/images/profile_placeholder.png';
@@ -26,25 +29,26 @@ const PROFILE_PLACEHOLDER_IMAGE_URL = '/assets/images/profile_placeholder.png';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  currentUser: FirebaseAuthState;
-  fbApp: any;
+  user: Observable<firebase.User>;
+  currentUser: firebase.User;
   messages: FirebaseListObservable<any>;
   profilePicStyles: {};
   topics = '';
   value = '';
 
-  constructor(public af: AngularFire, @Inject(FirebaseApp) fbApp: any, public snackBar: MdSnackBar) {
-    this.fbApp = fbApp;
-    this.af.auth.subscribe((user: FirebaseAuthState) => {
+  constructor(public db: AngularFireDatabase, public afAuth: AngularFireAuth, public snackBar: MdSnackBar) {
+    this.user = afAuth.authState;
+    this.user.subscribe((user: firebase.User) => {
+      console.log(user);
       this.currentUser = user;
 
       if (user) { // User is signed in!
         this.profilePicStyles = {
-          'background-image':  `url(${this.currentUser.auth.photoURL})`
+          'background-image':  `url(${this.currentUser.photoURL})`
         };
 
         // We load currently existing chat messages.
-        this.messages = this.af.database.list('/messages', {
+        this.messages = this.db.list('/messages', {
           query: {
             limitToLast: 12
           }
@@ -93,11 +97,11 @@ export class AppComponent {
   }
 
   login() {
-    this.af.auth.login();
+    this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   }
 
   logout() {
-     this.af.auth.logout();
+    this.afAuth.auth.signOut();
   }
 
   // TODO: Refactor into text message form component
@@ -128,11 +132,11 @@ export class AppComponent {
 
     if (this.value && this.checkSignedInWithMessage()) {
       // Add a new message entry to the Firebase Database.
-      const messages = this.af.database.list('/messages');
+      const messages = this.db.list('/messages');
       messages.push({
-        name: this.currentUser.auth.displayName,
+        name: this.currentUser.displayName,
         text: this.value,
-        photoUrl: this.currentUser.auth.photoURL || PROFILE_PLACEHOLDER_IMAGE_URL
+        photoUrl: this.currentUser.photoURL || PROFILE_PLACEHOLDER_IMAGE_URL
       }).then(() => {
         // Clear message text field and SEND button state.
         el.value = '';
@@ -166,20 +170,20 @@ export class AppComponent {
     if (this.checkSignedInWithMessage()) {
 
       // We add a message with a loading icon that will get updated with the shared image.
-      const messages = this.af.database.list('/messages');
+      const messages = this.db.list('/messages');
       messages.push({
-        name: this.currentUser.auth.displayName,
+        name: this.currentUser.displayName,
         imageUrl: LOADING_IMAGE_URL,
-        photoUrl: this.currentUser.auth.photoURL || PROFILE_PLACEHOLDER_IMAGE_URL
+        photoUrl: this.currentUser.photoURL || PROFILE_PLACEHOLDER_IMAGE_URL
       }).then((data) => {
         // Upload the image to Cloud Storage.
         const filePath = `${this.currentUser.uid}/${data.key}/${file.name}`;
-        return this.fbApp.storage().ref(filePath).put(file)
+        return firebase.storage().ref(filePath).put(file)
           .then((snapshot) => {
             // Get the file's Storage URI and update the chat message placeholder.
             const fullPath = snapshot.metadata.fullPath;
-            const imageUrl = this.fbApp.storage().ref(fullPath).toString();
-            return this.fbApp.storage().refFromURL(imageUrl).getMetadata();
+            const imageUrl = firebase.storage().ref(fullPath).toString();
+            return firebase.storage().refFromURL(imageUrl).getMetadata();
           }).then((metadata) => {
             // TODO: Instead of saving the download URL, save the GCS URI and
             //       dynamically load the download URL when displaying the image
@@ -205,12 +209,12 @@ export class AppComponent {
 
   // Saves the messaging device token to the datastore.
   saveMessagingDeviceToken() {
-    return this.fbApp.messaging().getToken()
+    return firebase.messaging().getToken()
       .then((currentToken) => {
         if (currentToken) {
           console.log('Got FCM device token:', currentToken);
           // Save the Device Token to the datastore.
-          this.fbApp.database()
+          firebase.database()
             .ref('/fcmTokens')
             .child(currentToken)
             .set(this.currentUser.uid);
@@ -229,7 +233,7 @@ export class AppComponent {
   // Requests permissions to show notifications.
   requestNotificationsPermissions() {
     console.log('Requesting notifications permission...');
-    return this.fbApp.messaging().requestPermission()
+    return firebase.messaging().requestPermission()
       // Notification permission granted.
       .then(() => this.saveMessagingDeviceToken())
       .catch((err) => {
