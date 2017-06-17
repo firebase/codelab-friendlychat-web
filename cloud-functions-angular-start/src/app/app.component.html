@@ -7,7 +7,7 @@
       </div>
       <div id="user-container">
         <div *ngIf="currentUser" id="user-pic" [ngStyle]="profilePicStyles"></div>
-        <div *ngIf="currentUser" id="user-name">{{ (af.auth | async)?.auth.displayName }}</div>
+        <div *ngIf="currentUser" id="user-name">{{ (user | async)?.displayName }}</div>
         <button *ngIf="currentUser" id="sign-out" (click)="logout()" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
           Sign-out
         </button>
