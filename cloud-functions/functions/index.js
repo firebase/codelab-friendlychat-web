@@ -21,7 +21,10 @@ const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 const gcs = require('@google-cloud/storage')();
 const vision = require('@google-cloud/vision')();
-const exec = require('child-process-promise').exec;
+const spawn = require('child-process-promise').spawn;
+const path = require('path');
+const os = require('os');
+const fs = require('fs');
 
 // Adds a message that welcomes new users into the chat.
 exports.addWelcomeMessages = functions.auth.user().onCreate(event => {
@@ -64,22 +67,24 @@ exports.blurOffensiveImages = functions.storage.object().onChange(event => {
 
 // Blurs the given image located in the given bucket using ImageMagick.
 function blurImage(filePath, bucket) {
-  const fileName = filePath.split('/').pop();
-  const tempLocalFile = `/tmp/${fileName}`;
-  const messageId = filePath.split('/')[1];
+  const tempLocalFile = path.join(os.tmpdir(), path.basename(filePath));
+  const messageId = filePath.split(path.sep)[1];
 
   // Download file from bucket.
   return bucket.file(filePath).download({destination: tempLocalFile})
       .then(() => {
         console.log('Image has been downloaded to', tempLocalFile);
         // Blur the image using ImageMagick.
-        return exec(`convert ${tempLocalFile} -channel RGBA -blur 0x24 ${tempLocalFile}`);
+        return spawn('convert', [tempLocalFile, '-channel', 'RGBA', '-blur', '0x24', tempLocalFile]);
       }).then(() => {
         console.log('Image has been blurred');
         // Uploading the Blurred image back into the bucket.
         return bucket.upload(tempLocalFile, {destination: filePath});
       }).then(() => {
         console.log('Blurred image has been uploaded to', filePath);
+        // Deleting the local file to free up disk space.
+        fs.unlinkSync(tempLocalFile);
+        console.log('Deleted local file.');
         // Indicate that the message has been moderated.
         return admin.database().ref(`/messages/${messageId}`).update({moderated: true});
       }).then(() => {
