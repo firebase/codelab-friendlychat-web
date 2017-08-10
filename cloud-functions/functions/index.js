@@ -51,14 +51,19 @@ exports.blurOffensiveImages = functions.storage.object().onChange(event => {
     return console.log('This is a deploy event.');
   }
 
-  const bucket = gcs.bucket(object.bucket);
-  const file = bucket.file(object.name);
+  const image = {
+    source: {imageUri: `gs://${object.bucket}/${object.name}`}
+  };
 
   // Check the image content using the Cloud Vision API.
-  return vision.detectSafeSearch(file).then(safeSearchResult => {
-    if (safeSearchResult[0].adult || safeSearchResult[0].violence) {
+  return vision.safeSearchDetection(image).then(batchAnnotateImagesResponse => {
+    const safeSearchResult = batchAnnotateImagesResponse[0].safeSearchAnnotation;
+    if (safeSearchResult.adult === 'LIKELY' ||
+        safeSearchResult.adult === 'VERY_LIKELY' ||
+        safeSearchResult.violence === 'LIKELY' ||
+        safeSearchResult.violence === 'VERY_LIKELY') {
       console.log('The image', object.name, 'has been detected as inappropriate.');
-      return blurImage(object.name, bucket);
+      return blurImage(object.name, object.bucket);
     } else {
       console.log('The image', object.name,'has been detected as OK.');
     }
@@ -66,9 +71,10 @@ exports.blurOffensiveImages = functions.storage.object().onChange(event => {
 });
 
 // Blurs the given image located in the given bucket using ImageMagick.
-function blurImage(filePath, bucket) {
+function blurImage(filePath, bucketName) {
   const tempLocalFile = path.join(os.tmpdir(), path.basename(filePath));
   const messageId = filePath.split(path.sep)[1];
+  const bucket = gcs.bucket(bucketName);
 
   // Download file from bucket.
   return bucket.file(filePath).download({destination: tempLocalFile})
