@@ -17,7 +17,7 @@ import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { MdSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import * as firebase from 'firebase';
 
 const LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif';
@@ -36,7 +36,7 @@ export class AppComponent {
   topics = '';
   value = '';
 
-  constructor(public db: AngularFireDatabase, public afAuth: AngularFireAuth, public snackBar: MdSnackBar) {
+  constructor(public db: AngularFireDatabase, public afAuth: AngularFireAuth, public snackBar: MatSnackBar) {
     this.user = afAuth.authState;
     this.user.subscribe((user: firebase.User) => {
       console.log(user);
