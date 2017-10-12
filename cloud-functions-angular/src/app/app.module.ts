@@ -21,7 +21,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { MaterialModule } from '@angular/material';
+import { MatSnackBarModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { StylizePipe } from './stylize.pipe';
@@ -54,7 +54,7 @@ if (!environment.firebase) {
     FormsModule,
     HttpModule,
     BrowserAnimationsModule,
-    MaterialModule,
+    MatSnackBarModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     AngularFireAuthModule
