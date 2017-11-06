@@ -38,7 +38,7 @@ exports.addWelcomeMessages = functions.auth.user().onCreate(event => {
     name: 'Firebase Bot',
     photoUrl: '/images/firebase-logo.png', // Firebase logo
     text: `${fullName} signed in for the first time! Welcome!`
-  });
+  }).then(() => console.log('Welcome message written to database.'));
 });
 
 // Checks if uploaded images are flagged as Adult or Violence and if so blurs them.
