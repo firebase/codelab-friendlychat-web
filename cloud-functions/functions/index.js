@@ -99,12 +99,8 @@ function blurImage(filePath, bucketName) {
 }
 
 // Sends a notifications to all users when a new message is posted.
-exports.sendNotifications = functions.database.ref('/messages/{messageId}').onWrite(event => {
+exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCreate(event => {
   const snapshot = event.data;
-  // Only send a notification when a message has been created.
-  if (snapshot.previous.val()) {
-    return;
-  }
 
   // Notification details.
   const text = snapshot.val().text;
