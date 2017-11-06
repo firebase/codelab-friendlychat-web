@@ -20,7 +20,8 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 const gcs = require('@google-cloud/storage')();
-const vision = require('@google-cloud/vision')();
+const Vision = require('@google-cloud/vision');
+const vision = new Vision();
 const spawn = require('child-process-promise').spawn;
 const path = require('path');
 const os = require('os');
@@ -58,10 +59,9 @@ exports.blurOffensiveImages = functions.storage.object().onChange(event => {
   // Check the image content using the Cloud Vision API.
   return vision.safeSearchDetection(image).then(batchAnnotateImagesResponse => {
     const safeSearchResult = batchAnnotateImagesResponse[0].safeSearchAnnotation;
-    if (safeSearchResult.adult === 'LIKELY' ||
-        safeSearchResult.adult === 'VERY_LIKELY' ||
-        safeSearchResult.violence === 'LIKELY' ||
-        safeSearchResult.violence === 'VERY_LIKELY') {
+    const Likelihood = Vision.types.Likelihood;
+    if (Likelihood[safeSearchResult.adult] >= Likelihood.LIKELY ||
+        Likelihood[safeSearchResult.violence] >= Likelihood.LIKELY) {
       console.log('The image', object.name, 'has been detected as inappropriate.');
       return blurImage(object.name, object.bucket);
     } else {
