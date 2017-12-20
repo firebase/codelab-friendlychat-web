@@ -2,10 +2,10 @@
   "name": "friendlychat-codelab",
   "description": "Firebase SDK for Cloud Functions codelab",
   "dependencies": {
-    "@google-cloud/storage": "^0.6.1",
-    "@google-cloud/vision": "^0.12.0",
-    "child-process-promise": "^2.2.0",
-    "firebase-admin": "^4.1.1",
-    "firebase-functions": "^0.5.1"
+    "@google-cloud/storage": "^1.5.1",
+    "@google-cloud/vision": "^0.13.0",
+    "child-process-promise": "^2.2.1",
+    "firebase-admin": "^5.5.1",
+    "firebase-functions": "^0.7.5"
   }
 }
