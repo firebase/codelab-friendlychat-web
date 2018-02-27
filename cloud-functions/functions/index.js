@@ -18,7 +18,7 @@
 const functions = require('firebase-functions');
 // Import and initialize the Firebase Admin SDK.
 const admin = require('firebase-admin');
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp();
 const gcs = require('@google-cloud/storage')();
 const Vision = require('@google-cloud/vision');
 const vision = new Vision();
@@ -55,9 +55,8 @@ exports.blurOffensiveImages = functions.storage.object().onFinalize(object => {
         Likelihood[safeSearchResult.violence] >= Likelihood.LIKELY) {
       console.log('The image', object.name, 'has been detected as inappropriate.');
       return blurImage(object.name, object.bucket);
-    } else {
-      console.log('The image', object.name,'has been detected as OK.');
     }
+    console.log('The image', object.name, 'has been detected as OK.');
   });
 });
 
