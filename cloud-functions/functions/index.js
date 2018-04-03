@@ -18,7 +18,7 @@
 const functions = require('firebase-functions');
 // Import and initialize the Firebase Admin SDK.
 const admin = require('firebase-admin');
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp();
 const gcs = require('@google-cloud/storage')();
 const Vision = require('@google-cloud/vision');
 const vision = new Vision();
@@ -28,8 +28,7 @@ const os = require('os');
 const fs = require('fs');
 
 // Adds a message that welcomes new users into the chat.
-exports.addWelcomeMessages = functions.auth.user().onCreate(event => {
-  const user = event.data;
+exports.addWelcomeMessages = functions.auth.user().onCreate(user => {
   console.log('A new user signed in for the first time.');
   const fullName = user.displayName || 'Anonymous';
 
@@ -43,15 +42,7 @@ exports.addWelcomeMessages = functions.auth.user().onCreate(event => {
 });
 
 // Checks if uploaded images are flagged as Adult or Violence and if so blurs them.
-exports.blurOffensiveImages = functions.storage.object().onChange(event => {
-  const object = event.data;
-  // Exit if this is a deletion or a deploy event.
-  if (object.resourceState === 'not_exists') {
-    return console.log('This is a deletion event.');
-  } else if (!object.name) {
-    return console.log('This is a deploy event.');
-  }
-
+exports.blurOffensiveImages = functions.storage.object().onFinalize(object => {
   const image = {
     source: {imageUri: `gs://${object.bucket}/${object.name}`}
   };
@@ -64,9 +55,8 @@ exports.blurOffensiveImages = functions.storage.object().onChange(event => {
         Likelihood[safeSearchResult.violence] >= Likelihood.LIKELY) {
       console.log('The image', object.name, 'has been detected as inappropriate.');
       return blurImage(object.name, object.bucket);
-    } else {
-      console.log('The image', object.name,'has been detected as OK.');
     }
+    console.log('The image', object.name, 'has been detected as OK.');
   });
 });
 
@@ -99,9 +89,7 @@ function blurImage(filePath, bucketName) {
 }
 
 // Sends a notifications to all users when a new message is posted.
-exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCreate(event => {
-  const snapshot = event.data;
-
+exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCreate(snapshot => {
   // Notification details.
   const text = snapshot.val().text;
   const payload = {
