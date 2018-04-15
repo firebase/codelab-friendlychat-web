@@ -320,8 +320,6 @@ FriendlyChat.prototype.checkSetup = function() {
   }
 };
 
-window.addEventListener('load' , function (){ 
-
+window.addEventListener('load' , function() { 
   window.friendlyChat = new FriendlyChat();
-
 });
