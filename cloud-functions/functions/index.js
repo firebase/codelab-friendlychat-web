@@ -101,7 +101,7 @@ exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCr
       title: `${snapshot.val().name} posted ${text ? 'a message' : 'an image'}`,
       body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : '',
       icon: snapshot.val().photoUrl || '/images/profile_placeholder.png',
-      click_action: `https://${functions.config().firebase.authDomain}`,
+      click_action: `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
     }
   };
 
