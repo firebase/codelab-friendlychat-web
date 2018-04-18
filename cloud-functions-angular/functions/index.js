@@ -20,15 +20,19 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
-const gcs = require('@google-cloud/storage')();
-const vision = require('@google-cloud/vision')();
+const Storage = require('@google-cloud/storage');
+const vision = require('@google-cloud/vision');
 const exec = require('child-process-promise').exec;
 
-const language = require('@google-cloud/language')();
+const visionClient = new vision.ImageAnnotatorClient();
+const storageClient = new Storage();
+
+const language = require('@google-cloud/language');
+const languageClient = new language.LanguageServiceClient();
+
 
 // Adds a message that welcomes new users into the chat.
-exports.addWelcomeMessages = functions.auth.user().onCreate((event) => {
-  const user = event.data;
+exports.addWelcomeMessages = functions.auth.user().onCreate((user) => {
   console.log('A new user signed in for the first time.');
   const fullName = user.displayName || 'Anonymous';
 
@@ -41,48 +45,19 @@ exports.addWelcomeMessages = functions.auth.user().onCreate((event) => {
   });
 });
 
-// Blurs uploaded images that are flagged as Adult or Violence.
-exports.blurOffensiveImages = functions.storage.object().onChange((event) => {
-  const object = event.data;
-  // Exit if this is a deletion or a deploy event.
-  if (object.resourceState === 'not_exists') {
-    return console.log('This is a deletion event.');
-  } else if (!object.name) {
-    return console.log('This is a deploy event.');
-  }
-
-  const messageId = object.name.split('/')[1];
-  const bucket = gcs.bucket(object.bucket);
-  const file = bucket.file(object.name);
-
-  return admin.database().ref(`/messages/${messageId}/moderated`).once('value')
-    .then((snapshot) => {
-      // The image has already been moderated.
-      if (snapshot.val()) {
-        return;
-      }
-
-      // Check the image content using the Cloud Vision API.
-      return vision.detectSafeSearch(file);
-    })
-    .then((safeSearchResult) => {
-      if (safeSearchResult[0].adult || safeSearchResult[0].violence) {
-        console.log('The image', object.name, 'has been detected as inappropriate.');
-        return blurImage(object.name, bucket);
-      } else {
-        console.log('The image', object.name,'has been detected as OK.');
-      }
-    });
-});
 
 // Blurs the given image located in the given bucket using ImageMagick.
-function blurImage(filePath, bucket, metadata) {
+function blurImage(object) {
+  const filePath = object.name;
+  const bucket = storageClient.bucket(object.bucket);
   const fileName = filePath.split('/').pop();
   const tempLocalFile = `/tmp/${fileName}`;
   const messageId = filePath.split('/')[1];
 
   // Download file from bucket.
-  return bucket.file(filePath).download({ destination: tempLocalFile })
+  return bucket
+    .file(filePath)
+    .download({ destination: tempLocalFile })
     .then(() => {
       console.log('Image has been downloaded to', tempLocalFile);
       // Blur the image using ImageMagick.
@@ -103,21 +78,57 @@ function blurImage(filePath, bucket, metadata) {
     });
 }
 
+// Blurs uploaded images that are flagged as Adult or Violence.
+exports.blurOffensiveImages = functions.storage.object().onFinalize((object) => {
+  // Exit if this is a deletion or a deploy event.
+  if (object.resourceState === 'not_exists') {
+    return console.log('This is a deletion event.');
+  } else if (!object.name) {
+    return console.log('This is a deploy event.');
+  }
+
+  const messageId = object.name.split('/')[1];
+
+  return admin.database().ref(`/messages/${messageId}/moderated`).once('value')
+    .then((snapshot) => {
+      // The image has already been moderated.
+      if (snapshot.val()) {
+        return;
+      }
+
+      // Check the image content using the Cloud Vision API.
+      return visionClient.safeSearchDetection(`gs://${object.bucket}/${object.name}`);
+    })
+    .then((results) => {
+      if (!results) {
+        return;
+      }
+      const detections = results[0].safeSearchAnnotation;
+      if (detections.adult || detections.violence) {
+        console.log('The image', object.name, 'has been detected as inappropriate.');
+        return blurImage(object);
+      } else {
+        console.log('The image', object.name, ' has been detected as OK.');
+      }
+    });
+});
+
+
 // Sends a notifications to all users when a new message is posted.
-exports.sendNotifications = functions.database.ref('/messages/{messageId}').onWrite((event) => {
-  const snapshot = event.data;
+exports.sendNotifications = functions.database.ref('/messages/{messageId}').onWrite((change, context) => {
   // Only send a notification when a message has been created.
-  if (snapshot.previous.val()) {
+  if (change.before.val()) {
     return;
   }
 
   // Notification details.
-  const text = snapshot.val().text;
+  const original = change.after.val();
+  const text = original.text;
   const payload = {
     notification: {
-      title: `${snapshot.val().name} posted ${text ? 'a message' : 'an image'}`,
+      title: `${original.name} posted ${text ? 'a message' : 'an image'}`,
       body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : '',
-      icon: snapshot.val().photoUrl || '/assets/images/profile_placeholder.png',
+      icon: original.photoUrl || '/assets/images/profile_placeholder.png',
       click_action: `https://${functions.config().firebase.authDomain}`
     }
   };
@@ -150,32 +161,37 @@ exports.sendNotifications = functions.database.ref('/messages/{messageId}').onWr
 });
 
 // Annotates messages using the Cloud Natural Language API
-exports.annotateMessages = functions.database.ref('/messages/{messageId}').onWrite((event) => {
-  const snapshot = event.data;
-  const messageId = event.params.messageId;
+exports.annotateMessages = functions.database.ref('/messages/{messageId}').onWrite((change, context) => {
+  const messageId = context.params.messageId;
 
-  // Only annotate new text-based messages.
-  if (snapshot.previous.val() || !snapshot.val().text) {
-    return;
+  // Only annotate new messages.
+  if (change.before.exists()) {
+    return null;
   }
 
   // Annotation arguments.
-  const text = snapshot.val().text;
-  const options = {
-    entities: true,
-    sentiment: true
+  const original = change.after.val();
+  const request = {
+    document: {
+      content: original.text,
+      type: 'PLAIN_TEXT'
+    },
+    features: {
+      extractDocumentSentiment: true,
+      extractEntities: true
+    }
   };
 
   console.log('Annotating new message.');
 
   // Detect the sentiment and entities of the new message.
-  return language.annotate(text, options)
+  return languageClient.annotateText(request)
     .then((result) => {
       console.log('Saving annotations.');
 
       // Update the message with the results.
       return admin.database().ref(`/messages/${messageId}`).update({
-        sentiment: result[0].sentiment,
+        sentiment: result[0].documentSentiment,
         entities: result[0].entities.map((entity) => {
           return {
             name: entity.name,
@@ -185,3 +201,4 @@ exports.annotateMessages = functions.database.ref('/messages/{messageId}').onWri
       });
     });
 });
+
