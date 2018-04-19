@@ -15,7 +15,7 @@
  */
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { MatSnackBar } from '@angular/material';
 import * as firebase from 'firebase';
@@ -31,7 +31,7 @@ const PROFILE_PLACEHOLDER_IMAGE_URL = '/assets/images/profile_placeholder.png';
 export class AppComponent {
   user: Observable<firebase.User>;
   currentUser: firebase.User;
-  messages: FirebaseListObservable<any>;
+  messages: Observable<any[]>;
   profilePicStyles: {};
   topics = '';
   value = '';
@@ -48,11 +48,7 @@ export class AppComponent {
         };
 
         // We load currently existing chat messages.
-        this.messages = this.db.list('/messages', {
-          query: {
-            limitToLast: 12
-          }
-        });
+        this.messages = this.db.list<any>('/messages', ref => ref.limitToLast(12)).valueChanges();
         this.messages.subscribe((messages) => {
           // Calculate list of recently discussed topics
           const topicsMap = {};
@@ -140,7 +136,7 @@ export class AppComponent {
       }).then(() => {
         // Clear message text field and SEND button state.
         el.value = '';
-      }).catch((err) => {
+      }, (err) => {
         this.snackBar.open('Error writing new message to Firebase Database.', null, {
           duration: 5000
         });
@@ -192,7 +188,7 @@ export class AppComponent {
               imageUrl: metadata.downloadURLs[0]
             });
           });
-      }).catch((err) => {
+      }).then(console.log, (err) => {
         this.snackBar.open('There was an error uploading a file to Cloud Storage.', null, {
           duration: 5000
         });
