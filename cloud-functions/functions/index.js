@@ -115,7 +115,7 @@ exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCr
       // Send notifications to all tokens.
       return admin.messaging().sendToDevice(tokens, payload);
     }
-    return {results: []};
+    return Promise.resolve({results: []});
   }).then(response => {
     // For each notification we check if there was an error.
     const tokensToRemove = {};
