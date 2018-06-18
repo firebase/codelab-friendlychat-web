@@ -136,7 +136,7 @@ FriendlyChat.prototype.onAuthStateChanged = function(user) {
     // Hide sign-in button.
     this.signInButton.setAttribute('hidden', 'true');
 
-    // We load currently existing chant messages.
+    // We load currently existing chat messages.
     this.loadMessages();
 
     // We save the Firebase Messaging Device token and enable notifications.
