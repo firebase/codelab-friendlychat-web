@@ -246,6 +246,6 @@ FriendlyChat.prototype.checkSetup = function() {
   }
 };
 
-window.onload = function() {
+window.addEventListener('load' , function() {
   window.friendlyChat = new FriendlyChat();
-};
+});
