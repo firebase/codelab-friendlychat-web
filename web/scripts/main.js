@@ -34,7 +34,7 @@ function FriendlyChat() {
   this.signInSnackbar = document.getElementById('must-signin-snackbar');
 
   // Saves message on form submit.
-  this.messageForm.addEventListener('submit', this.saveMessage.bind(this));
+  this.messageForm.addEventListener('submit', this.onMessageFormSubmit.bind(this));
   this.signOutButton.addEventListener('click', this.signOut.bind(this));
   this.signInButton.addEventListener('click', this.signIn.bind(this));
 
@@ -106,24 +106,15 @@ FriendlyChat.prototype.loadMessages = function() {
 };
 
 // Saves a new message on the Firebase DB.
-FriendlyChat.prototype.saveMessage = function(e) {
-  e.preventDefault();
-  // Check that the user entered a message and is signed in.
-  if (this.messageInput.value && this.checkSignedInWithMessage()) {
-    var currentUser = this.auth.currentUser;
-    // Add a new message entry to the Firebase Database.
-    this.messagesRef.push({
-      name: currentUser.displayName,
-      text: this.messageInput.value,
-      photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
-    }).then(function() {
-      // Clear message text field and SEND button state.
-      FriendlyChat.resetMaterialTextfield(this.messageInput);
-      this.toggleButton();
-    }.bind(this)).catch(function(error) {
-      console.error('Error writing new message to Firebase Database', error);
-    });
-  }
+FriendlyChat.prototype.saveMessage = function(messageText) {
+  // Add a new message entry to the Firebase Database.
+  return this.database.ref('/messages/').push({
+    name: this.getUserName(),
+    text: messageText,
+    photoUrl: this.getProfilePicUrl()
+  }).catch(function(error) {
+    console.error('Error writing new message to Firebase Database', error);
+  });
 };
 
 // Sets the URL of the given img element with the URL of the image stored in Cloud Storage.
@@ -163,7 +154,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 
     // We add a message with a loading icon that will get updated with the shared image.
     var currentUser = this.auth.currentUser;
-    this.messagesRef.push({
+    this.database.ref('/messages/').push({
       name: currentUser.displayName,
       imageUrl: FriendlyChat.LOADING_IMAGE_URL,
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
@@ -180,6 +171,19 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
     }.bind(this)).catch(function(error) {
       console.error('There was an error uploading a file to Cloud Storage:', error);
     });
+  }
+};
+
+// Triggered when the send new message form is submitted.
+FriendlyChat.prototype.onMessageFormSubmit = function(e) {
+  e.preventDefault();
+  // Check that the user entered a message and is signed in.
+  if (this.messageInput.value && this.checkSignedInWithMessage()) {
+    this.saveMessage(this.messageInput.value).then(function() {
+      // Clear message text field and re-enable the SEND button.
+      FriendlyChat.resetMaterialTextfield(this.messageInput);
+      this.toggleButton();
+    }.bind(this));
   }
 };
 

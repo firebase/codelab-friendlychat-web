@@ -34,7 +34,7 @@ function FriendlyChat() {
   this.signInSnackbar = document.getElementById('must-signin-snackbar');
 
   // Saves message on form submit.
-  this.messageForm.addEventListener('submit', this.saveMessage.bind(this));
+  this.messageForm.addEventListener('submit', this.onMessageFormSubmit.bind(this));
   this.signOutButton.addEventListener('click', this.signOut.bind(this));
   this.signInButton.addEventListener('click', this.signIn.bind(this));
 
@@ -89,14 +89,8 @@ FriendlyChat.prototype.loadMessages = function() {
 };
 
 // Saves a new message on the Firebase DB.
-FriendlyChat.prototype.saveMessage = function(e) {
-  e.preventDefault();
-  // Check that the user entered a message and is signed in.
-  if (this.messageInput.value && this.checkSignedInWithMessage()) {
-
-    // TODO(DEVELOPER): push new message to Firebase.
-
-  }
+FriendlyChat.prototype.saveMessage = function(message) {
+  // TODO 8: Push a new message to Firebase.
 };
 
 // Sets the URL of the given img element with the URL of the image stored in Cloud Storage.
@@ -129,6 +123,19 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 
     // TODO(DEVELOPER): Upload image to Firebase storage and add message.
 
+  }
+};
+
+// Triggered when the send new message form is submitted.
+FriendlyChat.prototype.onMessageFormSubmit = function(e) {
+  e.preventDefault();
+  // Check that the user entered a message and is signed in.
+  if (this.messageInput.value && this.checkSignedInWithMessage()) {
+    this.saveMessage(this.messageInput.value).then(function() {
+      // Clear message text field and re-enable the SEND button.
+      FriendlyChat.resetMaterialTextfield(this.messageInput);
+      this.toggleButton();
+    }.bind(this));
   }
 };
 
