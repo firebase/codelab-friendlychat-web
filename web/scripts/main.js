@@ -80,7 +80,7 @@ FriendlyChat.prototype.signOut = function() {
 
 // Returns the signed-in user's profile Pic URL.
 FriendlyChat.prototype.getProfilePicUrl = function() {
-  return this.auth.currentUser.photoURL;
+  return this.auth.currentUser.photoURL || '/images/profile_placeholder.png';
 }
 
 // Returns the signed-in user's display name.
