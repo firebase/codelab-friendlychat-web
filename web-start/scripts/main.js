@@ -85,7 +85,7 @@ FriendlyChat.prototype.isUserSignedIn = function() {
 
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
-  // TODO(DEVELOPER): Load and listens for new messages.
+  // TODO 7: Load and listens for new messages.
 };
 
 // Saves a new message on the Firebase DB.
