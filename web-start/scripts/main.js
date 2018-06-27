@@ -151,9 +151,6 @@ FriendlyChat.prototype.authStateObserver = function(user) {
     // Hide sign-in button.
     this.signInButton.setAttribute('hidden', 'true');
 
-    // We load currently existing chat messages.
-    this.loadMessages();
-
     // We save the Firebase Messaging Device token and enable notifications.
     this.saveMessagingDeviceToken();
   } else { // User is signed out!
@@ -165,6 +162,9 @@ FriendlyChat.prototype.authStateObserver = function(user) {
     // Show sign-in button.
     this.signInButton.removeAttribute('hidden');
   }
+
+  // We load currently existing chat messages.
+  this.loadMessages();
 };
 
 // Returns true if user is signed-in. Otherwise false and displays a message.

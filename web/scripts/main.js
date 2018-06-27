@@ -95,19 +95,14 @@ FriendlyChat.prototype.isUserSignedIn = function() {
 
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
-  // Reference to the /messages/ database path.
-  this.messagesRef = this.database.ref('messages');
-  // Make sure we remove all previous listeners.
-  this.messagesRef.off();
-
   // Loads the last 12 messages and listen for new ones.
   var setMessage = function(snap) {
     var data = snap.val();
     this.displayMessage(snap.key, data.name, data.text, data.photoUrl, data.imageUrl);
   }.bind(this);
-  
-  this.messagesRef.limitToLast(12).on('child_added', setMessage);
-  this.messagesRef.limitToLast(12).on('child_changed', setMessage);
+
+  this.database.ref('/messages/').limitToLast(12).on('child_added', setMessage);
+  this.database.ref('/messages/').limitToLast(12).on('child_changed', setMessage);
 };
 
 // Saves a new message on the Firebase DB.
@@ -207,9 +202,6 @@ FriendlyChat.prototype.authStateObserver = function(user) {
     // Hide sign-in button.
     this.signInButton.setAttribute('hidden', 'true');
 
-    // We load currently existing chat messages.
-    this.loadMessages();
-
     // We save the Firebase Messaging Device token and enable notifications.
     this.saveMessagingDeviceToken();
   } else { // User is signed out!
@@ -221,6 +213,9 @@ FriendlyChat.prototype.authStateObserver = function(user) {
     // Show sign-in button.
     this.signInButton.removeAttribute('hidden');
   }
+
+  // We load currently existing chat messages.
+  this.loadMessages();
 };
 
 // Returns true if user is signed-in. Otherwise false and displays a message.
