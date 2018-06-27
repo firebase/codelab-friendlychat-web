@@ -63,6 +63,11 @@ FriendlyChat.prototype.signIn = function() {
   // TODO(DEVELOPER): Sign in Firebase with credential from the Google user.
 };
 
+// Signs-out of Friendly Chat.
+FriendlyChat.prototype.signOut = function() {
+  // TODO(DEVELOPER): Sign out of Firebase.
+};
+
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
   // TODO(DEVELOPER): Load and listens for new messages.
@@ -110,11 +115,6 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
     // TODO(DEVELOPER): Upload image to Firebase storage and add message.
 
   }
-};
-
-// Signs-out of Friendly Chat.
-FriendlyChat.prototype.signOut = function() {
-  // TODO(DEVELOPER): Sign out of Firebase.
 };
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.

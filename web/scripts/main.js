@@ -70,6 +70,12 @@ FriendlyChat.prototype.signIn = function() {
   this.auth.signInWithPopup(provider);
 };
 
+// Signs-out of Friendly Chat.
+FriendlyChat.prototype.signOut = function() {
+  // Sign out of Firebase.
+  this.auth.signOut();
+};
+
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
   // Reference to the /messages/ database path.
@@ -162,12 +168,6 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
       console.error('There was an error uploading a file to Cloud Storage:', error);
     });
   }
-};
-
-// Signs-out of Friendly Chat.
-FriendlyChat.prototype.signOut = function() {
-  // Sign out of Firebase.
-  this.auth.signOut();
 };
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
