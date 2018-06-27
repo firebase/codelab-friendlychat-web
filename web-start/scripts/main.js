@@ -173,7 +173,7 @@ FriendlyChat.prototype.checkSignedInWithMessage = function() {
   if (this.isUserSignedIn()) {
     return true;
   }
-  
+
   // Display a message to the user using a Toast.
   var data = {
     message: 'You must sign-in first',
