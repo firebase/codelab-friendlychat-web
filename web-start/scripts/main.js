@@ -48,7 +48,7 @@ function FriendlyChat() {
     e.preventDefault();
     this.mediaCapture.click();
   }.bind(this));
-  this.mediaCapture.addEventListener('change', this.saveImageMessage.bind(this));
+  this.mediaCapture.addEventListener('change', this.onMediaFileSelected.bind(this));
 
   this.initFirebase();
 }
@@ -93,16 +93,14 @@ FriendlyChat.prototype.saveMessage = function(message) {
   // TODO 8: Push a new message to Firebase.
 };
 
-// Sets the URL of the given img element with the URL of the image stored in Cloud Storage.
-FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
-  imgElement.src = imageUri;
-
-  // TODO(DEVELOPER): If image is on Cloud Storage, fetch image URL and set img element's src.
+// Saves a new message containing an image URL in Firebase.
+// This first saves the image in Firebase storage.
+FriendlyChat.prototype.saveImageMessage = function(file) {
+  // TODO 9: Posts a new image as a message.
 };
 
-// Saves a new message containing an image URI in Firebase.
-// This first saves the image in Firebase storage.
-FriendlyChat.prototype.saveImageMessage = function(event) {
+// Triggered when a file is selected via the media picker.
+FriendlyChat.prototype.onMediaFileSelected = function(event) {
   event.preventDefault();
   var file = event.target.files[0];
 
@@ -120,9 +118,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
   }
   // Check if the user is signed-in
   if (this.checkSignedInWithMessage()) {
-
-    // TODO(DEVELOPER): Upload image to Firebase storage and add message.
-
+    this.saveImageMessage(file);
   }
 };
 
@@ -218,7 +214,7 @@ FriendlyChat.MESSAGE_TEMPLATE =
 FriendlyChat.LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif';
 
 // Displays a Message in the UI.
-FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageUri) {
+FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -237,12 +233,12 @@ FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageU
     messageElement.textContent = text;
     // Replace all line breaks by <br>.
     messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
-  } else if (imageUri) { // If the message is an image.
+  } else if (imageUrl) { // If the message is an image.
     var image = document.createElement('img');
     image.addEventListener('load', function() {
       this.messageList.scrollTop = this.messageList.scrollHeight;
     }.bind(this));
-    this.setImageUrl(imageUri, image);
+    this.setImageUrl(imageUrl, image);
     messageElement.innerHTML = '';
     messageElement.appendChild(image);
   }

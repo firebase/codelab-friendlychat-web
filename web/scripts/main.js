@@ -48,7 +48,7 @@ function FriendlyChat() {
     e.preventDefault();
     this.mediaCapture.click();
   }.bind(this));
-  this.mediaCapture.addEventListener('change', this.saveImageMessage.bind(this));
+  this.mediaCapture.addEventListener('change', this.onMediaFileSelected.bind(this));
 
   this.initFirebase();
 }
@@ -98,7 +98,7 @@ FriendlyChat.prototype.loadMessages = function() {
   // Loads the last 12 messages and listen for new ones.
   var setMessage = function(snap) {
     var data = snap.val();
-    this.displayMessage(snap.key, data.name, data.text, data.photoUrl, data.imageUrl);
+    this.displayMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl);
   }.bind(this);
 
   this.database.ref('/messages/').limitToLast(12).on('child_added', setMessage);
@@ -111,28 +111,40 @@ FriendlyChat.prototype.saveMessage = function(messageText) {
   return this.database.ref('/messages/').push({
     name: this.getUserName(),
     text: messageText,
-    photoUrl: this.getProfilePicUrl()
+    profilePicUrl: this.getProfilePicUrl()
   }).catch(function(error) {
     console.error('Error writing new message to Firebase Database', error);
   });
 };
 
-// Sets the URL of the given img element with the URL of the image stored in Cloud Storage.
-FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
-  // If the image is a Cloud Storage URI we fetch the URL.
-  if (imageUri.startsWith('gs://')) {
-    imgElement.src = FriendlyChat.LOADING_IMAGE_URL; // Display a loading image first.
-    this.storage.refFromURL(imageUri).getMetadata().then(function(metadata) {
-      imgElement.src = metadata.downloadURLs[0];
-    });
-  } else {
-    imgElement.src = imageUri;
-  }
-};
-
 // Saves a new message containing an image URI in Firebase.
 // This first saves the image in Firebase storage.
-FriendlyChat.prototype.saveImageMessage = function(event) {
+FriendlyChat.prototype.saveImageMessage = function(file) {
+  // We add a message with a loading icon that will get updated with the shared image.
+  this.database.ref('/messages/').push({
+    name: this.getUserName(),
+    imageUrl: FriendlyChat.LOADING_IMAGE_URL,
+    profilePicUrl: this.getProfilePicUrl()
+  }).then(function(messageRef) {
+    // Upload the image to Cloud Storage.
+    var filePath = currentUser.uid + '/' + messageRef.key + '/' + file.name;
+    return this.storage.ref(filePath).put(file).then(function(fileSnapshot) {
+      // Generate a file public URL.
+      return fileSnapshot.ref.getDownloadURL().then((url) => {
+        // Update the chat message placeholder.
+        return messageRef.update({
+          imageUrl: url,
+          storageUri: fileSnapshot.metadata.fullPath
+        });
+      });
+    }.bind(this));
+  }.bind(this)).catch(function(error) {
+    console.error('There was an error uploading a file to Cloud Storage:', error);
+  });
+};
+
+// Triggered when a file is selected via the media picker.
+FriendlyChat.prototype.onMediaFileSelected = function(event) {
   event.preventDefault();
   var file = event.target.files[0];
 
@@ -148,29 +160,9 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
     this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
     return;
   }
-
   // Check if the user is signed-in
   if (this.checkSignedInWithMessage()) {
-
-    // We add a message with a loading icon that will get updated with the shared image.
-    var currentUser = this.auth.currentUser;
-    this.database.ref('/messages/').push({
-      name: currentUser.displayName,
-      imageUrl: FriendlyChat.LOADING_IMAGE_URL,
-      photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
-    }).then(function(data) {
-
-      // Upload the image to Cloud Storage.
-      var filePath = currentUser.uid + '/' + data.key + '/' + file.name;
-      return this.storage.ref(filePath).put(file).then(function(snapshot) {
-
-        // Get the file's Storage URI and update the chat message placeholder.
-        var fullPath = snapshot.metadata.fullPath;
-        return data.update({imageUrl: this.storage.ref(fullPath).toString()});
-      }.bind(this));
-    }.bind(this)).catch(function(error) {
-      console.error('There was an error uploading a file to Cloud Storage:', error);
-    });
+    this.saveImageMessage(file);
   }
 };
 
@@ -284,7 +276,7 @@ FriendlyChat.MESSAGE_TEMPLATE =
 FriendlyChat.LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif';
 
 // Displays a Message in the UI.
-FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageUri) {
+FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -303,12 +295,12 @@ FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageU
     messageElement.textContent = text;
     // Replace all line breaks by <br>.
     messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
-  } else if (imageUri) { // If the message is an image.
+  } else if (imageUrl) { // If the message is an image.
     var image = document.createElement('img');
     image.addEventListener('load', function() {
       this.messageList.scrollTop = this.messageList.scrollHeight;
     }.bind(this));
-    this.setImageUrl(imageUri, image);
+    image.src = imageUrl;
     messageElement.innerHTML = '';
     messageElement.appendChild(image);
   }
