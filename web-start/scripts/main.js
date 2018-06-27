@@ -118,7 +118,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 };
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
-FriendlyChat.prototype.onAuthStateChanged = function(user) {
+FriendlyChat.prototype.authStateObserver = function(user) {
   if (user) { // User is signed in!
     // Get profile pic and user's name from the Firebase user object.
     var profilePicUrl = null;   // TODO(DEVELOPER): Get profile pic.

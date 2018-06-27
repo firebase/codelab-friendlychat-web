@@ -59,8 +59,10 @@ FriendlyChat.prototype.initFirebase = function() {
   this.auth = firebase.auth();
   this.database = firebase.database();
   this.storage = firebase.storage();
+  this.messaging = firebase.messaging();
+
   // Initiates Firebase auth and listen to auth state changes.
-  this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
+  this.auth.onAuthStateChanged(this.authStateObserver.bind(this));
 };
 
 // Signs-in Friendly Chat.
@@ -171,7 +173,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 };
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
-FriendlyChat.prototype.onAuthStateChanged = function(user) {
+FriendlyChat.prototype.authStateObserver = function(user) {
   if (user) { // User is signed in!
     // Get profile pic and user's name from the Firebase user object.
     var profilePicUrl = user.photoURL;
@@ -223,7 +225,7 @@ FriendlyChat.prototype.checkSignedInWithMessage = function() {
 
 // Saves the messaging device token to the datastore.
 FriendlyChat.prototype.saveMessagingDeviceToken = function() {
-  firebase.messaging().getToken().then(function(currentToken) {
+  this.messaging.getToken().then(function(currentToken) {
     if (currentToken) {
       console.log('Got FCM device token:', currentToken);
       // Saving the Device Token to the datastore.
@@ -241,7 +243,7 @@ FriendlyChat.prototype.saveMessagingDeviceToken = function() {
 // Requests permissions to show notifications.
 FriendlyChat.prototype.requestNotificationsPermissions = function() {
   console.log('Requesting notifications permission...');
-  firebase.messaging().requestPermission().then(function() {
+  this.messaging.requestPermission().then(function() {
     // Notification permission granted.
     this.saveMessagingDeviceToken();
   }.bind(this)).catch(function(error) {
