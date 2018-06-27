@@ -120,18 +120,18 @@ FriendlyChat.prototype.saveMessage = function(messageText) {
 // Saves a new message containing an image URI in Firebase.
 // This first saves the image in Firebase storage.
 FriendlyChat.prototype.saveImageMessage = function(file) {
-  // A - We add a message with a loading icon that will get updated with the shared image.
+  // 1 - We add a message with a loading icon that will get updated with the shared image.
   this.database.ref('/messages/').push({
     name: this.getUserName(),
     imageUrl: FriendlyChat.LOADING_IMAGE_URL,
     profilePicUrl: this.getProfilePicUrl()
   }).then(function(messageRef) {
-    // B - Upload the image to Cloud Storage.
+    // 2 - Upload the image to Cloud Storage.
     var filePath = currentUser.uid + '/' + messageRef.key + '/' + file.name;
     return this.storage.ref(filePath).put(file).then(function(fileSnapshot) {
-      // C - Generate a public URL for the file.
+      // 3 - Generate a public URL for the file.
       return fileSnapshot.ref.getDownloadURL().then((url) => {
-        // D - Update the chat message placeholder with the image’s URL.
+        // 4 - Update the chat message placeholder with the image’s URL.
         return messageRef.update({
           imageUrl: url,
           storageUri: fileSnapshot.metadata.fullPath
