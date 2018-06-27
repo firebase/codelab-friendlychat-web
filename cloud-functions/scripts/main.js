@@ -127,7 +127,7 @@ FriendlyChat.prototype.saveImageMessage = function(file) {
     profilePicUrl: this.getProfilePicUrl()
   }).then(function(messageRef) {
     // 2 - Upload the image to Cloud Storage.
-    var filePath = currentUser.uid + '/' + messageRef.key + '/' + file.name;
+    var filePath = this.auth().currentUser.uid + '/' + messageRef.key + '/' + file.name;
     return this.storage.ref(filePath).put(file).then(function(fileSnapshot) {
       // 3 - Generate a public URL for the file.
       return fileSnapshot.ref.getDownloadURL().then((url) => {
