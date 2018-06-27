@@ -99,6 +99,16 @@ FriendlyChat.prototype.saveImageMessage = function(file) {
   // TODO 9: Posts a new image as a message.
 };
 
+// Saves the messaging device token to the datastore.
+FriendlyChat.prototype.saveMessagingDeviceToken = function() {
+  // TODO 10: Save the device token in the realtime datastore
+};
+
+// Requests permissions to show notifications.
+FriendlyChat.prototype.requestNotificationsPermissions = function() {
+  // TODO 11: Request permissions to send notifications.
+};
+
 // Triggered when a file is selected via the media picker.
 FriendlyChat.prototype.onMediaFileSelected = function(event) {
   event.preventDefault();
@@ -184,16 +194,6 @@ FriendlyChat.prototype.checkSignedInWithMessage = function() {
   };
   this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
   return false;
-};
-
-// Saves the messaging device token to the datastore.
-FriendlyChat.prototype.saveMessagingDeviceToken = function() {
-  // TODO(DEVELOPER): Save the device token in the realtime datastore
-};
-
-// Requests permissions to show notifications.
-FriendlyChat.prototype.requestNotificationsPermissions = function() {
-  // TODO(DEVELOPER): Request permissions to send notifications.
 };
 
 // Resets the given MaterialTextField.
