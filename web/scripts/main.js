@@ -101,10 +101,11 @@ FriendlyChat.prototype.loadMessages = function() {
   this.messagesRef.off();
 
   // Loads the last 12 messages and listen for new ones.
-  var setMessage = function(data) {
-    var val = data.val();
-    this.displayMessage(data.key, val.name, val.text, val.photoUrl, val.imageUrl);
+  var setMessage = function(snap) {
+    var data = snap.val();
+    this.displayMessage(snap.key, data.name, data.text, data.photoUrl, data.imageUrl);
   }.bind(this);
+  
   this.messagesRef.limitToLast(12).on('child_added', setMessage);
   this.messagesRef.limitToLast(12).on('child_changed', setMessage);
 };
