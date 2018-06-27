@@ -55,18 +55,33 @@ function FriendlyChat() {
 
 // Sets up shortcuts to Firebase features and initiate firebase auth.
 FriendlyChat.prototype.initFirebase = function() {
-  // TODO(DEVELOPER): Initialize Firebase.
+  // TODO 1: Initialize Firebase.
 };
 
 // Signs-in Friendly Chat.
 FriendlyChat.prototype.signIn = function() {
-  // TODO(DEVELOPER): Sign in Firebase with credential from the Google user.
+  // TODO 2: Sign in Firebase with credential from the Google user.
 };
 
 // Signs-out of Friendly Chat.
 FriendlyChat.prototype.signOut = function() {
-  // TODO(DEVELOPER): Sign out of Firebase.
+  // TODO 3: Sign out of Firebase.
 };
+
+// Returns the signed-in user's profile Pic URL.
+FriendlyChat.prototype.getProfilePicUrl = function() {
+  // TODO 4: Return the user's profile pic URL.
+}
+
+// Returns the signed-in user's display name.
+FriendlyChat.prototype.getUserName = function() {
+  // TODO 5: Return the user's display name.
+}
+
+// Returns true if a user is signed-in.
+FriendlyChat.prototype.isUserSignedIn = function() {
+  // TODO 6: Return true if a user is signed-in.
+}
 
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
@@ -120,9 +135,9 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 FriendlyChat.prototype.authStateObserver = function(user) {
   if (user) { // User is signed in!
-    // Get profile pic and user's name from the Firebase user object.
-    var profilePicUrl = null;   // TODO(DEVELOPER): Get profile pic.
-    var userName = null;        // TODO(DEVELOPER): Get user's name.
+    // Get the signed-in user's profile pic and name.
+    var profilePicUrl = this.getProfilePicUrl();
+    var userName = this.getUserName();
 
     // Set the user's profile pic and name.
     this.userPic.style.backgroundImage = 'url(' + profilePicUrl + ')';
@@ -154,8 +169,11 @@ FriendlyChat.prototype.authStateObserver = function(user) {
 
 // Returns true if user is signed-in. Otherwise false and displays a message.
 FriendlyChat.prototype.checkSignedInWithMessage = function() {
-  // TODO(DEVELOPER): Check if user is signed-in Firebase.
-
+  // Return true if the user is signed in Firebase
+  if (this.isUserSignedIn()) {
+    return true;
+  }
+  
   // Display a message to the user using a Toast.
   var data = {
     message: 'You must sign-in first',

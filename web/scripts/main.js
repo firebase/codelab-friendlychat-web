@@ -78,6 +78,21 @@ FriendlyChat.prototype.signOut = function() {
   this.auth.signOut();
 };
 
+// Returns the signed-in user's profile Pic URL.
+FriendlyChat.prototype.getProfilePicUrl = function() {
+  return this.auth.currentUser.photoURL;
+}
+
+// Returns the signed-in user's display name.
+FriendlyChat.prototype.getUserName = function() {
+  return this.auth.currentUser.displayName;
+}
+
+// Returns true if a user is signed-in.
+FriendlyChat.prototype.isUserSignedIn = function() {
+  return !!this.auth.currentUser;
+}
+
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
   // Reference to the /messages/ database path.
@@ -175,9 +190,9 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 FriendlyChat.prototype.authStateObserver = function(user) {
   if (user) { // User is signed in!
-    // Get profile pic and user's name from the Firebase user object.
-    var profilePicUrl = user.photoURL;
-    var userName = user.displayName;
+    // Get the signed-in user's profile pic and name.
+    var profilePicUrl = this.getProfilePicUrl();
+    var userName = this.getUserName();
 
     // Set the user's profile pic and name.
     this.userPic.style.backgroundImage = 'url(' + (profilePicUrl || '/images/profile_placeholder.png') + ')';
@@ -210,7 +225,7 @@ FriendlyChat.prototype.authStateObserver = function(user) {
 // Returns true if user is signed-in. Otherwise false and displays a message.
 FriendlyChat.prototype.checkSignedInWithMessage = function() {
   // Return true if the user is signed in Firebase
-  if (this.auth.currentUser) {
+  if (this.isUserSignedIn()) {
     return true;
   }
 
