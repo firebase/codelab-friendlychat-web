@@ -58,6 +58,11 @@ FriendlyChat.prototype.initFirebase = function() {
   // TODO(DEVELOPER): Initialize Firebase.
 };
 
+// Signs-in Friendly Chat.
+FriendlyChat.prototype.signIn = function() {
+  // TODO(DEVELOPER): Sign in Firebase with credential from the Google user.
+};
+
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
   // TODO(DEVELOPER): Load and listens for new messages.
@@ -105,11 +110,6 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
     // TODO(DEVELOPER): Upload image to Firebase storage and add message.
 
   }
-};
-
-// Signs-in Friendly Chat.
-FriendlyChat.prototype.signIn = function() {
-  // TODO(DEVELOPER): Sign in Firebase with credential from the Google user.
 };
 
 // Signs-out of Friendly Chat.
