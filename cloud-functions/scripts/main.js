@@ -117,7 +117,7 @@ FriendlyChat.prototype.saveMessage = function(messageText) {
   });
 };
 
-// Saves a new message containing an image URI in Firebase.
+// Saves a new message containing an image URL in Firebase.
 // This first saves the image in Firebase storage.
 FriendlyChat.prototype.saveImageMessage = function(file) {
   // 1 - We add a message with a loading icon that will get updated with the shared image.
@@ -171,7 +171,6 @@ FriendlyChat.prototype.requestNotificationsPermissions = function() {
   });
 };
 
-
 // Triggered when a file is selected via the media picker.
 FriendlyChat.prototype.onMediaFileSelected = function(event) {
   event.preventDefault();
@@ -216,7 +215,7 @@ FriendlyChat.prototype.authStateObserver = function(user) {
     var userName = this.getUserName();
 
     // Set the user's profile pic and name.
-    this.userPic.style.backgroundImage = 'url(' + (profilePicUrl || '/images/profile_placeholder.png') + ')';
+    this.userPic.style.backgroundImage = 'url(' + profilePicUrl + ')';
     this.userName.textContent = userName;
 
     // Show user's profile and sign-out button.
