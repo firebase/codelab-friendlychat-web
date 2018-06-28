@@ -89,7 +89,7 @@ FriendlyChat.prototype.loadMessages = function() {
 };
 
 // Saves a new message on the Firebase DB.
-FriendlyChat.prototype.saveMessage = function(message) {
+FriendlyChat.prototype.saveMessage = function(messageText) {
   // TODO 8: Push a new message to Firebase.
 };
 
