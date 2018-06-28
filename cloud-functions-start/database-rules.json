@@ -1,14 +1,25 @@
 {
   "rules": {
     "messages": {
-      ".read": "auth !== null",
-      ".write": "auth !== null"
+      ".read": true,
+      // Users can only write messages if they are authenticated.
+      ".write": "auth !== null",
+      "$messageId": {
+        // The name has to be the real display name.
+        ".validate": "newData.child('name').val() === auth.token.name",
+        "text": {
+          // The text has to be less than 300 char.
+          ".validate": "newData.isString() && newData.val().length < 300"
+        }
+      }
     },
     "fcmTokens": {
       "$token": {
-        ".read": "data.val() === auth.uid", // Users can only read their own device tokens
-        ".write": "!data.exists() || data.val() === auth.uid", // Users can only write to their own device tokens
-        ".validate": "newData.val() === auth.uid" // value has to be the UID of the user
+        ".read": true,
+        // Users can only write to their own device tokens
+        ".write": "!data.exists() || data.val() === auth.uid",
+        // Value has to be the UID of the user
+        ".validate": "newData.val() === auth.uid"
       }
     }
   }
