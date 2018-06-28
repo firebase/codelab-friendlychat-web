@@ -28,7 +28,7 @@ const os = require('os');
 const fs = require('fs');
 
 // Adds a message that welcomes new users into the chat.
-exports.addWelcomeMessages = functions.auth.user().onCreate(user => {
+exports.addWelcomeMessages = functions.auth.user().onCreate(((user) => {
   console.log('A new user signed in for the first time.');
   const fullName = user.displayName || 'Anonymous';
 
@@ -36,7 +36,7 @@ exports.addWelcomeMessages = functions.auth.user().onCreate(user => {
   // which then displays it in the FriendlyChat clients.
   return admin.database().ref('messages').push({
     name: 'Firebase Bot',
-    photoUrl: '/images/firebase-logo.png', // Firebase logo
+    profilePicUrl: '/images/firebase-logo.png', // Firebase logo
     text: `${fullName} signed in for the first time! Welcome!`,
   }).then(() => {
     console.log('Welcome message written to database.');
@@ -45,13 +45,13 @@ exports.addWelcomeMessages = functions.auth.user().onCreate(user => {
 });
 
 // Checks if uploaded images are flagged as Adult or Violence and if so blurs them.
-exports.blurOffensiveImages = functions.storage.object().onFinalize(object => {
+exports.blurOffensiveImages = functions.storage.object().onFinalize((object) => {
   const image = {
     source: {imageUri: `gs://${object.bucket}/${object.name}`},
   };
 
   // Check the image content using the Cloud Vision API.
-  return vision.safeSearchDetection(image).then(batchAnnotateImagesResponse => {
+  return vision.safeSearchDetection(image).then((batchAnnotateImagesResponse) => {
     const safeSearchResult = batchAnnotateImagesResponse[0].safeSearchAnnotation;
     const Likelihood = Vision.types.Likelihood;
     if (Likelihood[safeSearchResult.adult] >= Likelihood.LIKELY ||
@@ -93,7 +93,7 @@ function blurImage(filePath, bucketName) {
 }
 
 // Sends a notifications to all users when a new message is posted.
-exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCreate(snapshot => {
+exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCreate((snapshot) => {
   // Notification details.
   const text = snapshot.val().text;
   const payload = {
@@ -107,7 +107,7 @@ exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCr
 
   let tokens = []; // All Device tokens to send a notification to.
   // Get the list of device tokens.
-  return admin.database().ref('fcmTokens').once('value').then(allTokens => {
+  return admin.database().ref('fcmTokens').once('value').then((allTokens) => {
     if (allTokens.val()) {
       // Listing all tokens.
       tokens = Object.keys(allTokens.val());
@@ -116,7 +116,7 @@ exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCr
       return admin.messaging().sendToDevice(tokens, payload);
     }
     return {results: []};
-  }).then(response => {
+  }).then((response) => {
     // For each notification we check if there was an error.
     const tokensToRemove = {};
     response.results.forEach((result, index) => {
