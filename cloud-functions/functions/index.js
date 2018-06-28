@@ -28,7 +28,7 @@ const os = require('os');
 const fs = require('fs');
 
 // Adds a message that welcomes new users into the chat.
-exports.addWelcomeMessages = functions.auth.user().onCreate(((user) => {
+exports.addWelcomeMessages = functions.auth.user().onCreate((user) => {
   console.log('A new user signed in for the first time.');
   const fullName = user.displayName || 'Anonymous';
 
