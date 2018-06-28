@@ -117,7 +117,7 @@ FriendlyChat.prototype.saveMessage = function(messageText) {
   });
 };
 
-// Saves a new message containing an image URI in Firebase.
+// Saves a new message containing an image URL in Firebase.
 // This first saves the image in Firebase storage.
 FriendlyChat.prototype.saveImageMessage = function(file) {
   // 1 - We add a message with a loading icon that will get updated with the shared image.
