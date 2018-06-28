@@ -19,7 +19,6 @@ const functions = require('firebase-functions');
 // Import and initialize the Firebase Admin SDK.
 const admin = require('firebase-admin');
 admin.initializeApp();
-const gcs = require('@google-cloud/storage')();
 const Vision = require('@google-cloud/vision');
 const vision = new Vision();
 const spawn = require('child-process-promise').spawn;
@@ -57,7 +56,7 @@ exports.blurOffensiveImages = functions.storage.object().onFinalize((object) => 
     if (Likelihood[safeSearchResult.adult] >= Likelihood.LIKELY ||
         Likelihood[safeSearchResult.violence] >= Likelihood.LIKELY) {
       console.log('The image', object.name, 'has been detected as inappropriate.');
-      return blurImage(object.name, object.bucket);
+      return blurImage(object.name);
     }
     console.log('The image', object.name, 'has been detected as OK.');
     return null;
@@ -65,10 +64,10 @@ exports.blurOffensiveImages = functions.storage.object().onFinalize((object) => 
 });
 
 // Blurs the given image located in the given bucket using ImageMagick.
-function blurImage(filePath, bucketName) {
+function blurImage(filePath) {
   const tempLocalFile = path.join(os.tmpdir(), path.basename(filePath));
   const messageId = filePath.split(path.sep)[1];
-  const bucket = gcs.bucket(bucketName);
+  const bucket = admin.storage().bucket();
 
   // Download file from bucket.
   return bucket.file(filePath).download({destination: tempLocalFile}).then(() => {
