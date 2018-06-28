@@ -22,7 +22,7 @@ main, #messages-card {
   padding-bottom: 0;
 }
 #messages-card-container {
-  height: calc(100% - 150px);
+  height: calc(100% - 35px);
   padding-bottom: 0;
 }
 #messages-card {

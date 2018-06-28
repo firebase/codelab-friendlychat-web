@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-html, body {
+ html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
 }
 main, #messages-card {
@@ -22,7 +22,7 @@ main, #messages-card {
   padding-bottom: 0;
 }
 #messages-card-container {
-  height: calc(100% - 150px);
+  height: calc(100% - 35px);
   padding-bottom: 0;
 }
 #messages-card {
@@ -55,6 +55,8 @@ main, #messages-card {
   overflow-y: auto;
   margin-bottom: 10px;
   height: calc(100% - 80px);
+  display: flex;
+  flex-direction: column;
 }
 #message-filler {
   flex-grow: 1;
