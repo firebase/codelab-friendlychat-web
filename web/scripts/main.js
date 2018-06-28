@@ -171,7 +171,6 @@ FriendlyChat.prototype.requestNotificationsPermissions = function() {
   });
 };
 
-
 // Triggered when a file is selected via the media picker.
 FriendlyChat.prototype.onMediaFileSelected = function(event) {
   event.preventDefault();
