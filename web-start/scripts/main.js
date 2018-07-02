@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,107 +15,69 @@
  */
 'use strict';
 
-// Initializes FriendlyChat.
-function FriendlyChat() {
-  this.checkSetup();
-
-  // Shortcuts to DOM Elements.
-  this.messageList = document.getElementById('messages');
-  this.messageForm = document.getElementById('message-form');
-  this.messageInput = document.getElementById('message');
-  this.submitButton = document.getElementById('submit');
-  this.submitImageButton = document.getElementById('submitImage');
-  this.imageForm = document.getElementById('image-form');
-  this.mediaCapture = document.getElementById('mediaCapture');
-  this.userPic = document.getElementById('user-pic');
-  this.userName = document.getElementById('user-name');
-  this.signInButton = document.getElementById('sign-in');
-  this.signOutButton = document.getElementById('sign-out');
-  this.signInSnackbar = document.getElementById('must-signin-snackbar');
-
-  // Saves message on form submit.
-  this.messageForm.addEventListener('submit', this.onMessageFormSubmit.bind(this));
-  this.signOutButton.addEventListener('click', this.signOut.bind(this));
-  this.signInButton.addEventListener('click', this.signIn.bind(this));
-
-  // Toggle for the button.
-  var buttonTogglingHandler = this.toggleButton.bind(this);
-  this.messageInput.addEventListener('keyup', buttonTogglingHandler);
-  this.messageInput.addEventListener('change', buttonTogglingHandler);
-
-  // Events for image upload.
-  this.submitImageButton.addEventListener('click', function(e) {
-    e.preventDefault();
-    this.mediaCapture.click();
-  }.bind(this));
-  this.mediaCapture.addEventListener('change', this.onMediaFileSelected.bind(this));
-
-  this.initFirebase();
-}
-
-// Sets up shortcuts to Firebase features and initiate firebase auth.
-FriendlyChat.prototype.initFirebase = function() {
-  // TODO 1: Initialize Firebase.
-};
-
 // Signs-in Friendly Chat.
-FriendlyChat.prototype.signIn = function() {
-  // TODO 2: Sign in Firebase with credential from the Google user.
+function signIn() {
+  // TODO 1: Sign in Firebase with credential from the Google user.
 };
 
 // Signs-out of Friendly Chat.
-FriendlyChat.prototype.signOut = function() {
-  // TODO 3: Sign out of Firebase.
+function signOut() {
+  // TODO 2: Sign out of Firebase.
+};
+
+// Initiate firebase auth.
+function initFirebaseAuth() {
+  // TODO 3: Initialize Firebase.
 };
 
 // Returns the signed-in user's profile Pic URL.
-FriendlyChat.prototype.getProfilePicUrl = function() {
+function getProfilePicUrl() {
   // TODO 4: Return the user's profile pic URL.
 }
 
 // Returns the signed-in user's display name.
-FriendlyChat.prototype.getUserName = function() {
+function getUserName() {
   // TODO 5: Return the user's display name.
 }
 
 // Returns true if a user is signed-in.
-FriendlyChat.prototype.isUserSignedIn = function() {
+function isUserSignedIn() {
   // TODO 6: Return true if a user is signed-in.
 }
 
 // Loads chat messages history and listens for upcoming ones.
-FriendlyChat.prototype.loadMessages = function() {
+function loadMessages() {
   // TODO 7: Load and listens for new messages.
 };
 
 // Saves a new message on the Firebase DB.
-FriendlyChat.prototype.saveMessage = function(messageText) {
+function saveMessage(messageText) {
   // TODO 8: Push a new message to Firebase.
 };
 
 // Saves a new message containing an image URL in Firebase.
 // This first saves the image in Firebase storage.
-FriendlyChat.prototype.saveImageMessage = function(file) {
+function saveImageMessage(file) {
   // TODO 9: Posts a new image as a message.
 };
 
 // Saves the messaging device token to the datastore.
-FriendlyChat.prototype.saveMessagingDeviceToken = function() {
+function saveMessagingDeviceToken() {
   // TODO 10: Save the device token in the realtime datastore
 };
 
 // Requests permissions to show notifications.
-FriendlyChat.prototype.requestNotificationsPermissions = function() {
+function requestNotificationsPermissions() {
   // TODO 11: Request permissions to send notifications.
 };
 
 // Triggered when a file is selected via the media picker.
-FriendlyChat.prototype.onMediaFileSelected = function(event) {
+function onMediaFileSelected(event) {
   event.preventDefault();
   var file = event.target.files[0];
 
   // Clear the selection in the file picker input.
-  this.imageForm.reset();
+  imageFormElement.reset();
 
   // Check if the file is an image.
   if (!file.type.match('image.*')) {
@@ -123,67 +85,64 @@ FriendlyChat.prototype.onMediaFileSelected = function(event) {
       message: 'You can only share images',
       timeout: 2000
     };
-    this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
+    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
     return;
   }
   // Check if the user is signed-in
-  if (this.checkSignedInWithMessage()) {
-    this.saveImageMessage(file);
+  if (checkSignedInWithMessage()) {
+    saveImageMessage(file);
   }
 };
 
 // Triggered when the send new message form is submitted.
-FriendlyChat.prototype.onMessageFormSubmit = function(e) {
+function onMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
-  if (this.messageInput.value && this.checkSignedInWithMessage()) {
-    this.saveMessage(this.messageInput.value).then(function() {
+  if (messageInputElement.value && checkSignedInWithMessage()) {
+    saveMessage(messageInputElement.value).then(function() {
       // Clear message text field and re-enable the SEND button.
-      FriendlyChat.resetMaterialTextfield(this.messageInput);
-      this.toggleButton();
-    }.bind(this));
+      resetMaterialTextfield(messageInputElement);
+      toggleButton();
+    });
   }
 };
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
-FriendlyChat.prototype.authStateObserver = function(user) {
+function authStateObserver(user) {
   if (user) { // User is signed in!
     // Get the signed-in user's profile pic and name.
-    var profilePicUrl = this.getProfilePicUrl();
-    var userName = this.getUserName();
+    var profilePicUrl = getProfilePicUrl();
+    var userName = getUserName();
 
     // Set the user's profile pic and name.
-    this.userPic.style.backgroundImage = 'url(' + profilePicUrl + ')';
-    this.userName.textContent = userName;
+    userPicElement.style.backgroundImage = 'url(' + profilePicUrl + ')';
+    userNameElement.textContent = userName;
 
     // Show user's profile and sign-out button.
-    this.userName.removeAttribute('hidden');
-    this.userPic.removeAttribute('hidden');
-    this.signOutButton.removeAttribute('hidden');
+    userNameElement.removeAttribute('hidden');
+    userPicElement.removeAttribute('hidden');
+    signOutButtonElement.removeAttribute('hidden');
 
     // Hide sign-in button.
-    this.signInButton.setAttribute('hidden', 'true');
+    signInButtonElement.setAttribute('hidden', 'true');
 
     // We save the Firebase Messaging Device token and enable notifications.
-    this.saveMessagingDeviceToken();
+    saveMessagingDeviceToken();
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
-    this.userName.setAttribute('hidden', 'true');
-    this.userPic.setAttribute('hidden', 'true');
-    this.signOutButton.setAttribute('hidden', 'true');
+    userNameElement.setAttribute('hidden', 'true');
+    userPicElement.setAttribute('hidden', 'true');
+    signOutButtonElement.setAttribute('hidden', 'true');
 
     // Show sign-in button.
-    this.signInButton.removeAttribute('hidden');
+    signInButtonElement.removeAttribute('hidden');
   }
-
-  // We load currently existing chat messages.
-  this.loadMessages();
 };
 
 // Returns true if user is signed-in. Otherwise false and displays a message.
-FriendlyChat.prototype.checkSignedInWithMessage = function() {
+function checkSignedInWithMessage() {
   // Return true if the user is signed in Firebase
-  if (this.isUserSignedIn()) {
+  if (isUserSignedIn()) {
     return true;
   }
 
@@ -192,18 +151,18 @@ FriendlyChat.prototype.checkSignedInWithMessage = function() {
     message: 'You must sign-in first',
     timeout: 2000
   };
-  this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
+  signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
   return false;
 };
 
 // Resets the given MaterialTextField.
-FriendlyChat.resetMaterialTextfield = function(element) {
+function resetMaterialTextfield(element) {
   element.value = '';
   element.parentNode.MaterialTextfield.boundUpdateClassesHandler();
 };
 
 // Template for messages.
-FriendlyChat.MESSAGE_TEMPLATE =
+var MESSAGE_TEMPLATE =
     '<div class="message-container">' +
       '<div class="spacing"><div class="pic"></div></div>' +
       '<div class="message"></div>' +
@@ -211,18 +170,18 @@ FriendlyChat.MESSAGE_TEMPLATE =
     '</div>';
 
 // A loading image URL.
-FriendlyChat.LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
+var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
 // Displays a Message in the UI.
-FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageUrl) {
+function displayMessage(key, name, text, picUrl, imageUrl) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
-    container.innerHTML = FriendlyChat.MESSAGE_TEMPLATE;
+    container.innerHTML = MESSAGE_TEMPLATE;
     div = container.firstChild;
     div.setAttribute('id', key);
-    this.messageList.appendChild(div);
+    messageListElement.appendChild(div);
   }
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
@@ -236,30 +195,30 @@ FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageU
   } else if (imageUrl) { // If the message is an image.
     var image = document.createElement('img');
     image.addEventListener('load', function() {
-      this.messageList.scrollTop = this.messageList.scrollHeight;
-    }.bind(this));
+      messageListElement.scrollTop = messageListElement.scrollHeight;
+    });
     image.src = imageUrl + '&' + new Date().getTime();
     messageElement.innerHTML = '';
     messageElement.appendChild(image);
   }
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
-  this.messageList.scrollTop = this.messageList.scrollHeight;
-  this.messageInput.focus();
+  messageListElement.scrollTop = messageListElement.scrollHeight;
+  messageInputElement.focus();
 };
 
 // Enables or disables the submit button depending on the values of the input
 // fields.
-FriendlyChat.prototype.toggleButton = function() {
-  if (this.messageInput.value) {
-    this.submitButton.removeAttribute('disabled');
+function toggleButton() {
+  if (messageInputElement.value) {
+    submitButtonElement.removeAttribute('disabled');
   } else {
-    this.submitButton.setAttribute('disabled', 'true');
+    submitButtonElement.setAttribute('disabled', 'true');
   }
 };
 
 // Checks that the Firebase SDK has been correctly setup and configured.
-FriendlyChat.prototype.checkSetup = function() {
+function checkSetup() {
   if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
     window.alert('You have not configured and imported the Firebase SDK. ' +
         'Make sure you go through the codelab setup instructions and make ' +
@@ -267,6 +226,41 @@ FriendlyChat.prototype.checkSetup = function() {
   }
 };
 
-window.addEventListener('load' , function() {
-  window.friendlyChat = new FriendlyChat();
+// Checks that Firebase has been imported.
+checkSetup();
+
+// Shortcuts to DOM Elements.
+var messageListElement = document.getElementById('messages');
+var messageFormElement = document.getElementById('message-form');
+var messageInputElement = document.getElementById('message');
+var submitButtonElement = document.getElementById('submit');
+var imageButtonElement = document.getElementById('submitImage');
+var imageFormElement = document.getElementById('image-form');
+var mediaCaptureElement = document.getElementById('mediaCapture');
+var userPicElement = document.getElementById('user-pic');
+var userNameElement = document.getElementById('user-name');
+var signInButtonElement = document.getElementById('sign-in');
+var signOutButtonElement = document.getElementById('sign-out');
+var signInSnackbarElement = document.getElementById('must-signin-snackbar');
+
+// Saves message on form submit.
+messageFormElement.addEventListener('submit', onMessageFormSubmit);
+signOutButtonElement.addEventListener('click', signOut);
+signInButtonElement.addEventListener('click', signIn);
+
+// Toggle for the button.
+messageInputElement.addEventListener('keyup', toggleButton);
+messageInputElement.addEventListener('change', toggleButton);
+
+// Events for image upload.
+imageButtonElement.addEventListener('click', function(e) {
+  e.preventDefault();
+  mediaCaptureElement.click();
 });
+mediaCaptureElement.addEventListener('change', onMediaFileSelected);
+
+// initialize Firebase
+initFirebaseAuth();
+
+// We load currently existing chat messages and listen to new ones.
+loadMessages();
