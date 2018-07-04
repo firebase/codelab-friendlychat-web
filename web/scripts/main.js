@@ -20,19 +20,19 @@ function signIn() {
   // Sign in Firebase using popup auth and Google as the identity provider.
   var provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider);
-};
+}
 
 // Signs-out of Friendly Chat.
 function signOut() {
   // Sign out of Firebase.
   firebase.auth().signOut();
-};
+}
 
 // Initiate firebase auth.
 function initFirebaseAuth() {
   // Listen to auth state changes.
   firebase.auth().onAuthStateChanged(authStateObserver);
-};
+}
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
@@ -59,7 +59,7 @@ function loadMessages() {
 
   firebase.database().ref('/messages/').limitToLast(12).on('child_added', callback);
   firebase.database().ref('/messages/').limitToLast(12).on('child_changed', callback);
-};
+}
 
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
@@ -71,7 +71,7 @@ function saveMessage(messageText) {
   }).catch(function(error) {
     console.error('Error writing new message to Firebase Database', error);
   });
-};
+}
 
 // Saves a new message containing an image URL in Firebase.
 // This first saves the image in Firebase storage.
@@ -97,7 +97,7 @@ function saveImageMessage(file) {
   }).catch(function(error) {
     console.error('There was an error uploading a file to Cloud Storage:', error);
   });
-};
+}
 
 // Saves the messaging device token to the datastore.
 function saveMessagingDeviceToken() {
@@ -114,7 +114,7 @@ function saveMessagingDeviceToken() {
   }).catch(function(error){
     console.error('Unable to get messaging token.', error);
   });
-};
+}
 
 // Requests permissions to show notifications.
 function requestNotificationsPermissions() {
@@ -125,7 +125,7 @@ function requestNotificationsPermissions() {
   }).catch(function(error) {
     console.error('Unable to get permission to notify.', error);
   });
-};
+}
 
 // Triggered when a file is selected via the media picker.
 function onMediaFileSelected(event) {
@@ -148,7 +148,7 @@ function onMediaFileSelected(event) {
   if (checkSignedInWithMessage()) {
     saveImageMessage(file);
   }
-};
+}
 
 // Triggered when the send new message form is submitted.
 function onMessageFormSubmit(e) {
@@ -161,7 +161,7 @@ function onMessageFormSubmit(e) {
       toggleButton();
     });
   }
-};
+}
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
@@ -193,7 +193,7 @@ function authStateObserver(user) {
     // Show sign-in button.
     signInButtonElement.removeAttribute('hidden');
   }
-};
+}
 
 // Returns true if user is signed-in. Otherwise false and displays a message.
 function checkSignedInWithMessage() {
@@ -209,13 +209,13 @@ function checkSignedInWithMessage() {
   };
   signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
   return false;
-};
+}
 
 // Resets the given MaterialTextField.
 function resetMaterialTextfield(element) {
   element.value = '';
   element.parentNode.MaterialTextfield.boundUpdateClassesHandler();
-};
+}
 
 // Template for messages.
 var MESSAGE_TEMPLATE =
@@ -261,7 +261,7 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
   setTimeout(function() {div.classList.add('visible')}, 1);
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
-};
+}
 
 // Enables or disables the submit button depending on the values of the input
 // fields.
@@ -271,7 +271,7 @@ function toggleButton() {
   } else {
     submitButtonElement.setAttribute('disabled', 'true');
   }
-};
+}
 
 // Checks that the Firebase SDK has been correctly setup and configured.
 function checkSetup() {
@@ -280,7 +280,7 @@ function checkSetup() {
         'Make sure you go through the codelab setup instructions and make ' +
         'sure you are running the codelab using `firebase serve`');
   }
-};
+}
 
 // Checks that Firebase has been imported.
 checkSetup();

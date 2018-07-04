@@ -18,17 +18,17 @@
 // Signs-in Friendly Chat.
 function signIn() {
   // TODO 1: Sign in Firebase with credential from the Google user.
-};
+}
 
 // Signs-out of Friendly Chat.
 function signOut() {
   // TODO 2: Sign out of Firebase.
-};
+}
 
 // Initiate firebase auth.
 function initFirebaseAuth() {
   // TODO 3: Initialize Firebase.
-};
+}
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
@@ -48,28 +48,28 @@ function isUserSignedIn() {
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   // TODO 7: Load and listens for new messages.
-};
+}
 
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
   // TODO 8: Push a new message to Firebase.
-};
+}
 
 // Saves a new message containing an image URL in Firebase.
 // This first saves the image in Firebase storage.
 function saveImageMessage(file) {
   // TODO 9: Posts a new image as a message.
-};
+}
 
 // Saves the messaging device token to the datastore.
 function saveMessagingDeviceToken() {
   // TODO 10: Save the device token in the realtime datastore
-};
+}
 
 // Requests permissions to show notifications.
 function requestNotificationsPermissions() {
   // TODO 11: Request permissions to send notifications.
-};
+}
 
 // Triggered when a file is selected via the media picker.
 function onMediaFileSelected(event) {
@@ -92,7 +92,7 @@ function onMediaFileSelected(event) {
   if (checkSignedInWithMessage()) {
     saveImageMessage(file);
   }
-};
+}
 
 // Triggered when the send new message form is submitted.
 function onMessageFormSubmit(e) {
@@ -105,7 +105,7 @@ function onMessageFormSubmit(e) {
       toggleButton();
     });
   }
-};
+}
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
@@ -137,7 +137,7 @@ function authStateObserver(user) {
     // Show sign-in button.
     signInButtonElement.removeAttribute('hidden');
   }
-};
+}
 
 // Returns true if user is signed-in. Otherwise false and displays a message.
 function checkSignedInWithMessage() {
@@ -153,13 +153,13 @@ function checkSignedInWithMessage() {
   };
   signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
   return false;
-};
+}
 
 // Resets the given MaterialTextField.
 function resetMaterialTextfield(element) {
   element.value = '';
   element.parentNode.MaterialTextfield.boundUpdateClassesHandler();
-};
+}
 
 // Template for messages.
 var MESSAGE_TEMPLATE =
@@ -205,7 +205,7 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
   setTimeout(function() {div.classList.add('visible')}, 1);
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
-};
+}
 
 // Enables or disables the submit button depending on the values of the input
 // fields.
@@ -215,7 +215,7 @@ function toggleButton() {
   } else {
     submitButtonElement.setAttribute('disabled', 'true');
   }
-};
+}
 
 // Checks that the Firebase SDK has been correctly setup and configured.
 function checkSetup() {
@@ -224,7 +224,7 @@ function checkSetup() {
         'Make sure you go through the codelab setup instructions and make ' +
         'sure you are running the codelab using `firebase serve`');
   }
-};
+}
 
 // Checks that Firebase has been imported.
 checkSetup();
