@@ -55,7 +55,7 @@ function saveMessage(messageText) {
   // TODO 8: Push a new message to Firebase.
 }
 
-// Saves a new message containing an image URL in Firebase.
+// Saves a new message containing an image in Firebase.
 // This first saves the image in Firebase storage.
 function saveImageMessage(file) {
   // TODO 9: Posts a new image as a message.
