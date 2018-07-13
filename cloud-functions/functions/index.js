@@ -42,22 +42,23 @@ exports.addWelcomeMessages = functions.auth.user().onCreate(async (user) => {
 });
 
 // Checks if uploaded images are flagged as Adult or Violence and if so blurs them.
-exports.blurOffensiveImages = functions.storage.object().onFinalize(async (object) => {
-  const image = {
-    source: {imageUri: `gs://${object.bucket}/${object.name}`},
-  };
+exports.blurOffensiveImages = functions.runWith({memory: '2GB'}).storage.object().onFinalize(
+    async (object) => {
+      const image = {
+        source: {imageUri: `gs://${object.bucket}/${object.name}`},
+      };
 
-  // Check the image content using the Cloud Vision API.
-  const batchAnnotateImagesResponse = await vision.safeSearchDetection(image);
-  const safeSearchResult = batchAnnotateImagesResponse[0].safeSearchAnnotation;
-  const Likelihood = Vision.types.Likelihood;
-  if (Likelihood[safeSearchResult.adult] >= Likelihood.LIKELY ||
-      Likelihood[safeSearchResult.violence] >= Likelihood.LIKELY) {
-    console.log('The image', object.name, 'has been detected as inappropriate.');
-    return blurImage(object.name);
-  }
-  console.log('The image', object.name, 'has been detected as OK.');
-});
+      // Check the image content using the Cloud Vision API.
+      const batchAnnotateImagesResponse = await vision.safeSearchDetection(image);
+      const safeSearchResult = batchAnnotateImagesResponse[0].safeSearchAnnotation;
+      const Likelihood = Vision.types.Likelihood;
+      if (Likelihood[safeSearchResult.adult] >= Likelihood.LIKELY ||
+          Likelihood[safeSearchResult.violence] >= Likelihood.LIKELY) {
+        console.log('The image', object.name, 'has been detected as inappropriate.');
+        return blurImage(object.name);
+      }
+      console.log('The image', object.name, 'has been detected as OK.');
+    });
 
 // Blurs the given image located in the given bucket using ImageMagick.
 async function blurImage(filePath) {
