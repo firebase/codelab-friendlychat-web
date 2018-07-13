@@ -97,7 +97,7 @@ exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCr
       };
 
       // Get the list of device tokens.
-      const allTokens = admin.database().ref('fcmTokens').once('value');
+      const allTokens = await admin.database().ref('fcmTokens').once('value');
       if (allTokens.exists()) {
         // Listing all device tokens to send a notification to.
         const tokens = Object.keys(allTokens.val());
