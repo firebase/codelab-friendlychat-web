@@ -36,7 +36,15 @@ function initFirebaseAuth() {
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
-  return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
+  var url = firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
+  return addSizeToGoogleProfilePic(url);
+}
+
+function addSizeToGoogleProfilePic(url) {
+  if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
+    return url + '?sz=150';
+  }
+  return url;
 }
 
 // Returns the signed-in user's display name.
@@ -240,7 +248,7 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
     messageListElement.appendChild(div);
   }
   if (picUrl) {
-    div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
+    div.querySelector('.pic').style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
   }
   div.querySelector('.name').textContent = name;
   var messageElement = div.querySelector('.message');
