@@ -6,13 +6,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "./",
-    "ignore": [
-      "firebase.json",
-      "database-rules.json",
-      "storage.rules",
-      "functions"
-    ],
+    "public": "./public",
     "headers": [{
       "source" : "**/*.@(js|html)",
       "headers" : [ {
