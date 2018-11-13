@@ -225,6 +225,13 @@ var MESSAGE_TEMPLATE =
       '<div class="name"></div>' +
     '</div>';
 
+function addSizeToGoogleProfilePic(url) {
+  if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
+    return url + '?sz=150';
+  }
+  return url;
+}
+
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
@@ -240,7 +247,7 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
     messageListElement.appendChild(div);
   }
   if (picUrl) {
-    div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
+    div.querySelector('.pic').style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
   }
   div.querySelector('.name').textContent = name;
   var messageElement = div.querySelector('.message');
