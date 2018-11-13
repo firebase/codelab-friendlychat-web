@@ -36,15 +36,7 @@ function initFirebaseAuth() {
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
-  var url = firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
-  return addSizeToGoogleProfilePic(url);
-}
-
-function addSizeToGoogleProfilePic(url) {
-  if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
-    return url + '?sz=150';
-  }
-  return url;
+  return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
 }
 
 // Returns the signed-in user's display name.
@@ -232,6 +224,13 @@ var MESSAGE_TEMPLATE =
       '<div class="message"></div>' +
       '<div class="name"></div>' +
     '</div>';
+
+function addSizeToGoogleProfilePic(url) {
+  if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
+    return url + '?sz=150';
+  }
+  return url;
+}
 
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
