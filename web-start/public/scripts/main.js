@@ -18,41 +18,71 @@
 // Signs-in Friendly Chat.
 function signIn() {
   // TODO 1: Sign in Firebase with credential from the Google user.
+  //Sign into Firebase using popup auth & Google as the identity provider.
+  var provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider);
 }
 
 // Signs-out of Friendly Chat.
 function signOut() {
   // TODO 2: Sign out of Firebase.
+  //Sign out of Firebase
+  firebase.auth().signOut();
 }
 
 // Initiate firebase auth.
 function initFirebaseAuth() {
   // TODO 3: Initialize Firebase.
+  //Listen to auth state changes
+  // 상태 바뀌면 UI 도 변화를 주거나 할 수 있도록
+  firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
-  // TODO 4: Return the user's profile pic URL.
+  return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
 }
 
 // Returns the signed-in user's display name.
 function getUserName() {
-  // TODO 5: Return the user's display name.
+  return firebase.auth().currentUser.displayName;
+}
+
+// 사용자가 메세지를 보낸 시간을 반환 //added by Haeyoon
+function getTimeStamp(){
+  return firebase.database.ServerValue.TIMESTAMP;
 }
 
 // Returns true if a user is signed-in.
 function isUserSignedIn() {
-  // TODO 6: Return true if a user is signed-in.
+  return !!firebase.auth().currentUser;
 }
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   // TODO 7: Load and listens for new messages.
+  //Loads the last 12 messages and listens for new ones.
+  var callback = function(snap){
+    var data = snap.val();
+    displayMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl, data.timestamp);
+  };
+
+  firebase.database().ref('/messages/').limitToLast(12).on('child_added', callback);
+  firebase.database().ref('/messages/').limitToLast(12).on('child_changed', callback);
 }
 
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
   // TODO 8: Push a new message to Firebase.
+  //Adds a new message entry to the Realtime Database.
+  return firebase.database().ref('/messages/').push({
+    name: getUserName(),
+    text: messageText,
+    profilePicUrl: getProfilePicUrl(),
+    timestamp: getTimeStamp()
+  }).catch(function(error){
+    console.error('Error writing new message to Realtime Database:', error);
+  });
 }
 
 // Saves a new message containing an image in Firebase.
@@ -64,11 +94,31 @@ function saveImageMessage(file) {
 // Saves the messaging device token to the datastore.
 function saveMessagingDeviceToken() {
   // TODO 10: Save the device token in the realtime datastore
+  firebase.messaging().getToken().then(function(currentToken) {
+    if (currentToken) {
+      console.log('Got FCM device token:', currentToken);
+      // Save the device token to the Realtime Database.
+      firebase.database().ref('/fcmTokens').child(currentToken)
+          .set(firebase.auth().currentUser.uid);
+    } else {
+      // Need to request permissions to show notifications.
+      requestNotificationsPermissions();
+    }
+  }).catch(function(error){
+    console.error('Unable to get messaging device token:', error);
+  });
 }
 
 // Requests permissions to show notifications.
 function requestNotificationsPermissions() {
   // TODO 11: Request permissions to send notifications.
+  console.log('Requesting notifications permission...');
+  firebase.messaging().requestPermission().then(function() {
+    // Notification permission granted.
+    saveMessagingDeviceToken();
+  }).catch(function(error) {
+    console.error('Unable to get permission to notify.', error);
+  });
 }
 
 // Triggered when a file is selected via the media picker.
@@ -169,19 +219,11 @@ var MESSAGE_TEMPLATE =
       '<div class="name"></div>' +
     '</div>';
 
-// Adds a size to Google Profile pics URLs.
-function addSizeToGoogleProfilePic(url) {
-  if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
-    return url + '?sz=150';
-  }
-  return url;
-}
-
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
 // Displays a Message in the UI.
-function displayMessage(key, name, text, picUrl, imageUrl) {
+function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   var div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -192,10 +234,40 @@ function displayMessage(key, name, text, picUrl, imageUrl) {
     messageListElement.appendChild(div);
   }
   if (picUrl) {
-    div.querySelector('.pic').style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
+    div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
   }
-  div.querySelector('.name').textContent = name;
+
+  //덧붙인 코드
+  var myDate = new Date(timestamp);
+  var dateParts = myDate.toString().split(' ');
+  var hourmin = dateParts[4].split(':',2);
+
+  var userNum;
+  if(name == "조해윤"){
+    userNum = 1;
+  }else{
+    userNum = 2;
+  }
+
+  //commit test
+  //commit test
+
+  var usersRef = firebase.database().ref('/users/'+userNum);
+  var location;
+
+  function callback(data){
+    location = data.val();
+  }
+  usersRef.once('value', function(data, callback){
+    location = console.log(data.val());
+
+  });
+
+
+
+  div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] + " " + location +" 에서 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
   var messageElement = div.querySelector('.message');
+
   if (text) { // If the message is text.
     messageElement.textContent = text;
     // Replace all line breaks by <br>.
