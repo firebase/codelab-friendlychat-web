@@ -1,4 +1,6 @@
-# Firebase Codelab: FriendlyChat
+# Firebase Codelab: FriendlyChat modified for 2018 OpenSW team project
+
+
 
 This is the source code for the Firebase FriendlyChat codelab. It includes start and end versions of the
 code for Web and Cloud Functions. To get started open the codelab instructions:
