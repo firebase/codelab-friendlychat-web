@@ -1,4 +1,4 @@
-# Firebase Codelab: FriendlyChat modified for 2018 OpenSW team project
+# Firebase Codelab: modified for 2018 OpenSW team project
 
 
 
