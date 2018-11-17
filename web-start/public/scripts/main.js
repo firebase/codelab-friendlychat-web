@@ -249,9 +249,6 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     userNum = 2;
   }
 
-  //commit test
-  //commit test
-
   var usersRef = firebase.database().ref('/users/'+userNum);
   var location;
 
@@ -344,3 +341,15 @@ initFirebaseAuth();
 
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
+
+
+//TimeZone 받아오는 코드 추가 부분
+function getLocation() { //버튼 눌리면 실행되는 함수
+  var obj = document.getElementById("mySelect");
+  var location = obj.options[obj.selectedIndex].text; //location에 텍스트 형태로 선택 된 타임존 저장되어있음
+
+  /*location변수에 저장된 정보를 파이어베이스 데이터베이스에 입력해야함*/
+  /*저장 할 때 입력 값을 적절하게 parse해서 타임존 API 사용에 용이하게 저장해야함*/
+
+  alert("Confirmed : " + location);
+}
