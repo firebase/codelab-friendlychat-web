@@ -71,14 +71,14 @@ main, #messages-card {
 #message-background-daytime{
   width:262px;
   height:150px;
-  background-iage:url(daytime.png);
+  background-image:url(daytime.png);
    }
 
 /*밤 배경*/
 #message-background-night{
   width:262px;
   height:150px;
-  background-iage:url(night.png);
+  background-image:url(night.png);
    }
 
 .message-container:first-of-type {
