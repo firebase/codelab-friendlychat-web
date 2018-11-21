@@ -66,6 +66,21 @@ main, #messages-card {
 #message-filler {
   flex-grow: 1;
 }
+
+/*낮 배경*/
+#message-background-daytime{
+  width:262px;
+  height:150px;
+  background-iage:url(daytime.png);
+   }
+
+/*밤 배경*/
+#message-background-night{
+  width:262px;
+  height:150px;
+  background-iage:url(night.png);
+   }
+
 .message-container:first-of-type {
   border-top-width: 0;
 }
