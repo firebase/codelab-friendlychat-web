@@ -1,8 +1,4 @@
-/1771005 °íÀ¯Á¤
-//Yeo
-//1771030¼Õ¼öÇö
-//1771058 È«¼ö¹Î
-/**
+ï»¿/**
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,6 +61,21 @@ main, #messages-card {
 #message-filler {
   flex-grow: 1;
 }
+
+/*ë‚® ë°°ê²½*/
+#message-background-daytime{
+  width:262px;
+  height:150px;
+  background-image:url(daytime.png);
+   }
+
+/*ë°¤ ë°°ê²½*/
+#message-background-night{
+  width:262px;
+  height:150px;
+  background-image:url(night.png);
+   }
+
 .message-container:first-of-type {
   border-top-width: 0;
 }
