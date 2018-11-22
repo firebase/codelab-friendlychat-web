@@ -1,4 +1,4 @@
-# Firebase Codelab: modified for 2018 OpenSW team project
+# Firebase Codelab: Friendly Chat 기반 오픈SW 프로젝트 JellyTalk
 
 This is a web chat modified from FriendlyChat for a team project
 
