@@ -21,8 +21,22 @@
 function signIn() {
   // TODO 1: Sign in Firebase with credential from the Google user.
   //Sign into Firebase using popup auth & Google as the identity provider.
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider);
+
+  /**유저 로그인 프로세스 진행 시 2명이 이미 해당 웹사이트에 로그인 하면 더이상 로그인 할 수 없도록 설정 */
+  var ref = firebase.database().ref('/users/');
+  ref.once("value")
+  .then(function(snapshot){
+    var test = snapshot.numChildren();
+    if(test!=2){
+      //현재 사용자 수가 두명이 아니라면 로그인을 진행할 수 있다.
+      var provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider);
+    }
+    else{
+      //이미 2명의 유저가 로그인 되어있으므로, 팝업창으로 알리고 로그인을 수행하지 않는다.
+      alert("Maximum user logged in");
+    }
+  });
 }
 
 // Signs-out of Friendly Chat.
@@ -355,6 +369,7 @@ function register() { //confirm 버튼 눌리면 실행되는 함수
   var offset = obj.value; //value 부분 값, 즉 GMT 기준으로 +-시간이 저장되어있음
 
   alert("Confirmed : " + location);
+ 
 
   /* 사용자 등록 & 해당 사용자의 현재 도시 및 GMT 기준 시간 offset 저장 */
   firebase.database().ref('/users/' + getUserName()).set({
