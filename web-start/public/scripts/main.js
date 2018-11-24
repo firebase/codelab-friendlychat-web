@@ -345,13 +345,21 @@ initFirebaseAuth();
 loadMessages();
 
 
+
 //TimeZone 받아오는 코드 추가 부분
-function getLocation() { //버튼 눌리면 실행되는 함수
+function getLocation() { //confirm 버튼 눌리면 실행되는 함수
   var obj = document.getElementById("mySelect");
   var location = obj.options[obj.selectedIndex].text; //location에 텍스트 형태로 선택 된 타임존 저장되어있음
+  var offset = obj.value; //value 부분 값, 즉 GMT 기준으로 +-시간이 저장되어있음
 
-  /*location변수에 저장된 정보를 파이어베이스 데이터베이스에 입력해야함*/
-  /*저장 할 때 입력 값을 적절하게 parse해서 타임존 API 사용에 용이하게 저장해야함*/
-
+  /*offset을 파이어베이스 데이터베이스에 입력해야함*/
+  
   alert("Confirmed : " + location);
+
+  return firebase.database().ref('/timezone/').push({
+    loc: "location",
+    off: "offset"
+  }).catch(function(error){
+    console.error('Error writing location and offset to Realtime Database:', error);
+  });
 }
