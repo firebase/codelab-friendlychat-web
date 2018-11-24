@@ -50,9 +50,9 @@ function getUserName() {
   return firebase.auth().currentUser.displayName;
 }
 
-// 사용자가 메세지를 보낸 시간을 반환 //added by Haeyoon
+// 사용자가 메세지를 보낸 시간을 반환 
 function getTimeStamp(){
-  return firebase.database.ServerValue.TIMESTAMP;
+  return firebase.database.ServerValue.TIMESTAMP; //한국 시간 기준임
 }
 
 // Returns true if a user is signed-in.
@@ -357,8 +357,9 @@ function getLocation() { //confirm 버튼 눌리면 실행되는 함수
   alert("Confirmed : " + location);
 
   return firebase.database().ref('/timezone/').push({
-    loc: "location",
-    off: "offset"
+    name: getUserName(),
+    location: location,
+    offset: offset
   }).catch(function(error){
     console.error('Error writing location and offset to Realtime Database:', error);
   });
