@@ -23,12 +23,17 @@ function signIn() {
   //Sign into Firebase using popup auth & Google as the identity provider.
   var provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider);
+  addUser();
 }
 
 // Signs-out of Friendly Chat.
 function signOut() {
   // TODO 2: Sign out of Firebase.
   //Sign out of Firebase
+  
+  /* 사용자가 로그아웃하면 정식 이용자 목록에서 삭제한다 */
+  deleteUser();
+
   firebase.auth().signOut();
 }
 
@@ -344,8 +349,6 @@ initFirebaseAuth();
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
 
-
-
 //TimeZone 받아오는 코드 추가 부분
 function getLocation() { //confirm 버튼 눌리면 실행되는 함수
   var obj = document.getElementById("mySelect");
@@ -363,6 +366,25 @@ function getLocation() { //confirm 버튼 눌리면 실행되는 함수
     console.error('Error writing location and offset to Realtime Database:', error);
   });
 
-  return 0;
+  /* 현재 도시를 confirm 하면 정식 사용자로 등록된다 */
+  addUser();
+}
 
+
+/* users 데이터베이스에서 사용자 목록 삭제 */
+function deleteUser(){
+  firebase.database().ref('/users/' + getUserName()).remove()
+    .catch(function(error){
+    console.error('Error deleting user information from Realtime Database:', error);
+  });
+}
+
+/* users 데이터베이스에 사용자 목록 추가 */
+/* 정식 사용자 등록 */
+function addUser(){
+  firebase.database().ref('/users/' + getUserName()).set({
+    profilePicUrl: "difuehw"
+  }).catch(function(error){
+    console.error('Error writing user information to Realtime Database:', error);
+  });
 }
