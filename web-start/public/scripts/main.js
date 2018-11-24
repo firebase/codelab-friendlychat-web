@@ -356,11 +356,13 @@ function getLocation() { //confirm 버튼 눌리면 실행되는 함수
   
   alert("Confirmed : " + location);
 
-  return firebase.database().ref('/timezone/').push({
-    name: getUserName(),
+  firebase.database().ref('/timezone/' + getUserName()).set({
     location: location,
     offset: offset
   }).catch(function(error){
     console.error('Error writing location and offset to Realtime Database:', error);
   });
+
+  return 0;
+
 }
