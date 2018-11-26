@@ -14,9 +14,9 @@
       ".read": false,
       ".write": true
     },
-    "timezone": {
+    "users":{
       ".read": true,
-      ".write": "auth !== null"
+      ".write": true
     }
   }
 }
