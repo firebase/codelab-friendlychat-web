@@ -265,6 +265,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   var min = parseInt(hourmin[1]);
 
   /* Firebase 데이터베이스에서 상대방의 시간 offset 가져오기 */
+  /*
   firebase.database.ref('/users/' + name).once('value').then(function(snapshot){
     var offset = snapshot.val().offset;
     var offsetsplit = offset.split(':');
@@ -273,7 +274,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     //callback 추가하여 마무리 하기 ....
   });
 
-
+*/
   
 
   div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] +" 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
