@@ -260,28 +260,23 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   var myDate = new Date(timestamp);
   var dateParts = myDate.toString().split(' ');
   var hourmin = dateParts[4].split(':',2);
+  /* 시, 분을 정수로 저장한 변수*/
+  var hour = parseInt(hourmin[0]);
+  var min = parseInt(hourmin[1]);
 
-  var userNum;
-  if(name == "조해윤"){
-    userNum = 1;
-  }else{
-    userNum = 2;
-  }
-
-  var usersRef = firebase.database().ref('/users/'+userNum);
-  var location;
-
-  function callback(data){
-    location = data.val();
-  }
-  usersRef.once('value', function(data, callback){
-    location = console.log(data.val());
-
+  /* Firebase 데이터베이스에서 상대방의 시간 offset 가져오기 */
+  firebase.database.ref('/users/' + name).once('value').then(function(snapshot){
+    var offset = snapshot.val().offset;
+    var offsetsplit = offset.split(':');
+    var foreignHour = parseInt(offsetsplit[0]);
+    var foreignMin = parseInt(offsetsplit[1]);
+    //callback 추가하여 마무리 하기 ....
   });
 
 
+  
 
-  div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] + " " + location +" 에서 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
+  div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] +" 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
   var messageElement = div.querySelector('.message');
 
   if (text) { // If the message is text.
