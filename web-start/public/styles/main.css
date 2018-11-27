@@ -67,14 +67,14 @@ main, #messages-card {
 #message-background-daytime{
   width:455px;
   height:385px;
-  background-image:url(daytime.png);
+  background-image:url(https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/daytime.png?alt=media&token=d259c722-c3e6-4ac6-9745-06ecd12808b5);
    }
 
 /*밤 배경*/
 #message-background-night{
-  width:262px;
-  height:150px;
-  background-image:url(night.png);
+  width:455px;
+  height:385px;
+  background-image:url(https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/night.png?alt=media&token=9d0289af-274c-49b0-aef0-4b15ab4bcd24);
    }
 
 .message-container:first-of-type {
