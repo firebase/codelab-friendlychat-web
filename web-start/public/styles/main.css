@@ -65,15 +65,15 @@ main, #messages-card {
 
 /*낮 배경*/
 #message-background-daytime{
-  width:262px;
-  height:150px;
-  background-image:url(https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/daytime.png?alt=media&token=e375dab2-a1b8-4396-ab9e-471853c525f8);
+  width:455px;
+  height:385px;
+  background-image:url(daytime.png);
    }
 
 /*밤 배경*/
 #message-background-night{
-  width:262px;
-  height:150px;
+  width:455px;
+  height:385px;
   background-image:url(night.png);
    }
 
