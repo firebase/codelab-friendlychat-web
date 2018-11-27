@@ -1,5 +1,4 @@
-﻿//
-/**
+﻿/**
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,7 +67,7 @@ main, #messages-card {
   width:262px;
   height:150px;
   background-image:url(https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/daytime.png?alt=media&token=e375dab2-a1b8-4396-ab9e-471853c525f8);
-   }
+  }
 
 /*밤 배경*/
 #message-background-night{
@@ -117,6 +116,7 @@ main, #messages-card {
   font-size: 12px;
   box-sizing: border-box;
 }
+
 #message-form {
   display: flex;
   flex-direction: row;
