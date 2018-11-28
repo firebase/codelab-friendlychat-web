@@ -2,20 +2,20 @@
   "rules": {
     "messages": {
       ".read": true,
-      // Users can only write messages if they are authenticated.
       ".write": "auth !== null",
       "$messageId": {
-        // The name has to be the real display name.
         ".validate": "newData.child('name').val() === auth.token.name",
         "text": {
-          // The text has to be less than 300 char.
           ".validate": "newData.isString() && newData.val().length < 300"
         }
       }
     },
     "fcmTokens": {
-      // User can write their tokens to the database but not read the list of tokens.
       ".read": false,
+      ".write": true
+    },
+    "users":{
+      ".read": true,
       ".write": true
     }
   }

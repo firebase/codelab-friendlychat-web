@@ -1,3 +1,5 @@
+//1515061 조해윤
+
 /**
  * Copyright 2018 Google Inc. All Rights Reserved.
  *
@@ -19,14 +21,31 @@
 function signIn() {
   // TODO 1: Sign in Firebase with credential from the Google user.
   //Sign into Firebase using popup auth & Google as the identity provider.
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider);
+
+  /**유저 로그인 프로세스 진행 시 2명이 이미 해당 웹사이트에 로그인 하면 더이상 로그인 할 수 없도록 설정 */
+  var ref = firebase.database().ref('/users/');
+  ref.once("value")
+  .then(function(snapshot){
+    var test = snapshot.numChildren();
+    if(test!=2){
+      //현재 사용자 수가 두명이 아니라면 로그인을 진행할 수 있다.
+      var provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider);
+    }
+    else{
+      //이미 2명의 유저가 로그인 되어있으므로, 팝업창으로 알리고 로그인을 수행하지 않는다.
+      alert("Maximum user logged in");
+    }
+  });
 }
 
 // Signs-out of Friendly Chat.
 function signOut() {
   // TODO 2: Sign out of Firebase.
   //Sign out of Firebase
+  
+  /* 사용자가 로그아웃 버튼을 누르면 정식 이용자 목록에서 삭제하고 로그아웃 처리를 해준다 */
+  deleteUser();
   firebase.auth().signOut();
 }
 
@@ -48,9 +67,9 @@ function getUserName() {
   return firebase.auth().currentUser.displayName;
 }
 
-// 사용자가 메세지를 보낸 시간을 반환 //added by Haeyoon
+// 사용자가 메세지를 보낸 시간을 반환 
 function getTimeStamp(){
-  return firebase.database.ServerValue.TIMESTAMP;
+  return firebase.database.ServerValue.TIMESTAMP; //한국 시간 기준임
 }
 
 // Returns true if a user is signed-in.
@@ -241,28 +260,24 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   var myDate = new Date(timestamp);
   var dateParts = myDate.toString().split(' ');
   var hourmin = dateParts[4].split(':',2);
+  /* 시, 분을 정수로 저장한 변수*/
+  var hour = parseInt(hourmin[0]);
+  var min = parseInt(hourmin[1]);
 
-  var userNum;
-  if(name == "조해윤"){
-    userNum = 1;
-  }else{
-    userNum = 2;
-  }
-
-  var usersRef = firebase.database().ref('/users/'+userNum);
-  var location;
-
-  function callback(data){
-    location = data.val();
-  }
-  usersRef.once('value', function(data, callback){
-    location = console.log(data.val());
-
+  /* Firebase 데이터베이스에서 상대방의 시간 offset 가져오기 */
+  /*
+  firebase.database.ref('/users/' + name).once('value').then(function(snapshot){
+    var offset = snapshot.val().offset;
+    var offsetsplit = offset.split(':');
+    var foreignHour = parseInt(offsetsplit[0]);
+    var foreignMin = parseInt(offsetsplit[1]);
+    //callback 추가하여 마무리 하기 ....
   });
 
+*/
+  
 
-
-  div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] + " " + location +" 에서 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
+  div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] +" 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
   var messageElement = div.querySelector('.message');
 
   if (text) { // If the message is text.
@@ -342,14 +357,30 @@ initFirebaseAuth();
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
 
-
 //TimeZone 받아오는 코드 추가 부분
-function getLocation() { //버튼 눌리면 실행되는 함수
+//사용자 목록도 추가한다.
+function register() { //confirm 버튼 눌리면 실행되는 함수
   var obj = document.getElementById("mySelect");
   var location = obj.options[obj.selectedIndex].text; //location에 텍스트 형태로 선택 된 타임존 저장되어있음
-
-  /*location변수에 저장된 정보를 파이어베이스 데이터베이스에 입력해야함*/
-  /*저장 할 때 입력 값을 적절하게 parse해서 타임존 API 사용에 용이하게 저장해야함*/
+  var offset = obj.value; //value 부분 값, 즉 GMT 기준으로 +-시간이 저장되어있음
 
   alert("Confirmed : " + location);
+ 
+
+  /* 사용자 등록 & 해당 사용자의 현재 도시 및 GMT 기준 시간 offset 저장 */
+  firebase.database().ref('/users/' + getUserName()).set({
+    location: location,
+    offset: offset
+  }).catch(function(error){
+    console.error('Error writing user information to Realtime Database:', error);
+  });
+}
+
+
+/* users 데이터베이스에서 사용자 목록 삭제 */
+function deleteUser(){
+  firebase.database().ref('/users/' + getUserName()).remove()
+    .catch(function(error){
+    console.error('Error deleting user information from Realtime Database:', error);
+  });
 }
