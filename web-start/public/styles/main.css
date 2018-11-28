@@ -67,7 +67,7 @@ main, #messages-card {
   width:455px;
   height:385px;
   background-image:url(daytime.png);
-   }
+  }
 
 /*밤 배경*/
 #message-background-night{
