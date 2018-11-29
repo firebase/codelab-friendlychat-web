@@ -236,15 +236,24 @@ function addSizeToGoogleProfilePic(url) {
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
+// Delete a Message from the UI.
+function deleteMessage(id) {
+  var div = document.getElementById(id);
+  // If an element for that message exists we delete it.
+  if (div) {
+    div.parentNode.removeChild(div);
+  }
+}
+
 // Displays a Message in the UI.
-function displayMessage(key, name, text, picUrl, imageUrl) {
-  var div = document.getElementById(key);
+function displayMessage(id, name, text, picUrl, imageUrl) {
+  var div = document.getElementById(id);
   // If an element for that message does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
     container.innerHTML = MESSAGE_TEMPLATE;
     div = container.firstChild;
-    div.setAttribute('id', key);
+    div.setAttribute('id', id);
     messageListElement.appendChild(div);
   }
   if (picUrl) {
