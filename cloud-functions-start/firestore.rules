@@ -1,0 +1,24 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Messages:
+    //   - Anyone can read.
+    //   - Authenticated users can add new messages.
+    //   - Validation: Check name is same as auth token and text length below 300 char.
+    //   - Deletes and updates are not allowed.
+    match /messages/{messageId} {
+      allow read;
+      allow create: if request.auth != null
+                    && request.resource.data.name == request.auth.token.name
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() <= 300;
+      allow update, delete: if false;
+    }
+    // FCM Tokens:
+    //   - Anyone can write their token.
+    //   - Reading list of tokens is not allowed.
+    match /fcmTokens/{token} {
+      allow read: if false;
+      allow write;
+    }
+  }
+}
