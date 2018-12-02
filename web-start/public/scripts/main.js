@@ -268,6 +268,57 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   /* Firebase 데이터베이스에서 본인 시간 offset을 가져오고 계산 */
   var offesetRef = firebase.database().ref('/users/'+name);
   var userOffset;
+  var otherOffset;
+
+  /*배열로 user 정보 한꺼번에 다 가져와서 본인과 상대방 시간대 동시에 계산*/
+  firebase.database().ref('/users').on('value', function(snapshot){
+    console.log(snapshotToArray(snapshot));
+    var userinfo= snapshotToArray(snapshot);
+
+    if(userinfo[0].key == name){
+      userOffset=userinfo[0].offset.toString();
+      otherOffset=userinfo[1].offset.toString();
+    }
+    else{
+      userOffset=userinfo[1].offset.toString();
+      otherOffset=userinfo[0].offset.toString;
+    }
+   
+    var uOffsetsplit = userOffset.split(':');
+    var oOffsetsplit = otherOffset.split(':');
+    var uHourOffset = parseInt(uOffsetsplit[0]);
+    var uMinOffset= parseInt(uOffsetsplit[1]);
+    var oHourOffset = parseInt(oOffsetsplit[0]);
+    var oMinOffset = parseInt(oOffsetsplit[1]);
+
+    console.log("GMT 기준 시간:"+hour+":"+min);
+    //myHour의 경우, hourOffset에 앞에 +가 있으면 양수, 없으면 음수로 자동 변환 되기 때문에
+    //그냥 더해주면 되지만, myMin같은 경우에는 알 길이 없으므로, hourOffset값이 양수인지 음수인지에 따라서
+    //덧셈을 할 지 뺄셈을 할지 정해주고 계산을 하면 됩니다.
+
+    /* 시, 분 덧셈 뺄셈 시 시간 기준 프로토콜 추가하기*/
+    /* 시간 계산법 적용해야함 */
+
+    //next milestone
+
+    /* */
+    var myHour = hour + uHourOffset;
+    if(uHourOffset<0) uMinOffset=uMinOffset*(-1);
+    var myMin = min + uMinOffset;
+
+    var otherHour = hour + oHourOffset;
+    if(oHourOffset<0) oMinOffset=oMinOffset*(-1);
+    var otherMin = min + oMinOffset;
+
+    console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin); 
+    console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
+    /* 메세지 시간 표시하는 부분 */
+    div.querySelector('.name').textContent = name + " " + myHour+":"+myMin +" 보냄  "+ otherHour+":"+otherMin+" 받음";
+  }, function(error){
+    console.log("Error: "+error.code);
+  });
+
+/*
   offesetRef.on("value", function(snapshot){
     console.log(snapshot.val().offset); //offset 값이 콘솔에 보여짐 (정상작동)
     userOffset=snapshot.val().offset; //사용자 위치의 offset
@@ -285,12 +336,11 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     var myMin = min + minOffset;
 
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin); //본인 기준은 완료?
-    /* 표시하는 부분 */
     div.querySelector('.name').textContent = name + " " + myHour+":"+myMin +" 보냄";
   }, function(error){
     console.log("Error: " + error.code);
   })
-  
+  */
   //div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] +" 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
   var messageElement = div.querySelector('.message');
 
@@ -398,3 +448,17 @@ function deleteUser(){
     console.error('Error deleting user information from Realtime Database:', error);
   });
 }
+
+/**데이터베이스의 모든 아이템을 배열 형태로 받아오는 함수 */
+function snapshotToArray(snapshot) {
+  var returnArr = [];
+
+  snapshot.forEach(function(childSnapshot) {
+      var item = childSnapshot.val();
+      item.key = childSnapshot.key;
+
+      returnArr.push(item);
+  });
+
+  return returnArr;
+};
