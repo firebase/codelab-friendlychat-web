@@ -43,7 +43,7 @@ function signIn() {
 function signOut() {
   // TODO 2: Sign out of Firebase.
   //Sign out of Firebase
-  
+
   /* 사용자가 로그아웃 버튼을 누르면 정식 이용자 목록에서 삭제하고 로그아웃 처리를 해준다 */
   deleteUser();
   firebase.auth().signOut();
@@ -67,7 +67,7 @@ function getUserName() {
   return firebase.auth().currentUser.displayName;
 }
 
-// 사용자가 메세지를 보낸 시간을 반환 
+// 사용자가 메세지를 보낸 시간을 반환
 function getTimeStamp(){
   return firebase.database.ServerValue.TIMESTAMP; //한국 시간 기준임
 }
@@ -283,7 +283,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
       userOffset=userinfo[1].offset.toString();
       otherOffset=userinfo[0].offset.toString();
     }
-   
+
     var uOffsetsplit = userOffset.split(':');
     var oOffsetsplit = otherOffset.split(':');
     var uHourOffset = parseInt(uOffsetsplit[0]);
@@ -310,7 +310,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     if(oHourOffset<0) oMinOffset=oMinOffset*(-1);
     var otherMin = min + oMinOffset;
 
-    console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin); 
+    console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
     console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
     /* 메세지 시간 표시하는 부분 */
     div.querySelector('.name').textContent = name + " " + myHour+":"+myMin +" 보냄  "+ otherHour+":"+otherMin+" 받음";
@@ -429,7 +429,7 @@ function register() { //confirm 버튼 눌리면 실행되는 함수
   var offset = obj.value; //value 부분 값, 즉 GMT 기준으로 +-시간이 저장되어있음
 
   alert("Confirmed : " + location);
- 
+
 
   /* 사용자 등록 & 해당 사용자의 현재 도시 및 GMT 기준 시간 offset 저장 */
   firebase.database().ref('/users/' + getUserName()).set({
