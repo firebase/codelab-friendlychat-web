@@ -93,8 +93,8 @@ main, #messages-card {
 .message-container .pic {
   background-image: url('/images/profile_placeholder.png');
   background-repeat: no-repeat;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   background-size: 30px;
   border-radius: 20px;
 }
@@ -115,7 +115,9 @@ main, #messages-card {
   font-style: italic;
   font-size: 12px;
   box-sizing: border-box;
+  white-space: pre;
 }
+
 
 #message-form {
   display: flex;
