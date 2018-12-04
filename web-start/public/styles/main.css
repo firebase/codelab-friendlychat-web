@@ -26,6 +26,15 @@ main, #messages-card {
   height: calc(100% - 35px);
   padding-bottom: 0;
 }
+/*밤 배경*/
+#messages-card-container-night {
+  background-image:url(Night.png);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 #messages-card {
   margin-top: 15px;
 }
@@ -64,18 +73,28 @@ main, #messages-card {
 }
 
 /*낮 배경*/
-#message-background-daytime{
-  width:455px;
-  height:385px;
-  background-image:url(daytime.png);
+/* #message-background-daytime{
+ /* width:455px;
+  height:385px;*/
+/*background-image:url(daytime.png);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
    }
+*/
 
 /*밤 배경*/
-#message-background-night{
-  width:455px;
-  height:385px;
-  background-image:url(night.png);
+/* #message-background-night{
+  /* width:455px;
+  height:385px;*/
+/*  background-image:url(night.png);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
    }
+*/
 
 .message-container:first-of-type {
   border-top-width: 0;
