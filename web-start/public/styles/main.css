@@ -35,6 +35,15 @@ main, #messages-card {
   background-size: cover;
 }
 
+/*낮 배경*/
+#messages-card-container-daytime {
+  background-image:url(daytime.png);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 #messages-card {
   margin-top: 15px;
 }
