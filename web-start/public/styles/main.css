@@ -37,7 +37,7 @@ main, #messages-card {
 
 /*낮 배경*/
 #messages-card-container-daytime {
-  background-image:url(daytime.png);
+  background-image:url("https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/daytime.png?alt=media&token=74ec09cb-ec02-45d6-8baf-8bb85c9a6603");
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
