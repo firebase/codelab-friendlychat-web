@@ -43,7 +43,7 @@ function signIn() {
 function signOut() {
   // TODO 2: Sign out of Firebase.
   //Sign out of Firebase
-  
+
   /* 사용자가 로그아웃 버튼을 누르면 정식 이용자 목록에서 삭제하고 로그아웃 처리를 해준다 */
   deleteUser();
   firebase.auth().signOut();
@@ -67,7 +67,7 @@ function getUserName() {
   return firebase.auth().currentUser.displayName;
 }
 
-// 사용자가 메세지를 보낸 시간을 반환 
+// 사용자가 메세지를 보낸 시간을 반환
 function getTimeStamp(){
   return firebase.database.ServerValue.TIMESTAMP; //한국 시간 기준임
 }
@@ -260,28 +260,88 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   var myDate = new Date(timestamp);
   var dateParts = myDate.toString().split(' ');
   var hourmin = dateParts[4].split(':',2);
+  /* GMT 00기준 시, 분을 정수로 저장한 변수*/
+  /*서버 시간이 한국 기준으로 되어있으므로, GMT 기준으로 변경하기 위해서 9시간을 빼줌*/
+  var hour = parseInt(hourmin[0]) - 9;
+  var min = parseInt(hourmin[1]);
 
-  var userNum;
-  if(name == "조해윤"){
-    userNum = 1;
-  }else{
-    userNum = 2;
-  }
+  /* Firebase 데이터베이스에서 본인 시간 offset을 가져오고 계산 */
+  var offesetRef = firebase.database().ref('/users/'+name);
+  var userOffset;
+  var otherOffset;
 
-  var usersRef = firebase.database().ref('/users/'+userNum);
-  var location;
+  /*배열로 user 정보 한꺼번에 다 가져와서 본인과 상대방 시간대 동시에 계산*/
+  firebase.database().ref('/users').on('value', function(snapshot){
+    console.log(snapshotToArray(snapshot));
+    var userinfo= snapshotToArray(snapshot);
 
-  function callback(data){
-    location = data.val();
-  }
-  usersRef.once('value', function(data, callback){
-    location = console.log(data.val());
+    if(userinfo[0].key == name){
+      userOffset=userinfo[0].offset.toString();
+      otherOffset=userinfo[1].offset.toString();
+    }
+    else{
+      userOffset=userinfo[1].offset.toString();
+      otherOffset=userinfo[0].offset.toString();
+    }
 
+    var uOffsetsplit = userOffset.split(':');
+    var oOffsetsplit = otherOffset.split(':');
+    var uHourOffset = parseInt(uOffsetsplit[0]);
+    var uMinOffset= parseInt(uOffsetsplit[1]);
+    var oHourOffset = parseInt(oOffsetsplit[0]);
+    var oMinOffset = parseInt(oOffsetsplit[1]);
+
+    console.log("GMT 기준 시간:"+hour+":"+min);
+    //myHour의 경우, hourOffset에 앞에 +가 있으면 양수, 없으면 음수로 자동 변환 되기 때문에
+    //그냥 더해주면 되지만, myMin같은 경우에는 알 길이 없으므로, hourOffset값이 양수인지 음수인지에 따라서
+    //덧셈을 할 지 뺄셈을 할지 정해주고 계산을 하면 됩니다.
+
+    /* 시, 분 덧셈 뺄셈 시 시간 기준 프로토콜 추가하기*/
+    /* 시간 계산법 적용해야함 */
+
+    //next milestone
+
+    /* */
+    var myHour = hour + uHourOffset;
+    if(uHourOffset<0) uMinOffset=uMinOffset*(-1);
+    var myMin = min + uMinOffset;
+
+    var otherHour = hour + oHourOffset;
+    if(oHourOffset<0) oMinOffset=oMinOffset*(-1);
+    var otherMin = min + oMinOffset;
+
+    console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
+    console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
+    /* 메세지 시간 표시하는 부분 */
+    div.querySelector('.name').textContent = name + " " + myHour+":"+myMin +" 보냄  "+ otherHour+":"+otherMin+" 받음";
+  }, function(error){
+    console.log("Error: "+error.code);
   });
 
+/*
+  offesetRef.on("value", function(snapshot){
+    console.log(snapshot.val().offset); //offset 값이 콘솔에 보여짐 (정상작동)
+    userOffset=snapshot.val().offset; //사용자 위치의 offset
 
+    var offsetsplit = userOffset.split(':');
+    var hourOffset = parseInt(offsetsplit[0]);
+    var minOffset= parseInt(offsetsplit[1]);
 
-  div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] + " " + location +" 에서 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
+    console.log("GMT 기준 시간:"+hour+":"+min);
+    //myHour의 경우, hourOffset에 앞에 +가 있으면 양수, 없으면 음수로 자동 변환 되기 때문에
+    //그냥 더해주면 되지만, myMin같은 경우에는 알 길이 없으므로, hourOffset값이 양수인지 음수인지에 따라서
+    //덧셈을 할 지 뺄셈을 할지 정해주고 계산을 하면 됩니다.
+    var myHour = hour + hourOffset;
+    if(hourOffset<0) minOffset=minOffset*(-1);
+    var myMin = min + minOffset;
+
+    console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin); //본인 기준은 완료?
+    div.querySelector('.name').textContent = name + " " + myHour+":"+myMin +" 보냄";
+  }, function(error){
+    console.log("Error: " + error.code);
+  })
+  */
+  //div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] +" 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
   var messageElement = div.querySelector('.message');
 
   if (text) { // If the message is text.
@@ -369,7 +429,7 @@ function register() { //confirm 버튼 눌리면 실행되는 함수
   var offset = obj.value; //value 부분 값, 즉 GMT 기준으로 +-시간이 저장되어있음
 
   alert("Confirmed : " + location);
- 
+
 
   /* 사용자 등록 & 해당 사용자의 현재 도시 및 GMT 기준 시간 offset 저장 */
   firebase.database().ref('/users/' + getUserName()).set({
@@ -387,4 +447,54 @@ function deleteUser(){
     .catch(function(error){
     console.error('Error deleting user information from Realtime Database:', error);
   });
+}
+
+/**데이터베이스의 모든 아이템을 배열 형태로 받아오는 함수 */
+function snapshotToArray(snapshot) {
+  var returnArr = [];
+
+  snapshot.forEach(function(childSnapshot) {
+      var item = childSnapshot.val();
+      item.key = childSnapshot.key;
+
+      returnArr.push(item);
+  });
+
+  return returnArr;
+};
+
+/* 상대방이 밤시간일때 메시지 보내지 않도록 팝업창 띄우기*/
+function isOtherSleeping(){
+  var isSleeping = false; //상대방 시간이 22시 이후 : true, 22시 이전 : False
+  var otherOffset;
+  var myname = getUserName();
+  var serverTime = new Date(getTimeStamp());
+  var serverTimeSplit = serverTime.toString().split(' ');
+  var serverHourMin = serverTimeSplit[4].split(':',2);
+  var gmtHour = parseInt(serverHourMin[0]) - 9;
+
+  var ref = if(firebase.database().ref('/users/');
+  ref.on('value', function(snapshot){
+    console.log(snapshotToArray(snapshot));
+    var userinfo = snapshotToArray(snapshot);
+
+    if(userinfo[0].key != myname){
+      otherOffset = userinfo[1].offset.toString();
+    }
+    else{
+      otherOffset = userinfo[0].offset.toString();
+    }
+
+    var otherOffsetSplit = otherofffset.split(':');
+    var otherHourOffset = parseInt(otherOffsetSplit[0]);
+
+    var otherHour = gmtHour + otherHourOffset;
+
+    
+    // 데이터베이스 작동 오류확인 후 추가계획
+    if(otherHour)
+  });
+
+  return isSleeping;
+
 }
