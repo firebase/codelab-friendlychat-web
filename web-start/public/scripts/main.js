@@ -281,7 +281,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     }
     else{
       userOffset=userinfo[1].offset.toString();
-      otherOffset=userinfo[0].offset.toString;
+      otherOffset=userinfo[0].offset.toString();
     }
    
     var uOffsetsplit = userOffset.split(':');
