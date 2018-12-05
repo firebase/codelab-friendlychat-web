@@ -28,10 +28,10 @@ main, #messages-card {
 /*밤 배경*/
 #messages-card-container-night {
   background-image:url("https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/night.png?alt=media&token=da31233a-2543-46ad-a5e2-ec6e993b07a8");
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+  background-repeat: repeat;
+  background-size: 100%;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /*낮 배경*/
@@ -135,21 +135,15 @@ main, #messages-card {
 .message-container .message {
   display: table-cell;
   width: calc(100% - 40px);
-  padding: 7px 10px 5px 10px;
+  padding: 5px 0 5px 10px;
   position: relative;
-  left: 10px;
-  top:1px;
-  background-repeat: no-repeat;
-  background-color:#e0e0e0;
-  border-radius: 40px 40px 40px 5px;
-  color:black;
-  font-size: 12px;
-  font-family: 'Gamja Flower', cursive;
+   left: 4px;
+   top:1px;
 }
 .message-container .name {
   display: inline;
   width: 90%;
-  padding-left: 10px;
+  padding-left: 0px;
   color: #bbb;
   font-style: italic;
   font-size: 11px;
@@ -158,16 +152,29 @@ main, #messages-card {
   position: relative;
   top: 4px;
 }
-.message-container .name1{
+.message-container .name3 {
   display: inline;
-  width: 10%;
-  padding-left: 1px;
+  width: 90%;
+  padding-left: 0px;
   color: #bbb;
-  font-style: normal;
+  font-style: italic;
   font-size: 11px;
   box-sizing: border-box;
+  white-space: pre;
   position: relative;
-  bottom:13px;
+  top: 4px;
+}
+.message-container .name1 {
+  display: inline;
+  width: 10%;
+  padding-left: 0px;
+  color: #bbb;
+  font-style: italic;
+  font-size: 11px;
+  box-sizing: border-box;
+
+  position: relative;
+  top: 4px;
 }
 
 
