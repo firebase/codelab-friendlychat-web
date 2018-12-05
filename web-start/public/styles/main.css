@@ -29,7 +29,8 @@ main, #messages-card {
 #messages-card-container-night {
   background-image:url("https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/night.png?alt=media&token=da31233a-2543-46ad-a5e2-ec6e993b07a8");
   background-repeat: no-repeat;
-  background-size: 100%;
+  background-size:1920px 795px;
+  /*background-size: 100%;*/
 }
 
 /*낮 배경*/
