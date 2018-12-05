@@ -81,7 +81,6 @@ main, #messages-card {
 }
 
 /*낮 배경*/
-<<<<<<< HEAD
 /* #message-background-daytime{
  /* width:455px;
   height:385px;*/
@@ -92,13 +91,6 @@ main, #messages-card {
   background-size: cover;
    }
 */
-=======
-#message-background-daytime{
-  width:455px;
-  height:385px;
-  background-image:url(daytime.png);
-  }
->>>>>>> master
 
 /*밤 배경*/
 /* #message-background-night{
