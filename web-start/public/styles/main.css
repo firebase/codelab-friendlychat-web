@@ -62,20 +62,20 @@ main, #messages-card {
   flex-grow: 1;
 }
 
-/*낮 배경*/
+/*낮 배경
 #message-background-daytime{
   width:455px;
   height:385px;
   background-image:url(daytime.png);
   }
-
-/*밤 배경*/
+*/
+/*밤 배경
 #message-background-night{
   width:455px;
   height:385px;
   background-image:url(night.png);
    }
-
+*/
 .message-container:first-of-type {
   border-top-width: 0;
 }
