@@ -107,15 +107,21 @@ main, #messages-card {
 .message-container .message {
   display: table-cell;
   width: calc(100% - 40px);
-  padding: 5px 0 5px 10px;
+  padding: 7px 10px 5px 10px;
   position: relative;
-   left: 4px;
-   top:1px;
+  left: 10px;
+  top:1px;
+  background-repeat: no-repeat;
+  background-color:#e0e0e0;
+  border-radius: 40px 40px 40px 5px;
+  color:black;
+  font-size: 12px;
+  font-family: 'Gamja Flower', cursive;
 }
 .message-container .name {
-  display: inline-block;
-  width: 100%;
-  padding-left: 0px;
+  display: inline;
+  width: 90%;
+  padding-left: 10px;
   color: #bbb;
   font-style: italic;
   font-size: 11px;
@@ -123,6 +129,17 @@ main, #messages-card {
   white-space: pre;
   position: relative;
   top: 4px;
+}
+.message-container .name1{
+  display: inline;
+  width: 10%;
+  padding-left: 1px;
+  color: #bbb;
+  font-style: normal;
+  font-size: 11px;
+  box-sizing: border-box;
+  position: relative;
+  bottom:13px;
 }
 
 
