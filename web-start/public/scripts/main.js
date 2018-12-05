@@ -496,7 +496,7 @@ function isOtherSleeping(){
 
     var otherHour = gmtHour + otherHourOffset;
 
-    
+
     // 데이터베이스 작동 오류확인 후 추가계획
     if(otherHour)
   });
@@ -504,4 +504,3 @@ function isOtherSleeping(){
   return isSleeping;
 
 }
-
