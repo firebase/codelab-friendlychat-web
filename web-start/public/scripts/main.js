@@ -263,6 +263,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   /* GMT 00기준 시, 분을 정수로 저장한 변수*/
   /*서버 시간이 한국 기준으로 되어있으므로, GMT 기준으로 변경하기 위해서 9시간을 빼줌*/
   var hour = parseInt(hourmin[0]) - 9;
+  if(hour<0) hour=hour+24;
   var min = parseInt(hourmin[1]);
 
   /* Firebase 데이터베이스에서 본인 시간 offset을 가져오고 계산 */
@@ -303,13 +304,16 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
 
     /* */
     var myHour = hour + uHourOffset;
+    if(myHour<0) myHour+=24;
     if(uHourOffset<0) uMinOffset=uMinOffset*(-1);
     var myMin = min + uMinOffset;
 
     var otherHour = hour + oHourOffset;
+    if(otherHour<0) otherHour+=24;
     if(oHourOffset<0) oMinOffset=oMinOffset*(-1);
     var otherMin = min + oMinOffset;
 
+    console.log("왜 안될까.. 이 값은 무엇?"+otherMin);
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
     console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
     /* 메세지 시간 표시하는 부분 */
