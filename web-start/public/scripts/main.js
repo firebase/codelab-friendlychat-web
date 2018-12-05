@@ -168,7 +168,7 @@ function onMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
   // 수정 : isOtherSleeping call
-  if (messageInputElement.value && checkSignedInWithMessage() && !isOtherSleeping()) {
+  if (messageInputElement.value && checkSignedInWithMessage()) {
     saveMessage(messageInputElement.value).then(function() {
       // Clear message text field and re-enable the SEND button.
       resetMaterialTextfield(messageInputElement);
