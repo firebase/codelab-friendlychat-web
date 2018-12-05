@@ -490,8 +490,8 @@ function isOtherSleeping(){
 
     var otherHour = gmtHour + otherHourOffset;
 
-    
-    // 데이터베이스 작동 오류확인 후 추가계획
+
+    // 시간표출 분단위 부분 오류 확인 중
     if(otherHour)
   });
 
