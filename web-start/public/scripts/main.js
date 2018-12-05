@@ -236,6 +236,7 @@ var MESSAGE_TEMPLATE =
     '<div class="message-container">' +
       '<div class="spacing"><div class="pic"></div></div>' +
       '<div class="message"></div>' +
+      '<div class="name1"></div>' +
       '<div class="name"></div>' +
     '</div>';
 
@@ -318,10 +319,14 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
     console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
     /* 메세지 시간 표시하는 부분 */
-    div.querySelector('.name').textContent = name+"    "+myHour+":"+myMin +" 보냄\n                "+ otherHour+":"+otherMin+" 받음";
+    div.querySelector('.name1').textContent = name;
+    div.querySelector('.name').textContent = myHour+":"+myMin +" 보냄\n"+ otherHour+":"+otherMin+" 받음";
   }, function(error){
     console.log("Error: "+error.code);
-  });
+  }
+
+);
+
 
 /*
   offesetRef.on("value", function(snapshot){
@@ -502,6 +507,7 @@ function isOtherSleeping(){
 
     var otherHour = otherHourOffset;
 
+
     if(otherHour <= 0){
       isSleeping = true;
       alert(othername + "'s time is over 22'")  //22시 이상이면 메시지 띄우고 못보냄
@@ -515,3 +521,4 @@ function isOtherSleeping(){
 function isOtherNightTime(){
 
 }
+
