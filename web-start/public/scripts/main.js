@@ -167,6 +167,7 @@ function onMediaFileSelected(event) {
 function onMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
+  // 수정 : isOtherSleeping call
   if (messageInputElement.value && checkSignedInWithMessage()) {
     saveMessage(messageInputElement.value).then(function() {
       // Clear message text field and re-enable the SEND button.
@@ -469,11 +470,12 @@ function snapshotToArray(snapshot) {
 
 
 /* 상대방이 밤시간일때 메시지 보내지 않도록 팝업창 띄우기*/
-/*
+
 function isOtherSleeping(){
   var isSleeping = false; //상대방 시간이 22시 이후 : true, 22시 이전 : False
   var otherOffset;
   var myname = getUserName();
+  var othername;
   var serverTime = new Date(getTimeStamp());
   var serverTimeSplit = serverTime.toString().split(' ');
   var serverHourMin = serverTimeSplit[4].split(':',2);
@@ -485,10 +487,12 @@ function isOtherSleeping(){
     var userinfo = snapshotToArray(snapshot);
 
     if(userinfo[0].key != myname){
-      otherOffset = userinfo[1].offset.toString();
+      otherOffset = userinfo[0].offset.toString();
+      othername = unserinfo[0].key;
     }
     else{
-      otherOffset = userinfo[0].offset.toString();
+      otherOffset = userinfo[1].offset.toString();
+      othername = userinfo[1].key;
     }
 
     var otherOffsetSplit = otherofffset.split(':');
@@ -496,12 +500,12 @@ function isOtherSleeping(){
 
     var otherHour = gmtHour + otherHourOffset;
 
-
-    // 데이터베이스 작동 오류확인 후 추가계획
-    if(otherHour)
+    if(otherHour >= 22){
+      isSleeping = true;
+      alert(othername + "'s time is over 22'")  //22시 이상이면 메시지 띄우고 못보냄
+    }
   });
 
   return isSleeping;
 
 }
-*/
