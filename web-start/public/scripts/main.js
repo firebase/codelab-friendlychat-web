@@ -467,3 +467,41 @@ function snapshotToArray(snapshot) {
 
   return returnArr;
 };
+
+
+/* 상대방이 밤시간일때 메시지 보내지 않도록 팝업창 띄우기*/
+function isOtherSleeping(){
+  var isSleeping = false; //상대방 시간이 22시 이후 : true, 22시 이전 : False
+  var otherOffset;
+  var myname = getUserName();
+  var serverTime = new Date(getTimeStamp());
+  var serverTimeSplit = serverTime.toString().split(' ');
+  var serverHourMin = serverTimeSplit[4].split(':',2);
+  var gmtHour = parseInt(serverHourMin[0]) - 9;
+
+  var ref = if(firebase.database().ref('/users/');
+  ref.on('value', function(snapshot){
+    console.log(snapshotToArray(snapshot));
+    var userinfo = snapshotToArray(snapshot);
+
+    if(userinfo[0].key != myname){
+      otherOffset = userinfo[1].offset.toString();
+    }
+    else{
+      otherOffset = userinfo[0].offset.toString();
+    }
+
+    var otherOffsetSplit = otherofffset.split(':');
+    var otherHourOffset = parseInt(otherOffsetSplit[0]);
+
+    var otherHour = gmtHour + otherHourOffset;
+
+    
+    // 데이터베이스 작동 오류확인 후 추가계획
+    if(otherHour)
+  });
+
+  return isSleeping;
+
+}
+

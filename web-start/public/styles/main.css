@@ -25,6 +25,24 @@ main, #messages-card {
   height: calc(100% - 35px);
   padding-bottom: 0;
 }
+/*밤 배경*/
+#messages-card-container-night {
+  background-image:url("https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/night.png?alt=media&token=da31233a-2543-46ad-a5e2-ec6e993b07a8");
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+/*낮 배경*/
+#messages-card-container-daytime {
+  background-image:url("https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/daytime.png?alt=media&token=74ec09cb-ec02-45d6-8baf-8bb85c9a6603");
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 #messages-card {
   margin-top: 15px;
 }
@@ -63,18 +81,28 @@ main, #messages-card {
 }
 
 /*낮 배경*/
-#message-background-daytime{
-  width:455px;
-  height:385px;
-  background-image:url(daytime.png);
-  }
+/* #message-background-daytime{
+ /* width:455px;
+  height:385px;*/
+/*background-image:url(daytime.png);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+   }
+*/
 
 /*밤 배경*/
-#message-background-night{
-  width:455px;
-  height:385px;
-  background-image:url(night.png);
+/* #message-background-night{
+  /* width:455px;
+  height:385px;*/
+/*  background-image:url(night.png);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
    }
+*/
 
 .message-container:first-of-type {
   border-top-width: 0;
