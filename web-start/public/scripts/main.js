@@ -464,6 +464,7 @@ function snapshotToArray(snapshot) {
 };
 
 /* 상대방이 밤시간일때 메시지 보내지 않도록 팝업창 띄우기*/
+/*
 function isOtherSleeping(){
   var isSleeping = false; //상대방 시간이 22시 이후 : true, 22시 이전 : False
   var otherOffset;
@@ -498,3 +499,4 @@ function isOtherSleeping(){
   return isSleeping;
 
 }
+*/
