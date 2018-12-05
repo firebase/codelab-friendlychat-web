@@ -313,7 +313,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
     console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
     /* 메세지 시간 표시하는 부분 */
-    div.querySelector('.name').textContent = name + " " + myHour+":"+myMin +" 보냄  "+ otherHour+":"+otherMin+" 받음";
+    div.querySelector('.name').textContent = name+"    "+myHour+":"+myMin +" 보냄\n                "+ otherHour+":"+otherMin+" 받음";
   }, function(error){
     console.log("Error: "+error.code);
   });
@@ -463,6 +463,7 @@ function snapshotToArray(snapshot) {
   return returnArr;
 };
 
+
 /* 상대방이 밤시간일때 메시지 보내지 않도록 팝업창 띄우기*/
 /*
 function isOtherSleeping(){
@@ -491,7 +492,7 @@ function isOtherSleeping(){
 
     var otherHour = gmtHour + otherHourOffset;
 
-    
+
     // 데이터베이스 작동 오류확인 후 추가계획
     if(otherHour)
   });

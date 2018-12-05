@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "friendlychat-web-a6132"
+    "default": "friendlychat-web-a6132",
+    "JellyTalk-web": "friendlychat-web-a6132"
   }
 }

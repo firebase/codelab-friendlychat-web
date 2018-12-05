@@ -124,7 +124,9 @@ main, #messages-card {
   width: 30px;
   height: 30px;
   background-size: 30px;
-  border-radius: 20px;
+  border-radius: 50%;
+  position: relative;
+  left: 3px;
 }
 .message-container .spacing {
   display: table-cell;
@@ -134,16 +136,23 @@ main, #messages-card {
   display: table-cell;
   width: calc(100% - 40px);
   padding: 5px 0 5px 10px;
+  position: relative;
+   left: 4px;
+   top:1px;
 }
 .message-container .name {
   display: inline-block;
   width: 100%;
-  padding-left: 40px;
+  padding-left: 0px;
   color: #bbb;
   font-style: italic;
-  font-size: 12px;
+  font-size: 11px;
   box-sizing: border-box;
+  white-space: pre;
+  position: relative;
+  top: 4px;
 }
+
 
 #message-form {
   display: flex;
