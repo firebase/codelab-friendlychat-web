@@ -12,3 +12,4 @@ cloud-functions-start/functions/node_modules
 cloud-functions/functions/node_modules
 .firebaserc
 firebase-debug.log
+.firebase
