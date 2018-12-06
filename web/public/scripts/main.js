@@ -65,7 +65,7 @@ function saveMessage(messageText) {
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   // Create the query to load the last 12 messages and listen for new ones.
-  var query = firebase.firestore().collection('messages').orderBy('timestamp').limit(12);
+  var query = firebase.firestore().collection('messages').orderBy('timestamp', 'desc').limit(12);
   
   // Start listening to the query.
   query.onSnapshot(function(snapshot) {
@@ -74,7 +74,8 @@ function loadMessages() {
         deleteMessage(change.doc.id);
       } else {
         var message = change.doc.data();
-        displayMessage(change.doc.id, message.name, message.text, message.profilePicUrl, message.imageUrl);
+        displayMessage(change.doc.id, message.timestamp, message.name,
+                      message.text, message.profilePicUrl, message.imageUrl);
       }
     });
   });
@@ -254,7 +255,7 @@ function deleteMessage(id) {
 }
 
 // Displays a Message in the UI.
-function displayMessage(id, name, text, picUrl, imageUrl) {
+function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
   var div = document.getElementById(id);
   // If an element for that message does not exists yet we create it.
   if (!div) {
@@ -262,7 +263,18 @@ function displayMessage(id, name, text, picUrl, imageUrl) {
     container.innerHTML = MESSAGE_TEMPLATE;
     div = container.firstChild;
     div.setAttribute('id', id);
-    messageListElement.appendChild(div);
+    div.setAttribute('timestamp', timestamp);
+    for (var i = 0; i < messageListElement.children.length; i++) {
+      var child = messageListElement.children[i];
+      console.log(i, child);
+      var time = child.getAttribute('timestamp');
+      if (time && time > timestamp) {
+        break;
+      }
+    }
+    console.log(div, child);
+
+    messageListElement.insertBefore(div, child);
   }
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
