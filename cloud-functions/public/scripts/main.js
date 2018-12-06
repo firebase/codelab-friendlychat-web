@@ -49,6 +49,19 @@ function isUserSignedIn() {
   return !!firebase.auth().currentUser;
 }
 
+// Saves a new message on the Cloud Firestore.
+function saveMessage(messageText) {
+  // Add a new message entry to the Firebase database.
+  return firebase.firestore().collection('messages').add({
+    name: getUserName(),
+    text: messageText,
+    profilePicUrl: getProfilePicUrl(),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(error) {
+    console.error('Error writing new message to Firebase Database', error);
+  });
+}
+
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   // Create the query to load the last 12 messages and listen for new ones.
@@ -64,19 +77,6 @@ function loadMessages() {
         displayMessage(change.doc.id, message.name, message.text, message.profilePicUrl, message.imageUrl);
       }
     });
-  });
-}
-
-// Saves a new message on the Cloud Firestore.
-function saveMessage(messageText) {
-  // Add a new message entry to the Firebase database.
-  return firebase.firestore().collection('messages').add({
-    name: getUserName(),
-    text: messageText,
-    profilePicUrl: getProfilePicUrl(),
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).catch(function(error) {
-    console.error('Error writing new message to Firebase Database', error);
   });
 }
 

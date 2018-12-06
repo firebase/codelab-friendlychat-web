@@ -45,14 +45,14 @@ function isUserSignedIn() {
   // TODO 6: Return true if a user is signed-in.
 }
 
-// Loads chat messages history and listens for upcoming ones.
-function loadMessages() {
-  // TODO 7: Load and listens for new messages.
-}
-
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
-  // TODO 8: Push a new message to Firebase.
+  // TODO 7: Push a new message to Firebase.
+}
+
+// Loads chat messages history and listens for upcoming ones.
+function loadMessages() {
+  // TODO 8: Load and listens for new messages.
 }
 
 // Saves a new message containing an image in Firebase.
