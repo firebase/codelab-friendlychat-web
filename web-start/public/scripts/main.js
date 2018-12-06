@@ -201,14 +201,11 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
     div.setAttribute('timestamp', timestamp);
     for (var i = 0; i < messageListElement.children.length; i++) {
       var child = messageListElement.children[i];
-      console.log(i, child);
       var time = child.getAttribute('timestamp');
       if (time && time > timestamp) {
         break;
       }
     }
-    console.log(div, child);
-
     messageListElement.insertBefore(div, child);
   }
   if (picUrl) {
