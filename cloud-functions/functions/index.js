@@ -33,10 +33,11 @@ exports.addWelcomeMessages = functions.auth.user().onCreate(async (user) => {
 
   // Saves the new welcome message into the database
   // which then displays it in the FriendlyChat clients.
-  await admin.database().ref('messages').push({
+  await admin.firestore().collection('messages').add({
     name: 'Firebase Bot',
     profilePicUrl: '/images/firebase-logo.png', // Firebase logo
     text: `${fullName} signed in for the first time! Welcome!`,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
   });
   console.log('Welcome message written to database.');
 });
@@ -79,52 +80,54 @@ async function blurImage(filePath) {
   fs.unlinkSync(tempLocalFile);
   console.log('Deleted local file.');
   // Indicate that the message has been moderated.
-  await admin.database().ref(`/messages/${messageId}`).update({moderated: true});
+  await admin.firestore().collection('messages').doc(messageId).update({moderated: true});
   console.log('Marked the image as moderated in the database.');
 }
 
 // Sends a notifications to all users when a new message is posted.
-exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCreate(
-    async (snapshot) => {
-      // Notification details.
-      const text = snapshot.val().text;
-      const payload = {
-        notification: {
-          title: `${snapshot.val().name} posted ${text ? 'a message' : 'an image'}`,
-          body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : '',
-          icon: snapshot.val().photoUrl || '/images/profile_placeholder.png',
-          click_action: `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
-        }
-      };
-
-      // Get the list of device tokens.
-      const allTokens = await admin.database().ref('fcmTokens').once('value');
-      if (allTokens.exists()) {
-        // Listing all device tokens to send a notification to.
-        const tokens = Object.keys(allTokens.val());
-
-        // Send notifications to all tokens.
-        const response = await admin.messaging().sendToDevice(tokens, payload);
-        await cleanupTokens(response, tokens);
-        console.log('Notifications have been sent and tokens cleaned up.');
+exports.sendNotifications = functions.firestore.document('messages/{messageId}').onCreate(
+  async (snapshot) => {
+    // Notification details.
+    const text = snapshot.data().text;
+    const payload = {
+      notification: {
+        title: `${snapshot.data().name} posted ${text ? 'a message' : 'an image'}`,
+        body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : '',
+        icon: snapshot.data().profilePicUrl || '/images/profile_placeholder.png',
+        click_action: `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
       }
+    };
+
+    // Get the list of device tokens.
+    const allTokens = await admin.firestore().collection('fcmTokens').get();
+    const tokens = [];
+    allTokens.forEach((tokenDoc) => {
+      tokens.push(tokenDoc.id);
     });
+
+    if (tokens.length > 0) {
+      // Send notifications to all tokens.
+      const response = await admin.messaging().sendToDevice(tokens, payload);
+      await cleanupTokens(response, tokens);
+      console.log('Notifications have been sent and tokens cleaned up.');
+    }
+  });
 
 // Cleans up the tokens that are no longer valid.
 function cleanupTokens(response, tokens) {
   // For each notification we check if there was an error.
-  const tokensToRemove = {};
+  const tokensDelete = [];
   response.results.forEach((result, index) => {
     const error = result.error;
     if (error) {
+      console.error('Failure sending notification to', tokens[index], error);
       // Cleanup the tokens who are not registered anymore.
       if (error.code === 'messaging/invalid-registration-token' ||
           error.code === 'messaging/registration-token-not-registered') {
-        tokensToRemove[`/fcmTokens/${tokens[index]}`] = null;
-      } else {
-        console.error('Failure sending notification to', tokens[index], error);
+        const deleteTask = admin.firestore().collection('messages').doc(tokens[index]).delete();
+        tokensDelete.push(deleteTask);
       }
     }
   });
-  return admin.database().ref().update(tokensToRemove);
+  return Promise.all(tokensDelete); 
 }
