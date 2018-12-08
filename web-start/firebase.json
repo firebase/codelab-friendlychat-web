@@ -1,8 +1,9 @@
 {
   "hosting": {
+    "public":  "./public",
     "headers": [
       {
-        "source": "/service-worker.js",
+        "source": "**/*.@(js|html)",
         "headers": [
           {
             "key": "Cache-Control",
