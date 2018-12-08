@@ -167,7 +167,8 @@ function onMediaFileSelected(event) {
 function onMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
-  if (messageInputElement.value && checkSignedInWithMessage()) {
+  // 수정 : isOtherSleeping call
+  if (messageInputElement.value && checkSignedInWithMessage() && isOtherSleeping()) {
     saveMessage(messageInputElement.value).then(function() {
       // Clear message text field and re-enable the SEND button.
       resetMaterialTextfield(messageInputElement);
@@ -264,6 +265,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   /* GMT 00기준 시, 분을 정수로 저장한 변수*/
   /*서버 시간이 한국 기준으로 되어있으므로, GMT 기준으로 변경하기 위해서 9시간을 빼줌*/
   var hour = parseInt(hourmin[0]) - 9;
+  if(hour<0) hour=hour+24;
   var min = parseInt(hourmin[1]);
 
   /* Firebase 데이터베이스에서 본인 시간 offset을 가져오고 계산 */
@@ -304,13 +306,16 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
 
     /* */
     var myHour = hour + uHourOffset;
+    if(myHour<0) myHour+=24;
     if(uHourOffset<0) uMinOffset=uMinOffset*(-1);
     var myMin = min + uMinOffset;
 
     var otherHour = hour + oHourOffset;
+    if(otherHour<0) otherHour+=24;
     if(oHourOffset<0) oMinOffset=oMinOffset*(-1);
     var otherMin = min + oMinOffset;
 
+    console.log("왜 안될까.. 이 값은 무엇?"+otherMin);
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
     console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
     /* 메세지 시간 표시하는 부분 */
@@ -470,37 +475,50 @@ function snapshotToArray(snapshot) {
 
 
 /* 상대방이 밤시간일때 메시지 보내지 않도록 팝업창 띄우기*/
+
 function isOtherSleeping(){
   var isSleeping = false; //상대방 시간이 22시 이후 : true, 22시 이전 : False
   var otherOffset;
   var myname = getUserName();
-  var serverTime = new Date(getTimeStamp());
-  var serverTimeSplit = serverTime.toString().split(' ');
-  var serverHourMin = serverTimeSplit[4].split(':',2);
-  var gmtHour = parseInt(serverHourMin[0]) - 9;
+  console.log(myname);
+  var othername;
+  //var serverTime = new Date(getTimeStamp());
+  //console.log(serverTime);
+  //var serverTimeSplit = serverTime.toString().split(' ');
+  //var serverHourMin = serverTimeSplit[4].split(':',2);
+  //var gmtHour = parseInt(serverHourMin[0]) - 9;
 
-  var ref = if(firebase.database().ref('/users/');
+  var ref = firebase.database().ref('/users/');
   ref.on('value', function(snapshot){
     console.log(snapshotToArray(snapshot));
     var userinfo = snapshotToArray(snapshot);
 
     if(userinfo[0].key != myname){
-      otherOffset = userinfo[1].offset.toString();
+      otherOffset = userinfo[0].offset.toString();
+      othername = unserinfo[0].key;
     }
     else{
-      otherOffset = userinfo[0].offset.toString();
+      otherOffset = userinfo[1].offset.toString();
+      othername = userinfo[1].key;
     }
 
-    var otherOffsetSplit = otherofffset.split(':');
+    var otherOffsetSplit = otherOffset.split(':');
     var otherHourOffset = parseInt(otherOffsetSplit[0]);
 
-    var otherHour = gmtHour + otherHourOffset;
+    var otherHour = otherHourOffset;
 
 
-    // 데이터베이스 작동 오류확인 후 추가계획
-    if(otherHour)
+    if(otherHour <= 0){
+      isSleeping = true;
+      alert(othername + "'s time is over 22'")  //22시 이상이면 메시지 띄우고 못보냄
+    }
   });
 
   return isSleeping;
 
 }
+//상대방 시간 오후 6시 기준으로 나의 UI(배경화면) 설정
+function isOtherNightTime(){
+
+}
+
