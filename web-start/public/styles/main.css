@@ -61,6 +61,7 @@ main, #messages-card {
   position: absolute;
   max-width: 1024px;
   margin: auto;
+  position:absolute;
 }
 .material-icons {
   font-size: 36px;
@@ -145,11 +146,11 @@ main, #messages-card {
   width: calc(100% - 40px);
   padding: 7px 10px 5px 10px;
   position: relative;
-  left: 15px;
+  left: 17px;
   top:1px;
   background-repeat: no-repeat;
   background-color:#e0e0e0;
-  border-radius: 40px 40px 40px 5px;
+  border-radius: 10px 10px 10px 0px;
   color:black;
   font-size: 12px;
   font-family: 'Poor Story', cursive;
@@ -164,20 +165,20 @@ main, #messages-card {
   box-sizing: border-box;
   white-space: pre;
   position: relative;
+  bottom:10px;
   left:45px;
-  bottom: 13px
+  font-family: 'Poor Story', cursive;
 }
 .message-container .name1{
   display: inline-block;
   width: 10%;
-  padding-left: 0px;
-  color: #bbb;
+  padding-left: 3px;
+  color: black;
   font-style: italic;
   font-size: 11px;
   box-sizing: border-box;
   position: relative;
-  left:3px;
-  top:5px;
+  top:8px;
   font-family: 'Poor Story', cursive;
 }
 
