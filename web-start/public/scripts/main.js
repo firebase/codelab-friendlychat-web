@@ -88,6 +88,7 @@ function loadMessages() {
 
   firebase.database().ref('/messages/').limitToLast(12).on('child_added', callback);
   firebase.database().ref('/messages/').limitToLast(12).on('child_changed', callback);
+
 }
 
 // Saves a new message on the Firebase DB.
@@ -201,7 +202,7 @@ function onMessageFormSubmit(e) {
 
       if(userinfo[0].key != myname){
         otheroffset = userinfo[0].offset.toString();
-        othername = unserinfo[0].key;
+        othername = userinfo[0].key;
         console.log(otheroffset + "   " + othername);
       }
       else{
@@ -330,7 +331,6 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   var min = parseInt(hourmin[1]);
 
   /* Firebase 데이터베이스에서 본인 시간 offset을 가져오고 계산 */
-  var offesetRef = firebase.database().ref('/users/'+name);
   var userOffset;
   var otherOffset;
 
@@ -460,8 +460,6 @@ initFirebaseAuth();
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
 
-//상대방의 시간에 따라서 배경을 바꾼다.
-changeBackground();
 
 //TimeZone 받아오는 코드 추가 부분
 //사용자 목록도 추가한다.
@@ -505,7 +503,40 @@ function snapshotToArray(snapshot) {
   return returnArr;
 };
 
+
 /*상대방의 시간에 따른 배경 변경 기능*/
 function changeBackground(){
+  //클라이언트 기준을 한국으로 설정하고 진행하였음
+  var time = new Date().getHours() - 9; //GMT 기준 시간
+  var name = getUserName();
+  console.log("현재 시각은 "+time);
 
+
+  firebase.database().ref('/users').on('value', function(snapshot){
+    console.log(snapshotToArray(snapshot));
+    var userinfo= snapshotToArray(snapshot);
+    var otherOffset;
+
+    if(userinfo[0].key == name){
+      otherOffset = userinfo[1].offset.toString(); //다른 사용자의 시간 오프셋을 받아온다
+    }
+    else{
+      otherOffset = userinfo[0].offset.toString();
+    }
+    if(time+otherOffset>=22 || time+otherOffset<7){
+      document.getElementById('messages-card-container').id='messages-card-container-night';
+      console.log("밤으로 바뀜~");
+    }
+    else{
+      document.getElementById('messages-card-container').id='messages-card-container-daytime';
+      console.log("낮으로 바뀜~");
+    }
+
+  }, function(error){
+    console.log("Error: "+error.code);
+    document.getElementById('messages-card-container').id='messages-card-container';
+  }
+
+);
+  
 }
