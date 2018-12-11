@@ -88,6 +88,7 @@ function loadMessages() {
 
   firebase.database().ref('/messages/').limitToLast(12).on('child_added', callback);
   firebase.database().ref('/messages/').limitToLast(12).on('child_changed', callback);
+
 }
 
 // Saves a new message on the Firebase DB.
@@ -201,7 +202,7 @@ function onMessageFormSubmit(e) {
 
       if(userinfo[0].key != myname){
         otheroffset = userinfo[0].offset.toString();
-        othername = unserinfo[0].key;
+        othername = userinfo[0].key;
         console.log(otheroffset + "   " + othername);
       }
       else{
@@ -330,7 +331,6 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   var min = parseInt(hourmin[1]);
 
   /* Firebase 데이터베이스에서 본인 시간 offset을 가져오고 계산 */
-  var offesetRef = firebase.database().ref('/users/'+name);
   var userOffset;
   var otherOffset;
 
@@ -360,9 +360,6 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     //그냥 더해주면 되지만, myMin같은 경우에는 알 길이 없으므로, hourOffset값이 양수인지 음수인지에 따라서
     //덧셈을 할 지 뺄셈을 할지 정해주고 계산을 하면 됩니다.
 
-    //next milestone: 분 계산 추가...
-    //동적 배경 변경 추가
-
     var myHour = hour + uHourOffset;
     if(myHour<0) myHour+=24;
     if(uHourOffset<0) uMinOffset=uMinOffset*(-1);
@@ -373,7 +370,6 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     if(oHourOffset<0) oMinOffset=oMinOffset*(-1);
     var otherMin = min + oMinOffset;
 
-    console.log("왜 안될까.. 이 값은 무엇?"+otherMin);
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
     console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
     /* 메세지 시간 표시하는 부분 */
@@ -385,31 +381,6 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
 
 );
 
-
-/*
-  offesetRef.on("value", function(snapshot){
-    console.log(snapshot.val().offset); //offset 값이 콘솔에 보여짐 (정상작동)
-    userOffset=snapshot.val().offset; //사용자 위치의 offset
-
-    var offsetsplit = userOffset.split(':');
-    var hourOffset = parseInt(offsetsplit[0]);
-    var minOffset= parseInt(offsetsplit[1]);
-
-    console.log("GMT 기준 시간:"+hour+":"+min);
-    //myHour의 경우, hourOffset에 앞에 +가 있으면 양수, 없으면 음수로 자동 변환 되기 때문에
-    //그냥 더해주면 되지만, myMin같은 경우에는 알 길이 없으므로, hourOffset값이 양수인지 음수인지에 따라서
-    //덧셈을 할 지 뺄셈을 할지 정해주고 계산을 하면 됩니다.
-    var myHour = hour + hourOffset;
-    if(hourOffset<0) minOffset=minOffset*(-1);
-    var myMin = min + minOffset;
-
-    console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin); //본인 기준은 완료?
-    div.querySelector('.name').textContent = name + " " + myHour+":"+myMin +" 보냄";
-  }, function(error){
-    console.log("Error: " + error.code);
-  })
-  */
-  //div.querySelector('.name').textContent = name + " " + hourmin[0]+":"+hourmin[1] +" 보냄"; //+ " " + dateParts[5] + " " + dateParts[6]+ " "+ dateParts[7];
   var messageElement = div.querySelector('.message');
 
   if (text) { // If the message is text.
@@ -489,8 +460,6 @@ initFirebaseAuth();
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
 
-//상대방의 시간에 따라서 배경을 바꾼다.
-changeBackground();
 
 //TimeZone 받아오는 코드 추가 부분
 //사용자 목록도 추가한다.
@@ -534,6 +503,40 @@ function snapshotToArray(snapshot) {
   return returnArr;
 };
 
+
+/*상대방의 시간에 따른 배경 변경 기능*/
 function changeBackground(){
+  //클라이언트 기준을 한국으로 설정하고 진행하였음
+  var time = new Date().getHours() - 9; //GMT 기준 시간
+  var name = getUserName();
+  console.log("현재 시각은 "+time);
+
+
+  firebase.database().ref('/users').on('value', function(snapshot){
+    console.log(snapshotToArray(snapshot));
+    var userinfo= snapshotToArray(snapshot);
+    var otherOffset;
+
+    if(userinfo[0].key == name){
+      otherOffset = userinfo[1].offset.toString(); //다른 사용자의 시간 오프셋을 받아온다
+    }
+    else{
+      otherOffset = userinfo[0].offset.toString();
+    }
+    if(time+otherOffset>=22 || time+otherOffset<7){
+      document.getElementById('messages-card-container').id='messages-card-container-night';
+      console.log("밤으로 바뀜~");
+    }
+    else{
+      document.getElementById('messages-card-container').id='messages-card-container-daytime';
+      console.log("낮으로 바뀜~");
+    }
+
+  }, function(error){
+    console.log("Error: "+error.code);
+    document.getElementById('messages-card-container').id='messages-card-container';
+  }
+
+);
   
 }
