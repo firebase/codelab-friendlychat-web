@@ -428,6 +428,9 @@ initFirebaseAuth();
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
 
+//상대방의 시간에 따라서 배경을 바꾼다.
+changeBackground();
+
 //TimeZone 받아오는 코드 추가 부분
 //사용자 목록도 추가한다.
 function register() { //confirm 버튼 눌리면 실행되는 함수
@@ -463,7 +466,7 @@ function snapshotToArray(snapshot) {
   snapshot.forEach(function(childSnapshot) {
       var item = childSnapshot.val();
       item.key = childSnapshot.key;
-
+      
       returnArr.push(item);
   });
 
