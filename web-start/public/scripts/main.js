@@ -164,19 +164,80 @@ function onMediaFileSelected(event) {
 }
 
 // Triggered when the send new message form is submitted.
+/* 여주은 */
+/* onMessageFormSubmit 수정 */
+/* 상대방의 시간이 22시를 넘었거나 7시 이전이면 메시지 보내 않도록 하기 */
 function onMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
-  // 수정 : isOtherSleeping call
-  if (messageInputElement.value && checkSignedInWithMessage() && isOtherSleeping()) {
-    saveMessage(messageInputElement.value).then(function() {
-      // Clear message text field and re-enable the SEND button.
-      resetMaterialTextfield(messageInputElement);
-      toggleButton();
-    });
-  }
-}
+  var myname = getUserName();
+  console.log("my name: " + myname);
+  var servertime = 0;
 
+  var ref = firebase.database().ref('/.info/serverTimeOffset');
+  ref.once('value').then(function stv(data) {
+    var isSleeping = true;
+    var serverTime = data.val() + Date.now();
+    var otheroffset;
+    var othername;
+    var servertime;
+    console.log("servertimestamp: " + serverTime);
+
+    var serverDate = new Date(serverTime);
+    var dateParts = serverDate.toString().split(' ');
+    var hourmin = dateParts[4].split(':',2);
+    /* GMT 00기준 시, 분을 정수로 저장한 변수*/
+    /*서버 시간이 한국 기준으로 되어있으므로, GMT 기준으로 변경하기 위해서 9시간을 빼줌*/
+    var hour = parseInt(hourmin[0]) - 9;
+    if(hour<0) hour=hour+24;
+    var min = parseInt(hourmin[1]);
+    console.log("GMT hour: " + hour);  //서버시간, GMT 기준
+
+    var ref = firebase.database().ref('/users/');
+
+    ref.on('value', function(snapshot){
+      console.log(snapshotToArray(snapshot));
+      var userinfo = snapshotToArray(snapshot);
+
+      if(userinfo[0].key != myname){
+        otheroffset = userinfo[0].offset.toString();
+        othername = unserinfo[0].key;
+        console.log(otheroffset + "   " + othername);
+      }
+      else{
+        otheroffset = userinfo[1].offset.toString();
+        othername = userinfo[1].key;
+        console.log(otheroffset + "   " + othername);
+      }
+
+      var otheroffsetSplit = otheroffset.split(':');
+      var otherHourOffset = parseInt(otheroffsetSplit[0]);
+
+      var otherHour = otherHourOffset + hour;
+      console.log("other's hour : " + otherHour);
+
+      if(otherHour >= 22 || otherHour <= 7){
+        if(confirm("Too late or too early to send a message to "+ othername + ", Send it?")){
+          isSleeping = true;
+        }
+        else{
+          isSleeping = false;
+        }
+      }
+    });
+    console.log("send?  " + isSleeping);
+
+    if (messageInputElement.value && checkSignedInWithMessage() && isSleeping) {
+      saveMessage(messageInputElement.value).then(function() {
+        // Clear message text field and re-enable the SEND button.
+        resetMaterialTextfield(messageInputElement);
+        toggleButton();
+      });
+    }
+  }, function (err) {
+    console.log("err");
+  });
+}
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
@@ -473,52 +534,6 @@ function snapshotToArray(snapshot) {
   return returnArr;
 };
 
-
-/* 상대방이 밤시간일때 메시지 보내지 않도록 팝업창 띄우기*/
-
-function isOtherSleeping(){
-  var isSleeping = false; //상대방 시간이 22시 이후 : true, 22시 이전 : False
-  var otherOffset;
-  var myname = getUserName();
-  console.log(myname);
-  var othername;
-  //var serverTime = new Date(getTimeStamp());
-  //console.log(serverTime);
-  //var serverTimeSplit = serverTime.toString().split(' ');
-  //var serverHourMin = serverTimeSplit[4].split(':',2);
-  //var gmtHour = parseInt(serverHourMin[0]) - 9;
-
-  var ref = firebase.database().ref('/users/');
-  ref.on('value', function(snapshot){
-    console.log(snapshotToArray(snapshot));
-    var userinfo = snapshotToArray(snapshot);
-
-    if(userinfo[0].key != myname){
-      otherOffset = userinfo[0].offset.toString();
-      othername = unserinfo[0].key;
-    }
-    else{
-      otherOffset = userinfo[1].offset.toString();
-      othername = userinfo[1].key;
-    }
-
-    var otherOffsetSplit = otherOffset.split(':');
-    var otherHourOffset = parseInt(otherOffsetSplit[0]);
-
-    var otherHour = otherHourOffset;
-
-
-    if(otherHour <= 0){
-      isSleeping = true;
-      alert(othername + "'s time is over 22'")  //22시 이상이면 메시지 띄우고 못보냄
-    }
-  });
-
-  return isSleeping;
-
+function changeBackground(){
+  
 }
-//상대방 시간 오후 6시 기준으로 나의 UI(배경화면) 설정
-function isOtherNightTime(){
-
-}
-
