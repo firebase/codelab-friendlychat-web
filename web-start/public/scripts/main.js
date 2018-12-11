@@ -299,12 +299,9 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     //그냥 더해주면 되지만, myMin같은 경우에는 알 길이 없으므로, hourOffset값이 양수인지 음수인지에 따라서
     //덧셈을 할 지 뺄셈을 할지 정해주고 계산을 하면 됩니다.
 
-    /* 시, 분 덧셈 뺄셈 시 시간 기준 프로토콜 추가하기*/
-    /* 시간 계산법 적용해야함 */
+    //next milestone: 분 계산 추가...
+    //동적 배경 변경 추가
 
-    //next milestone
-
-    /* */
     var myHour = hour + uHourOffset;
     if(myHour<0) myHour+=24;
     if(uHourOffset<0) uMinOffset=uMinOffset*(-1);
