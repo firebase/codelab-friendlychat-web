@@ -27,23 +27,31 @@ main, #messages-card {
 }
 /*밤 배경*/
 #messages-card-container-night {
+  padding: 0;
+  margin: 0;
   background-image:url("https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/night.png?alt=media&token=da31233a-2543-46ad-a5e2-ec6e993b07a8");
-  background-repeat: no-repeat;
-  background-size:1920px 795px;
-  /*background-size: 100%;*/
+  background-repeat: repeat;
+  background-size: 100%;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
 }
 
 /*낮 배경*/
 #messages-card-container-daytime {
+  padding: 0;
+  margin: 0;
   background-image:url("https://firebasestorage.googleapis.com/v0/b/friendlychat-web-a6132.appspot.com/o/daytime.png?alt=media&token=74ec09cb-ec02-45d6-8baf-8bb85c9a6603");
+  background-repeat: repeat;
+  background-size: 100%;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
-  background-size: cover;
 }
 
 #messages-card {
-  margin-top: 15px;
+  margin-top: 10px;
+  margin-left:200px;
 }
 .mdl-layout__header-row span {
   margin-left: 15px;
