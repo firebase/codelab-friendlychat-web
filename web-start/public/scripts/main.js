@@ -164,11 +164,15 @@ function onMediaFileSelected(event) {
 }
 
 // Triggered when the send new message form is submitted.
+/*
+수정 : 여주은
 function onMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
   // 수정 : isOtherSleeping call
-  if (messageInputElement.value && checkSignedInWithMessage() && isOtherSleeping()) {
+  var isOtherSleeping = isOtherSleepingF();
+  console.log(isOtherSleeping);
+  if (messageInputElement.value && checkSignedInWithMessage() && isOtherSleeping) {
     saveMessage(messageInputElement.value).then(function() {
       // Clear message text field and re-enable the SEND button.
       resetMaterialTextfield(messageInputElement);
@@ -176,6 +180,7 @@ function onMessageFormSubmit(e) {
     });
   }
 }
+*/
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
@@ -236,6 +241,7 @@ var MESSAGE_TEMPLATE =
     '<div class="message-container">' +
       '<div class="spacing"><div class="pic"></div></div>' +
       '<div class="message"></div>' +
+      '<div class="name1"></div>' +
       '<div class="name"></div>' +
     '</div>';
 
@@ -264,6 +270,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   /* GMT 00기준 시, 분을 정수로 저장한 변수*/
   /*서버 시간이 한국 기준으로 되어있으므로, GMT 기준으로 변경하기 위해서 9시간을 빼줌*/
   var hour = parseInt(hourmin[0]) - 9;
+  if(hour<0) hour=hour+24;
   var min = parseInt(hourmin[1]);
 
   /* Firebase 데이터베이스에서 본인 시간 offset을 가져오고 계산 */
@@ -304,30 +311,35 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
 
     /* */
     var myHour = hour + uHourOffset;
+    if(myHour<0) myHour+=24;
     if(uHourOffset<0) uMinOffset=uMinOffset*(-1);
     var myMin = min + uMinOffset;
 
     var otherHour = hour + oHourOffset;
+    if(otherHour<0) otherHour+=24;
     if(oHourOffset<0) oMinOffset=oMinOffset*(-1);
     var otherMin = min + oMinOffset;
 
+    console.log("왜 안될까.. 이 값은 무엇?"+otherMin);
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
     console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
     /* 메세지 시간 표시하는 부분 */
-    div.querySelector('.name').textContent = name+"    "+myHour+":"+myMin +" 보냄\n                "+ otherHour+":"+otherMin+" 받음";
+    div.querySelector('.name1').textContent = name;
+    div.querySelector('.name').textContent = myHour+":"+myMin +" 보냄\n"+ otherHour+":"+otherMin+" 받음";
   }, function(error){
     console.log("Error: "+error.code);
-  });
+  }
+
+);
+
 
 /*
   offesetRef.on("value", function(snapshot){
     console.log(snapshot.val().offset); //offset 값이 콘솔에 보여짐 (정상작동)
     userOffset=snapshot.val().offset; //사용자 위치의 offset
-
     var offsetsplit = userOffset.split(':');
     var hourOffset = parseInt(offsetsplit[0]);
     var minOffset= parseInt(offsetsplit[1]);
-
     console.log("GMT 기준 시간:"+hour+":"+min);
     //myHour의 경우, hourOffset에 앞에 +가 있으면 양수, 없으면 음수로 자동 변환 되기 때문에
     //그냥 더해주면 되지만, myMin같은 경우에는 알 길이 없으므로, hourOffset값이 양수인지 음수인지에 따라서
@@ -335,7 +347,6 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     var myHour = hour + hourOffset;
     if(hourOffset<0) minOffset=minOffset*(-1);
     var myMin = min + minOffset;
-
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin); //본인 기준은 완료?
     div.querySelector('.name').textContent = name + " " + myHour+":"+myMin +" 보냄";
   }, function(error){
@@ -462,49 +473,94 @@ function snapshotToArray(snapshot) {
   });
 
   return returnArr;
-};
-
+}
 
 /* 상대방이 밤시간일때 메시지 보내지 않도록 팝업창 띄우기*/
-
-function isOtherSleeping(){
-  var isSleeping = false; //상대방 시간이 22시 이후 : true, 22시 이전 : False
-  var otherOffset;
-  var myname = getUserName();
-  console.log(myname);
-  var othername;
-  //var serverTime = new Date(getTimeStamp());
-  //console.log(serverTime);
-  //var serverTimeSplit = serverTime.toString().split(' ');
-  //var serverHourMin = serverTimeSplit[4].split(':',2);
-  //var gmtHour = parseInt(serverHourMin[0]) - 9;
-
-  var ref = firebase.database().ref('/users/');
-  ref.on('value', function(snapshot){
-    console.log(snapshotToArray(snapshot));
-    var userinfo = snapshotToArray(snapshot);
-
-    if(userinfo[0].key != myname){
-      otherOffset = userinfo[0].offset.toString();
-      othername = unserinfo[0].key;
-    }
-    else{
-      otherOffset = userinfo[1].offset.toString();
-      othername = userinfo[1].key;
-    }
-
-    var otherOffsetSplit = otherOffset.split(':');
-    var otherHourOffset = parseInt(otherOffsetSplit[0]);
-
-    var otherHour = otherHourOffset;
-
-    if(otherHour <= 0){
-      isSleeping = true;
-      alert(othername + "'s time is over 22'")  //22시 이상이면 메시지 띄우고 못보냄
-    }
+function getserverTime(){
+  var ref = firebase.database().ref('/.info/serverTimeOffset');
+  ref.once('value').then(function stv(data) {
+    var serverTime = data.val() + Date.now();
+    console.log(serverTime);
+    console.log(data.val() + Date.now());
+    return serverTime;
+  }, function (err) {
+    return err;
   });
+}
 
-  return isSleeping;
+/* 여주은 */
+/* onMessageFormSubmit 수정 */
+/* 상대방의 시간이 22시를 넘었거나 7시 이전이면 메시지 보내 않도록 하기 */
+function onMessageFormSubmit(e) {
+  e.preventDefault();
+  // Check that the user entered a message and is signed in.
+  var myname = getUserName();
+  console.log("my name: " + myname);
+  var servertime = 0;
+
+  var ref = firebase.database().ref('/.info/serverTimeOffset');
+  ref.once('value').then(function stv(data) {
+    var isSleeping = true;
+    var serverTime = data.val() + Date.now();
+    var otheroffset;
+    var othername;
+    var servertime;
+    console.log("servertimestamp: " + serverTime);
+
+    var serverDate = new Date(serverTime);
+    var dateParts = serverDate.toString().split(' ');
+    var hourmin = dateParts[4].split(':',2);
+    /* GMT 00기준 시, 분을 정수로 저장한 변수*/
+    /*서버 시간이 한국 기준으로 되어있으므로, GMT 기준으로 변경하기 위해서 9시간을 빼줌*/
+    var hour = parseInt(hourmin[0]) - 9;
+    if(hour<0) hour=hour+24;
+    var min = parseInt(hourmin[1]);
+    console.log("GMT hour: " + hour);  //서버시간, GMT 기준
+
+    var ref = firebase.database().ref('/users/');
+
+    ref.on('value', function(snapshot){
+      console.log(snapshotToArray(snapshot));
+      var userinfo = snapshotToArray(snapshot);
+
+      if(userinfo[0].key != myname){
+        otheroffset = userinfo[0].offset.toString();
+        othername = unserinfo[0].key;
+        console.log(otheroffset + "   " + othername);
+      }
+      else{
+        otheroffset = userinfo[1].offset.toString();
+        othername = userinfo[1].key;
+        console.log(otheroffset + "   " + othername);
+      }
+
+      var otheroffsetSplit = otheroffset.split(':');
+      var otherHourOffset = parseInt(otheroffsetSplit[0]);
+
+      var otherHour = otherHourOffset + hour;
+      console.log("other's hour : " + otherHour);
+
+      if(otherHour >= 22 || otherHour <= 7){
+        if(confirm("Too late or too early to send a message to "+ othername + ", Send it?")){
+          isSleeping = true;
+        }
+        else{
+          isSleeping = false;
+        }
+      }
+    });
+    console.log("send?  " + isSleeping);
+
+    if (messageInputElement.value && checkSignedInWithMessage() && isSleeping) {
+      saveMessage(messageInputElement.value).then(function() {
+        // Clear message text field and re-enable the SEND button.
+        resetMaterialTextfield(messageInputElement);
+        toggleButton();
+      });
+    }
+  }, function (err) {
+    console.log("err");
+  });
 
 }
 //상대방 시간 오후 6시 기준으로 나의 UI(배경화면) 설정
