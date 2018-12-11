@@ -11,3 +11,5 @@ web-start/functions/node_modules
 cloud-functions-start/functions/node_modules
 cloud-functions/functions/node_modules
 web-start/.firebase/
+*.cache
+web-start/.firebase/hosting.cHVibGlj.cache

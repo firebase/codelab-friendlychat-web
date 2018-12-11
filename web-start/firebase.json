@@ -1,16 +1,12 @@
 {
   "hosting": {
-    "public":  "./public",
-    "headers": [
-      {
-        "source": "**/*.@(js|html)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      }
-    ]
+    "public": "./public",
+    "headers": [{
+      "source" : "**/*.@(js|html|css)",
+      "headers" : [ {
+        "key" : "Cache-Control",
+        "value" : "max-age=0, no-cache"
+      } ]
+    }]
   }
 }
