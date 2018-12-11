@@ -1,0 +1,31 @@
+[debug] [2018-12-11T14:40:02.860Z] ----------------------------------------------------------------------
+[debug] [2018-12-11T14:40:02.864Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\홍수민\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --except functions
+[debug] [2018-12-11T14:40:02.865Z] CLI Version:   6.1.2
+[debug] [2018-12-11T14:40:02.865Z] Platform:      win32
+[debug] [2018-12-11T14:40:02.865Z] Node Version:  v10.14.1
+[debug] [2018-12-11T14:40:02.868Z] Time:          Tue Dec 11 2018 23:40:02 GMT+0900 (GMT+09:00)
+[debug] [2018-12-11T14:40:02.868Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-12-11T14:40:02.898Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-12-11T14:40:02.900Z] > authorizing via signed-in user
+[debug] [2018-12-11T14:40:02.900Z] [iam] checking project friendlychat-web-a6132 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2018-12-11T14:40:02.907Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/friendlychat-web-a6132:testIamPermissions  
+
+[debug] [2018-12-11T14:40:04.036Z] <<< HTTP RESPONSE 200
+[debug] [2018-12-11T14:40:04.038Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/friendlychat-web-a6132  
+ 
+[debug] [2018-12-11T14:40:04.977Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'friendlychat-web-a6132'...
+[info] 
+[info] i  deploying hosting
+[debug] [2018-12-11T14:40:06.774Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/friendlychat-web-a6132/versions  
+
+[debug] [2018-12-11T14:40:08.381Z] <<< HTTP RESPONSE 200
+[info] i  hosting[friendlychat-web-a6132]: beginning deploy...
+[info] i  hosting[friendlychat-web-a6132]: found 13 files in ./public
+[debug] [2018-12-11T14:40:08.459Z] [hosting] hash cache [cHVibGlj] load error: lines is not defined
+[debug] [2018-12-11T14:40:08.504Z] [hosting] hash cache [cHVibGlj] stored for 13 files
+[debug] [2018-12-11T14:40:08.505Z] [hosting][hash queue][FINAL]
+[debug] [2018-12-11T14:40:08.505Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/friendlychat-web-a6132/versions/764ed72de3152f21:populateFiles  
+ <request body omitted>
