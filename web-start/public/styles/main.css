@@ -52,6 +52,7 @@ main, #messages-card {
 .mdl-grid {
   max-width: 1024px;
   margin: auto;
+  position:absolute;
 }
 .material-icons {
   font-size: 36px;
@@ -146,7 +147,7 @@ main, #messages-card {
   font-family: 'Poor Story', cursive;
 }
 .message-container .name {
-  display: inline-block;
+  display: flex;
   width: 90%;
   padding-left: 0px;
   color: #bbb;
@@ -155,7 +156,8 @@ main, #messages-card {
   box-sizing: border-box;
   white-space: pre;
   position: relative;
-  top: 5px;
+  bottom:10px;
+  left:45px;
   font-family: 'Poor Story', cursive;
 }
 .message-container .name1{
@@ -167,7 +169,7 @@ main, #messages-card {
   font-size: 11px;
   box-sizing: border-box;
   position: relative;
-  bottom: 13px;
+  top:8px;
   font-family: 'Poor Story', cursive;
 }
 
