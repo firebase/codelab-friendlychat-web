@@ -236,6 +236,7 @@ var MESSAGE_TEMPLATE =
     '<div class="message-container">' +
       '<div class="spacing"><div class="pic"></div></div>' +
       '<div class="message"></div>' +
+      '<div class="name1"></div>' +
       '<div class="name"></div>' +
     '</div>';
 
@@ -264,6 +265,7 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
   /* GMT 00기준 시, 분을 정수로 저장한 변수*/
   /*서버 시간이 한국 기준으로 되어있으므로, GMT 기준으로 변경하기 위해서 9시간을 빼줌*/
   var hour = parseInt(hourmin[0]) - 9;
+  if(hour<0) hour=hour+24;
   var min = parseInt(hourmin[1]);
 
   /* Firebase 데이터베이스에서 본인 시간 offset을 가져오고 계산 */
@@ -297,27 +299,31 @@ function displayMessage(key, name, text, picUrl, imageUrl, timestamp) {
     //그냥 더해주면 되지만, myMin같은 경우에는 알 길이 없으므로, hourOffset값이 양수인지 음수인지에 따라서
     //덧셈을 할 지 뺄셈을 할지 정해주고 계산을 하면 됩니다.
 
-    /* 시, 분 덧셈 뺄셈 시 시간 기준 프로토콜 추가하기*/
-    /* 시간 계산법 적용해야함 */
+    //next milestone: 분 계산 추가...
+    //동적 배경 변경 추가
 
-    //next milestone
-
-    /* */
     var myHour = hour + uHourOffset;
+    if(myHour<0) myHour+=24;
     if(uHourOffset<0) uMinOffset=uMinOffset*(-1);
     var myMin = min + uMinOffset;
 
     var otherHour = hour + oHourOffset;
+    if(otherHour<0) otherHour+=24;
     if(oHourOffset<0) oMinOffset=oMinOffset*(-1);
     var otherMin = min + oMinOffset;
 
+    console.log("왜 안될까.. 이 값은 무엇?"+otherMin);
     console.log("시간 계산 후 나의 시간->" + myHour + ":" + myMin);
     console.log("시간 계산 후 상대방 시간-> "+otherHour+":"+otherMin);
     /* 메세지 시간 표시하는 부분 */
-    div.querySelector('.name').textContent = name+"    "+myHour+":"+myMin +" 보냄\n                "+ otherHour+":"+otherMin+" 받음";
+    div.querySelector('.name1').textContent = name;
+    div.querySelector('.name').textContent = myHour+":"+myMin +" 보냄\n"+ otherHour+":"+otherMin+" 받음";
   }, function(error){
     console.log("Error: "+error.code);
-  });
+  }
+
+);
+
 
 /*
   offesetRef.on("value", function(snapshot){
@@ -498,6 +504,7 @@ function isOtherSleeping(){
 
     var otherHour = otherHourOffset;
 
+
     if(otherHour <= 0){
       isSleeping = true;
       alert(othername + "'s time is over 22'")  //22시 이상이면 메시지 띄우고 못보냄
@@ -511,3 +518,4 @@ function isOtherSleeping(){
 function isOtherNightTime(){
 
 }
+

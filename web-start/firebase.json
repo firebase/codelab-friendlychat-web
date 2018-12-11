@@ -2,10 +2,10 @@
   "hosting": {
     "public": "./public",
     "headers": [{
-      "source" : "**/*.@(js|html)",
+      "source" : "**/*.@(js|html|css)",
       "headers" : [ {
         "key" : "Cache-Control",
-        "value" : "max-age=0"
+        "value" : "max-age=0, no-cache"
       } ]
     }]
   }
