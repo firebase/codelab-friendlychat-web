@@ -89,30 +89,6 @@ main, #messages-card {
   flex-grow: 1;
 }
 
-/*낮 배경*/
-/* #message-background-daytime{
- /* width:455px;
-  height:385px;*/
-/*background-image:url(daytime.png);
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-   }
-*/
-
-/*밤 배경*/
-/* #message-background-night{
-  /* width:455px;
-  height:385px;*/
-/*  background-image:url(night.png);
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-   }
-*/
-
 .message-container:first-of-type {
   border-top-width: 0;
 }
