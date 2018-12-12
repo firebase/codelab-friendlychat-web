@@ -6,6 +6,13 @@
 > 3. 사용자들은 웹페이지 배경화면을 통해서 직관적으로 상대방의 대략적인 시간대를 알 수 있습니다.
 
 
+## 개발자 정보
++고유정
++손수현
++여주은
++조해윤
++홍수민
+
 ## 오픈 소스 목록
  - [Firebase Web Codelab](https://codelabs.developers.google.com/codelabs/firebase-web/).
 
