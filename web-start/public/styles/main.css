@@ -87,31 +87,6 @@ main, #messages-card {
 #message-filler {
   flex-grow: 1;
 }
-
-/*ë® ë°°ê²½*/
-/* #message-background-daytime{
- /* width:455px;
-  height:385px;*/
-/*background-image:url(daytime.png);
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-   }
-*/
-
-/*ë°¤ ë°°ê²½*/
-/* #message-background-night{
-  /* width:455px;
-  height:385px;*/
-/*  background-image:url(night.png);
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-   }
-*/
-
 .message-container:first-of-type {
   border-top-width: 0;
 }
@@ -200,6 +175,46 @@ main, #messages-card {
 #message-form button, #image-form button {
   width: 100px;
   margin: 15px 0 0 10px;
+}
+.button_back{
+
+}
+
+button{
+  background:#424242;
+  color:#fff;
+  border:none;
+  position:;
+  height:23px;
+  font-size:0.7em;
+  padding:0 2em;
+  cursor:pointer;
+  transition:800ms ease all;
+  outline:none;
+}
+button:hover{
+  background: #fff;
+  color: rgba(0,0,0,.87);
+}
+button:before,button:after{
+  content:'';
+  position:absolute;
+  top:0;
+  right:0;
+  height:2px;
+  width:0;
+  background: #424242;
+  transition:40ms ease all;
+}
+button:after{
+  right:inherit;
+  top:inherit;
+  left:0;
+  bottom:0;
+}
+button:hover:before,button:hover:after{
+  width:19%;
+  transition:800ms ease-in-out all;
 }
 .mdl-card {
   min-height: 0;
