@@ -58,10 +58,10 @@ main, #messages-card {
   margin-top: 17px;
 }
 .mdl-grid {
-  position: absolute;
+  position:initial;
   max-width: 1024px;
   margin: auto;
-  position:absolute;
+
 }
 .material-icons {
   font-size: 36px;
@@ -178,16 +178,14 @@ main, #messages-card {
   width: 100px;
   margin: 15px 0 0 10px;
 }
-.button_back{
 
-}
 
 button{
   background:#424242;
   color:#fff;
   border:none;
   position:;
-  height:23px;
+  height:26px;
   font-size:0.7em;
   padding:0 2em;
   cursor:pointer;
@@ -203,7 +201,7 @@ button:before,button:after{
   position:absolute;
   top:0;
   right:0;
-  height:2px;
+  height:0px;
   width:0;
   background: #424242;
   transition:40ms ease all;
