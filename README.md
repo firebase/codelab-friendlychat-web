@@ -1,5 +1,6 @@
-# Friendly Chat 기반 오픈SW 프로젝트 JellyTalk
+# JellyTalk : Web-based Chat Messenger with User TimeZone Conversion
 
+> 젤리톡은 
 
 
 ## 오픈 소스 목록
