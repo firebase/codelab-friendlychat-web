@@ -7,11 +7,11 @@
 
 
 ## 개발자 정보
-+고유정  
-+손수현  
-+여주은  
-+조해윤  
-+홍수민  
++ 고유정  
++ 손수현  
++ 여주은  
++ 조해윤  
++ 홍수민  
 
 ## 오픈 소스 목록
  - [Firebase Web Codelab](https://codelabs.developers.google.com/codelabs/firebase-web/).
