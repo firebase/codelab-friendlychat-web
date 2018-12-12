@@ -7,11 +7,11 @@
 
 
 ## 개발자 정보
-+ 고유정 `Youjung2`
-+ 손수현 `sonsuhyune` 
-+ 여주은 `jueunyeo`
-+ 조해윤 `hy00nc`
-+ 홍수민 `hongsuminn`
++ **고유정 `Youjung2`
++ **손수현 `sonsuhyune` 
++ **여주은 `jueunyeo`
++ **조해윤 `hy00nc`
++ **홍수민 `hongsuminn`
 
 ## 오픈 소스 목록
  - [Firebase Web Codelab](https://codelabs.developers.google.com/codelabs/firebase-web/).
