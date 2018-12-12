@@ -58,10 +58,9 @@ main, #messages-card {
   margin-top: 17px;
 }
 .mdl-grid {
-  position: absolute;
+  position:initial;
   max-width: 1024px;
   margin: auto;
-  position:absolute;
 }
 .material-icons {
   font-size: 36px;
