@@ -1,4 +1,4 @@
-﻿/**
+
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ main, #messages-card {
   height: calc(100% - 35px);
   padding-bottom: 0;
 }
-/*밤 배경*/
+/*ë°¤ ë°°ê²½*/
 #messages-card-container-night {
   padding: 0;
   margin: 0;
@@ -37,7 +37,7 @@ main, #messages-card {
   -o-background-size: cover;
 }
 
-/*낮 배경*/
+/*ë® ë°°ê²½*/
 #messages-card-container-daytime {
   padding: 0;
   margin: 0;
@@ -61,7 +61,6 @@ main, #messages-card {
   position:initial;
   max-width: 1024px;
   margin: auto;
-
 }
 .material-icons {
   font-size: 36px;
@@ -88,7 +87,6 @@ main, #messages-card {
 #message-filler {
   flex-grow: 1;
 }
-
 .message-container:first-of-type {
   border-top-width: 0;
 }
