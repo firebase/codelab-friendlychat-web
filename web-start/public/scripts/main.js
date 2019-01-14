@@ -45,14 +45,14 @@ function isUserSignedIn() {
   // TODO 6: Return true if a user is signed-in.
 }
 
-// Loads chat messages history and listens for upcoming ones.
-function loadMessages() {
-  // TODO 7: Load and listens for new messages.
-}
-
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
-  // TODO 8: Push a new message to Firebase.
+  // TODO 7: Push a new message to Firebase.
+}
+
+// Loads chat messages history and listens for upcoming ones.
+function loadMessages() {
+  // TODO 8: Load and listens for new messages.
 }
 
 // Saves a new message containing an image in Firebase.
@@ -115,7 +115,7 @@ function authStateObserver(user) {
     var userName = getUserName();
 
     // Set the user's profile pic and name.
-    userPicElement.style.backgroundImage = 'url(' + profilePicUrl + ')';
+    userPicElement.style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
     userNameElement.textContent = userName;
 
     // Show user's profile and sign-out button.
@@ -180,16 +180,33 @@ function addSizeToGoogleProfilePic(url) {
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
+// Delete a Message from the UI.
+function deleteMessage(id) {
+  var div = document.getElementById(id);
+  // If an element for that message exists we delete it.
+  if (div) {
+    div.parentNode.removeChild(div);
+  }
+}
+
 // Displays a Message in the UI.
-function displayMessage(key, name, text, picUrl, imageUrl) {
-  var div = document.getElementById(key);
+function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
+  var div = document.getElementById(id);
   // If an element for that message does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
     container.innerHTML = MESSAGE_TEMPLATE;
     div = container.firstChild;
-    div.setAttribute('id', key);
-    messageListElement.appendChild(div);
+    div.setAttribute('id', id);
+    div.setAttribute('timestamp', timestamp);
+    for (var i = 0; i < messageListElement.children.length; i++) {
+      var child = messageListElement.children[i];
+      var time = child.getAttribute('timestamp');
+      if (time && time > timestamp) {
+        break;
+      }
+    }
+    messageListElement.insertBefore(div, child);
   }
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
@@ -269,6 +286,11 @@ mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
 // initialize Firebase
 initFirebaseAuth();
+
+// Remove the warning about timstamps change. 
+var firestore = firebase.firestore();
+var settings = {timestampsInSnapshots: true};
+firestore.settings(settings);
 
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
