@@ -47,6 +47,7 @@ function getUserName() {
 // Returns true if a user is signed-in.
 function isUserSignedIn() {
   return !!firebase.auth().currentUser;
+}
 
 // Saves a new message on the Cloud Firestore.
 function saveMessage(messageText) {
@@ -59,7 +60,6 @@ function saveMessage(messageText) {
   }).catch(function(error) {
     console.error('Error writing new message to Firebase Database', error);
   });
-}
 }
 
 // Loads chat messages history and listens for upcoming ones.
