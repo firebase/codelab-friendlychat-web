@@ -74,7 +74,7 @@ function loadMessages() {
         deleteMessage(change.doc.id);
       } else {
         var message = change.doc.data();
-        displayMessage(change.doc.id, message.timestamp, message.name,
+        displayMessage(change.doc.id, message.timestamp.seconds, message.name,
                        message.text, message.profilePicUrl, message.imageUrl);
       }
     });
