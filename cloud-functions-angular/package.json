@@ -27,9 +27,11 @@
     "core-js": "^2.4.1",
     "firebase": "^5.7.3",
     "rxjs": "^6.4.0",
+    "tslib": "^1.9.0",
     "zone.js": "^0.8.29"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "~0.13.0",
     "@angular/cli": "7.3.8",
     "@angular/compiler-cli": "7.2.12",
     "@angular/language-service": "7.2.12",
