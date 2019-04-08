@@ -5,6 +5,7 @@ This folder contains the start code of the [Firebase SDK for Cloud Functions (An
 If you'd like to jump directly to the end and see the finished code head to the [cloud-functions-angular](../cloud-functions-angular) directory.
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0.
+Now, it's updated to version 7.3.8 of the [Angular CLI](https://github.com/angular/angular-cli).
 
 # Running locally
 
@@ -35,4 +36,4 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 # Deploying
 
 Run `firebase deploy` to deploy hosting, database, and functions. Run
-`firebase deploy --except` to only deploy hosting and database.
+`firebase deploy --except functions` to only deploy hosting and database.
