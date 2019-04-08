@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { Component, Inject } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
+import { Observable } from 'rxjs';
+import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { MatSnackBar } from '@angular/material';
 import * as firebase from 'firebase';
 
