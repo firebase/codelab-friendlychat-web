@@ -354,8 +354,6 @@ initFirebaseAuth();
 
 // Remove the warning about timstamps change. 
 var firestore = firebase.firestore();
-var settings = {timestampsInSnapshots: true};
-firestore.settings(settings);
 
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
