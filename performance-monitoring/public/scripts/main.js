@@ -92,14 +92,15 @@ function saveImageMessage(file) {
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   }).then(function(messageRef) {
 
-    // TODO: Get performance object from Firebase.
-    var perf = firebase.performance();
     // TODO: Create custom trace to monitor image upload.
-    const trace = perf.trace('saveImageMessage');
+    const trace = firebase.performance().trace('saveImageMessage');
+
     // TODO: Record image size.
     trace.incrementMetric('imageSize', file.size);
+
     // TODO: Record image MIME type.
     trace.putAttribute('imageType', file.type);
+
     // TODO: Start timer for custom trace.
     trace.start();
 
@@ -108,8 +109,10 @@ function saveImageMessage(file) {
     return firebase.storage().ref(filePath).put(file).then(function(fileSnapshot) {
       // 3 - Generate a public URL for the file.
       return fileSnapshot.ref.getDownloadURL().then((url) => {
+
         // TODO: Stop timer for custom trace.
         trace.stop();
+
         // 4 - Update the chat message placeholder with the image’s URL.
         return messageRef.update({
           imageUrl: url,
@@ -370,6 +373,9 @@ initFirebaseAuth();
 var firestore = firebase.firestore();
 var settings = {timestampsInSnapshots: true};
 firestore.settings(settings);
+
+// TODO: Enable Firebase Performance Monitoring.
+firebase.performance();
 
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
