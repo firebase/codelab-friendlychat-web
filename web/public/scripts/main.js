@@ -355,5 +355,8 @@ initFirebaseAuth();
 // Remove the warning about timstamps change. 
 var firestore = firebase.firestore();
 
+ // TODO: Enable Firebase Performance Monitoring.
+firebase.performance();
+
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
