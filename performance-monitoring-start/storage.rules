@@ -1,0 +1,14 @@
+// Returns true if the uploaded file is an image and its size is below the given number of MB.
+function isImageBelowMaxSize(maxSizeMB) {
+  return request.resource.size < maxSizeMB * 1024 * 1024
+      && request.resource.contentType.matches('image/.*');
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{userId}/{messageId}/{fileName} {
+      allow write: if request.auth != null && request.auth.uid == userId && isImageBelowMaxSize(5);
+      allow read;
+    }
+  }
+}
