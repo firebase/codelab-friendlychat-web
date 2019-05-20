@@ -101,7 +101,7 @@ function saveImageMessage(file) {
     // TODO: Record image MIME type.
     trace.putAttribute('imageType', file.type);
 
-    // TODO: Start timer for custom trace.
+    // TODO: Start the “timer” for the custom trace.
     trace.start();
 
     // 2 - Upload the image to Cloud Storage.
@@ -110,7 +110,7 @@ function saveImageMessage(file) {
       // 3 - Generate a public URL for the file.
       return fileSnapshot.ref.getDownloadURL().then((url) => {
 
-        // TODO: Stop timer for custom trace.
+        // TODO: Stop the “timer” for the custom trace.
         trace.stop();
 
         // 4 - Update the chat message placeholder with the image’s URL.
