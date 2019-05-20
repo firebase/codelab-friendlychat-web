@@ -98,7 +98,7 @@ function saveImageMessage(file) {
 
     // TODO: Record image MIME type.
 
-    // TODO: Start timer for custom trace.
+    // TODO: Start the “timer” for the custom trace.
 
     // 2 - Upload the image to Cloud Storage.
     var filePath = firebase.auth().currentUser.uid + '/' + messageRef.id + '/' + file.name;
@@ -106,7 +106,7 @@ function saveImageMessage(file) {
       // 3 - Generate a public URL for the file.
       return fileSnapshot.ref.getDownloadURL().then((url) => {
 
-        // TODO: Stop timer for custom trace.
+        // TODO: Stop the “timer” for the custom trace.
 
         // 4 - Update the chat message placeholder with the image’s URL.
         return messageRef.update({
