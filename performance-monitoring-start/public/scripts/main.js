@@ -366,8 +366,6 @@ initFirebaseAuth();
 
 // Remove the warning about timstamps change. 
 var firestore = firebase.firestore();
-var settings = {timestampsInSnapshots: true};
-firestore.settings(settings);
 
 // TODO: Enable Firebase Performance Monitoring.
 
