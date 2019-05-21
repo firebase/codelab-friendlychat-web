@@ -96,7 +96,7 @@ function saveImageMessage(file) {
     const trace = firebase.performance().trace('saveImageMessage');
 
     // TODO: Record image size.
-    trace.incrementMetric('imageSize', file.size);
+    trace.putMetric('imageSize', file.size);
 
     // TODO: Record image MIME type.
     trace.putAttribute('imageType', file.type);
@@ -374,7 +374,7 @@ var firestore = firebase.firestore();
 var settings = {timestampsInSnapshots: true};
 firestore.settings(settings);
 
-// TODO: Enable Firebase Performance Monitoring.
+// TODO: Initialize Firebase Performance Monitoring.
 firebase.performance();
 
 // We load currently existing chat messages and listen to new ones.
