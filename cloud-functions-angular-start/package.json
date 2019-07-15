@@ -24,9 +24,8 @@
     "@angular/platform-browser": "^6.1.10",
     "@angular/platform-browser-dynamic": "^6.1.10",
     "@angular/router": "6.1.10",
-    "@firebase/app": "^0.1.10",
     "core-js": "2.4.1",
-    "firebase": "^6.2.4",
+    "firebase": "^6.3.0",
     "rxjs": "^6.5.2",
     "rxjs-compat": "^6.5.2",
     "zone.js": "~0.8.26"
