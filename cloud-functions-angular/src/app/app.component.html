@@ -40,7 +40,7 @@
           <div *ngIf="topics"><em>Recent topics: {{ topics }}</em></div>
           <form id="message-form" (submit)="saveMessage($event, box)">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <input #box class="mdl-textfield__input" type="text" id="message"
+              <input #box class="mdl-textfield__input" type="text" id="message" autocomplete="off"
                 (keyup)="update(box.value)" (blur)="update(box.value)"
                 placeholder="Message...">
             </div>
