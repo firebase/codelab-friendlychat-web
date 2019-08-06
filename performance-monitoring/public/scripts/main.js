@@ -271,30 +271,58 @@ function deleteMessage(id) {
   }
 }
 
-// Displays a Message in the UI.
-function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
-  var div = document.getElementById(id);
-  // If an element for that message does not exists yet we create it.
-  if (!div) {
-    var container = document.createElement('div');
-    container.innerHTML = MESSAGE_TEMPLATE;
-    div = container.firstChild;
-    div.setAttribute('id', id);
-    div.setAttribute('timestamp', timestamp);
-    for (var i = 0; i < messageListElement.children.length; i++) {
-      var child = messageListElement.children[i];
-      var time = child.getAttribute('timestamp');
-      if (time && time > timestamp) {
+function createAndInsertMessage(id, timestamp) {
+  const container = document.createElement('div');
+  container.innerHTML = MESSAGE_TEMPLATE;
+  const div = container.firstChild;
+  div.setAttribute('id', id);
+
+  // If timestamp is null, assume we've gotten a brand new message.
+  // https://stackoverflow.com/a/47781432/4816918
+  timestamp = timestamp ? timestamp.toMillis() : Date.now();
+  div.setAttribute('timestamp', timestamp);
+
+  // figure out where to insert new message
+  const existingMessages = messageListElement.children;
+  if (existingMessages.length === 0) {
+    messageListElement.appendChild(div);
+  } else {
+    let messageListNode = existingMessages[0];
+
+    while (messageListNode) {
+      const messageListNodeTime = messageListNode.getAttribute('timestamp');
+
+      if (!messageListNodeTime) {
+        throw new Error(
+          `Child ${messageListNode.id} has no 'timestamp' attribute`
+        );
+      }
+
+      if (messageListNodeTime > timestamp) {
         break;
       }
+
+      messageListNode = messageListNode.nextSibling;
     }
-    messageListElement.insertBefore(div, child);
+
+    messageListElement.insertBefore(div, messageListNode);
   }
+
+  return div;
+}
+
+// Displays a Message in the UI.
+function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
+  var div = document.getElementById(id) || createAndInsertMessage(id, timestamp);
+
+  // profile picture
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
   }
+
   div.querySelector('.name').textContent = name;
   var messageElement = div.querySelector('.message');
+
   if (text) { // If the message is text.
     messageElement.textContent = text;
     // Replace all line breaks by <br>.
