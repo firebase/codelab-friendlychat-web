@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+
+body {
+  margin: 0;
+}
+
+.header {
+  position: fixed;
+  top: 0vh;
+  height: 35px;
+  width: 100%;
+  background-color: black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 999;
+}
+
+.menuIconContainer {
+  /* flex-direction: row; */
+}
+
+.appNameContainer {
+  /* justify-content: center; */
+}
+
+.appNameContainer > a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.headerIconContainer {
+  flex-direction: flex-end;
+}
+
+.headerAppName {
+  font-family: 'Pacifico', cursive;
+  color: #cfecd8;
+  font-size: 23px;
+}
+
+.headerIconContainer {
+  justify-content: flex-end;
+}
+
+.personIcon, .menuIcon {
+  color: #fff;
+  margin: 0 15px 0 15px;
+  cursor: pointer;
+}
+
+.sidebar {
+  display: none;
+}
+
+.widgetLoader {
+  margin: calc(50vh - 100px) auto;
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 1s linear infinite; /* Safari */
+  animation: spin 1s linear infinite;
+}
+
+.displayPierre {
+  display: none;
+}
+
+header .userImage {
+  border: 1px solid black;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.titleBeta {
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.main {
+  /* width: 100vw; */
+}
+
+@media only screen and (min-device-width: 812px) {
+  .appComponent {
+    display: grid;
+    grid-template-columns: 250px auto;
+    grid-template-areas:
+      "header header"
+      "sidebar main";
+  }
+  .sidebar {
+    display: unset;
+  }
+  .menuComponent {
+    /* position: absolute; */
+    /* z-index: 999; */
+    grid-area: sidebar;
+    /* background-color: #E1E2E1; */
+  }
+  .header {
+    grid-area: header;
+    /* z-index: 4; */
+  }
+  .main {
+    /* width: 100vw; */
+    grid-area: main;
+  }
+  .menuIcon {
+    display: none;
+  }
+  .displayPierre {
+    display: unset;
+  }
+}

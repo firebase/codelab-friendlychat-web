@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+
+.registrationForm {
+  width: 100vw;
+  font-family: 'Roboto', sans-serif;
+  /* font-size: 1em; */
+}
+
+.registrationFieldset {
+  border: 0px;
+  /* padding: 0 100px; */
+}
+
+.formLegend {
+  text-align: center;
+  /* border: 0px; */
+}
+
+.appNameAtAuth {
+  font-family: 'Pacifico', cursive;
+  font-size: 30px;
+}
+
+.parentFlex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 90vh;
+  height: calc(var(--vh, 1vh) * 100 - 168px);
+}
+
+.oAuthButtons {
+  list-style-type: none;
+  padding: unset;
+}
+
+.formGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.errorMessage {
+  width: 100%;
+}
+
+.parentFlex > section {
+  width: 80%;
+  display: flex;
+  align-items: center;
+}
+
+.authHero {
+  justify-content: center;
+  height: 20%;
+}
+
+.fieldsContainer {
+  height: 35%;
+  flex-direction: column-reverse;
+}
+
+.buttonsContainer {
+  height: 10%;
+}
+
+.oAuthDialog {
+  height: 15%;
+  justify-content: center;
+  text-align: center;
+}
+
+.oAuthContainer {
+  height: 20%;
+  width: 100% !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between !important;
+}
+
+.authLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  /* width: 100%; */
+}
+
+.selectionContainer {
+  height: 30%;
+}
+
+.shouldMerge {
+  width: 100%;
+  height: auto;
+}
+
+.input {
+  font-size: 16px;
+  display: block;
+  margin: 0;
+  width: 100%;
+  height: 25px;
+  border: 1px solid #232323;
+  padding: 0;
+  border-radius: 4px;
+  margin-bottom: 25px;
+}
+
+.input:focus {
+  outline: 0;
+}
+
+.errorMessage {
+  height: 20px;
+}
+
+.disclaimerAndTos span {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.loadingAnimation {
+  margin: calc(50vh - 120px) auto;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+.displayNone {
+  display: none;
+}
+
+.oAuthButton {
+  height: 80px;
+}
+
+.submitFormButton {
+  border: 1px solid black;
+  border-radius: 8px;
+  height: 40px;
+  width: 100%;
+  background-color: #232323;
+  color: #fff;
+  font-size: 1em;
+}
+
+@media screen and (min-width: 450px) {
+  .registrationFieldset > section {
+    margin: auto;
+    width: 400px;
+  }
+  .parentFlex {
+    height: 470px;
+  }
+  .registrationFieldset {
+    margin: auto;
+    max-width: 500px;
+    border: 1px solid black;
+    border-radius: 10px;
+  }
+};

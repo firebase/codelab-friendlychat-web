@@ -1,0 +1,23 @@
+{
+  "activity" : {
+    "isOnline" : true,
+    "lastChanged" : 1560289085781
+  },
+  "displayName" : "mykey",
+  "fcmTokens" : {
+    "cc2L1Dv0AIk:APA91bEnfNTRllKgCqqCNm-M8Ss09x4RTrdorRPQO2zlDpJ5zPHSWi8y5YigbRVQyIvPM9_qFU9YD5wO_MEr6xLDjUcgRLyuIoL2sLUNOTz_KzCQUWtWs2_xo3C7c8z0Z5Lpk-SNvaXc" : false,
+    "djvoidg5dFk:APA91bFmAFOfKUMax7YxrrVi9q9KM12FCjnyVkgpJ9VPeE_vavYAhM-h9msXFA7TcM7CVw_zXkFNtjBJFG6mQBTjQK_XjFNXsV-5x1Vf8m0yCxk2Y8jE_FcIGzdPkuW52e_5MjA8tjoy" : true,
+    "e-eg0RhgXMo:APA91bHlcvtj24S49xbvV6-lT-D6ppSrJtvdRbF20OMLzNvSduA6nQhby1-EhIneAYNXdePqw0htBI8wCMo_wjfit-upxGngm4Xv19DfcIIw4xfEMstvcKCF5Bu8XzcQPkd-IMaHb-iG" : false,
+    "eARx9jjOrwU:APA91bGdqILtVVrUxhFWz-1UUbWmCLpxV6XA_BfBlDIaCK0loWxFos6oktGNfsnrHB5yf2XKSVDQ5_4M1xsSvr5O2xFeM5KTOHYz202xs8HzrGE5dMocr5uuO4SaBGljrHzL0_P6APYw" : false,
+    "eCZGEPnqh1w:APA91bFr_u0ohYIiF2YSVtaqOEyltFM5cpdMOLK2_1vhyqq37KYiQp3DYAMz28B3Tsz5mQnnUg9TFkRfGhiOBeahS11mfMzZrl4nVu5-R9P5IJBsALgQBeozuyzJH_Nd1l0pd2sx84BQ" : false,
+    "eY8_EAnKXi4:APA91bH3v9Bx6U0ueEYjFvZtjUin5hvqKP4lGvGq8RQ5jBtrUXdVjANz8BfrmpakRv3SBQL---6rElRl33lY7jd6tEHRJiwnLrmGIEZHBy0apEM0C6sZlRXOsgn9lOK5A2KKCKG87YtI" : true,
+    "eZ2hnkXeB9A:APA91bHqYq3kFBYbJSywawD-pasd4JpZYfDwFPuBDFO_SjZ25NfLx2TMAmNXOtuS9POoNJ6zOGs9cN8mrgdeqVwy1u-yQGDiCmhaZj7kvIj2T99nFwEvZ_t3NQS24zFNYA6Csx7GC-1R" : true,
+    "fHjFpppCB7U:APA91bEcDhqZA7FkeGnPinV5cTyN_WodMhyceUcTQ7Dj73NuwHS7mFMAkpj47t5xKQ04SvWIWeAT0FWz-zOHd0OmjyZTgavsjB5bGFHu_QWCk_xiEurgvCHD7EOYEcF41AYg4Q_JLAmS" : false,
+    "fbSWVr9szIY:APA91bH6rr9yjj6b4QoFYKr2W8T_oLfZ4cH3Ckpf4J6YLuvjCwz1p_kvMDNTIkHSSy2a0fksVZPNRp7KpZ252jQotBbXlh6CY1JeWTV_Qmj6hrRihygdD1ik1zxSUmcb4tgbqgV84Ovw" : false
+  },
+  "lastVisited" : "-Ld7mZCDqAEcMSGxJt-x",
+  "notifications" : {
+    "-Lh2fQrfZq56-Lpwnm82" : true
+  },
+  "rooms" : [ "uid-N4OX2pYK4uSlDsyFmUurr0uuL293", "-Ld7mZCDqAEcMSGxJt-x" ]
+}

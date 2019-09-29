@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+.menuComponent {
+  position: fixed;
+  bottom: 0;
+  height: calc(100vh - 40px);
+  background-color: #fff;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  margin-left: 8px;
+}
+
+.menuComponent legend.avatarLegend {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menuComponent ul.usersList {
+  height: 87%;
+  overflow-y: scroll;
+  margin: 0;
+}
+
+.menuComponent ul.authImagesList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.userAvatar {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  border: 1px solid black;
+  margin-right: 5px;
+}
+
+.authImagesList {
+  display: flex;
+}
+
+.userImage {
+  height: 25px;
+  width: 25px;
+}
+
+.authImage {
+  width: 17px;
+  height: 17px;
+  border: 0;
+  border-radius: 50%;
+}
+
+.menuComponent fieldset {
+  border-radius: 5px;
+  width: 210px;
+  position: absolute;
+  margin: 0;
+  border: 1px solid gray;
+  /* box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23); */
+}
+
+.menuComponent fieldset.avatarFieldset {
+  top: 0;
+  height: 100px;
+}
+
+.menuComponent fieldset.roomsFieldset {
+  top: 125px;
+  height: calc(38% - 125px);
+}
+
+.menuComponent fieldset.usersFieldset {
+  bottom: 20px;
+  height: 55%;
+}
+
+.menuComponent .userListItem {
+  display: flex;
+  align-items: center;
+}
+
+.menuComponent img.userImage {
+  height: 25px;
+  width: 25px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+.menuComponent div.userDisplayName {
+  width: 141px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menuComponent div.userAction {
+  width: auto;
+  text-align: right;
+}
+
+.widgetLoader {
+  margin: calc(50vh - 100px) auto;
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 1s linear infinite; /* Safari */
+  animation: spin 1s linear infinite;
+}
+
+.roomSelect {
+	font-size: 1.3em;
+	padding: .20em;
+	width: 100%;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	appearance: none;
+}
+.roomSelect::-ms-expand {
+	display: none;
+}
+.roomSelect:hover {
+	border-color: #232323;
+}
+.roomSelect:focus {
+	outline: none;
+}
+
+.trafficCard {
+  display: none;
+}
+
+/* .menuComponent fieldset .trafficImage {
+  display: none;
+} */
+
+/* .menuComponent .trafficListItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+} */
+
+/* .menuComponent .trafficListItem > .trafficDisplayName {
+  width: 100px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menuComponent .trafficListItem > .trafficAction {
+  width: 80px;
+  text-align: left;
+}
+
+.menuComponent .trafficListItem > .timeago {
+  width: 67px;
+  text-align: right;
+} */
+
+/* .menuComponent fieldset .trafficImage {
+  margin-right: 0;
+  font-size: 0.5em;
+} */

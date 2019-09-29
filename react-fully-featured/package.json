@@ -1,0 +1,32 @@
+{
+  "name": "potato",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://wiscosauce.web.com/",
+  "dependencies": {
+    "bad-words": "^3.0.2",
+    "faker": "^4.1.0",
+    "firebase": "^5.11.0",
+    "firebase-admin": "^8.4.0",
+    "firebase-functions": "^3.2.0",
+    "firebase-tools": "^6.7.2",
+    "google-auth-library": "^4.0.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-markdown": "^4.0.8",
+    "react-router-dom": "^5.0.1",
+    "serve": "^11.0.2",
+    "showdown": "^1.9.0"
+  },
+  "devDependencies": {
+    "gh-pages": "^2.0.1",
+    "react-scripts": "^1.0.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "predeploy": "react-scripts build"
+  }
+}

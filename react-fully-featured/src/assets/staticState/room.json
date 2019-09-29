@@ -1,0 +1,11 @@
+{
+  "active" : false,
+  "creator" : "uid-N4OX2pYK4uSlDsyFmUurr0uuL293",
+  "dscription" : "mykey's first Potato. Welcome!",
+  "key" : "uid-N4OX2pYK4uSlDsyFmUurr0uuL293",
+  "moderators" : [ "uid-N4OX2pYK4uSlDsyFmUurr0uuL293" ],
+  "name" : "mykey's Potato",
+  "users" : {
+    "uid-N4OX2pYK4uSlDsyFmUurr0uuL293" : "mykey"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "short_name": "potato",
+  "name": "potato",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "gcm_sender_id": "103953800507"
+}

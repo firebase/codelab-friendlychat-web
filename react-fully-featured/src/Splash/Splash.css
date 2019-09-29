@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+
+.splashComponent {
+  display: flex;
+  flex-direction: column;
+}
+
+.splashHeader {
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nameLogoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.anchor {
+  text-decoration: none;
+}
+
+.splashLogo {
+  width: 40px;
+}
+
+.splashAppName {
+  font-family: 'Pacifico', cursive;
+  color: #191a1b;
+  font-size: 30px;
+  margin-left: 10px;
+}
+
+.menuIcon {
+  font-weight: bold;
+}
+
+.splashMain {
+  margin-top: 175px;
+}
+
+.mainContentContainer {
+  width: 85%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  font-family: 'Roboto', sans-serif;
+}
+
+.appDescription {
+  font-family: 'Roboto', sans-serif;
+  line-height: 28px;
+  color: #191a1b;
+  margin-top: 20px;
+}
+
+.splashFooter {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 130px;
+  display: none;
+}
+
+.getStartedButton {
+  width: 100%;
+  max-width: 400px;
+  padding: 18px 20px;
+  background-color: #506cf0;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  border-radius: 6px;
+  margin-top: 130px;
+}
+
+.companyImagesContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-top: 150px;
+}
+
+.firebaseLogo {
+  width: 300px;
+}
+
+.reactLogo {
+  animation: reactLogoSpin infinite 20s linear;
+  width: 300px;
+  pointer-events: none;
+}
+
+.loadingAnimation {
+  margin: calc(50vh - 120px) auto;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes reactLogoSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .getStartedButton {
+    margin-top: 50px;
+  }
+  .companyImagesContainer {
+    flex-direction: row;
+    margin-top: 150px;
+    width: 100vw;
+  }
+  .reactLogo {
+    width: 200px;
+  }
+  .mainContentContainer {
+    width: 500px;
+  }
+  .splashFooter {
+    position: fixed;
+    bottom: 0;
+  }
+}

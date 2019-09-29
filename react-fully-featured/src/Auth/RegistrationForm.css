@@ -1,0 +1,90 @@
+/* @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+
+.registrationFormComponent {
+  font-family: 'Roboto', sans-serif;
+  width: 90%;
+}
+
+.registrationFieldset {
+  margin: 0;
+  padding: 0;
+}
+
+.appNameAtAuth {
+  font-family: 'Pacifico', cursive;
+  font-size: 30px;
+}
+
+.registrationFieldset {
+  padding: 0;
+}
+
+.registrationLegend {
+  text-align: center;
+  border-radius: 6px;
+}
+
+.googleButton {
+  width: 80%;
+  cursor: pointer;
+}
+
+.parentFlex {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: calc(var(--vh, 1vh) * 100 - 28px - 75px - 28px);
+}
+
+.input {
+  font-size: 16px;
+  height: 40px;
+  border: 1px solid #232323;
+  padding-left: 8px;
+  border-radius: 6px;
+}
+
+.input:focus {
+  outline: 0;
+}
+
+.registrationButton {
+  display: block;
+  width: 80%;
+  height: 55px;
+  background-color: #506cf0;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
+.horizontalRule:after, .horizontalRule:before {
+  content:"\00a0\00a0\00a0\00a0\00a0";
+  text-decoration: line-through;
+}
+
+.errorMessage {
+  height: 20px;
+}
+
+.toggleFormLink {
+  font-size: 12px;
+}
+
+.toggleFormLink span {
+  cursor: pointer;
+  text-decoration: underline;
+  padding-left: 4px;
+}
+
+@media screen and (min-width: 450px) {
+  .parentFlex {
+    height: 470px;
+  }
+  .registrationFieldset {
+    margin-bottom: 43px;
+  }
+}; */

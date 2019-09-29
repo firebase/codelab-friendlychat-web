@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+
+.textarea {
+  outline: none;
+  border-radius: 7px;
+  border: 0;
+  resize: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  height: 1.5em;
+  min-height: 1em;
+  margin: auto 0 auto 0;
+  padding-left: 10px;
+  width: 100%;
+}
+
+.formButtonWrapper {
+  outline: none;
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid gray;
+  border-radius: 7px;
+  padding: 5px 0 5px 0;
+  width: 100%;
+}
+
+.sendButton {
+  cursor: pointer;
+  width: auto;
+  height: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  flex-direction: column-reverse;
+}
+
+.sendButton:focus {
+  outline: none;
+}
+
+.send {
+  color: blue;
+}
+
+.notification {
+  color: green;
+  display: none;
+}
+
+@media only screen and (min-device-width: 812px) {
+  .submitTextArea {
+    /* width: inherit; */
+  }
+};

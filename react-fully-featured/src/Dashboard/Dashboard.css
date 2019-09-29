@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+.dashboardComponent {
+  /* width: 100vw; */
+  font-family: 'Roboto', sans-serif;
+}
+
+.dashboardComponent > header {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0vh;
+  height: 5vh;
+  width: 100%;
+  font-size: 1.35em;
+  z-index: 999;
+}
+
+.dashboardComponent .exit {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  top: 4.5vh;
+  height: 5vh;
+  /* width: 100; */
+  z-index: 999;
+}
+
+.dashboardComponent main {
+  margin-top: 80px;
+  margin-left: 20px;
+  z-index: 0;
+}
+
+.trafficList, .usersList {
+  padding: 0;
+  list-style-type: none;
+}
+
+.dashboardContent .trafficImage {
+  border-radius: 50%;
+  height: 60px;
+}
+
+.dashboardContent div {
+  font-size: 1.5em;
+}
+
+.dashboardComponent footer {
+  position: fixed;
+  bottom: 0vh;
+  height: 10vh;
+  width: 100%;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-around;
+}
+
+.navToUsers, .navToChannels, .navToTraffic {
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin: 0 8px;
+}
+
+.navToUsers, .navToChannels, .navToTraffic {
+  display: none;
+}
+
+.exitButton {
+  margin-left: 20px;
+}
+
+.exitButton:focus {
+  outline: none;
+}
+
+.navToUsers:focus {
+  outline: none;
+}
+
+.navToChannels:focus {
+  outline: none;
+}
+
+.navToTraffic:focus {
+  outline: none;
+}
+
+.dashboardContent > .trafficListContent, .userListContent {
+  /* font-family: 'Roboto', sans-serif; */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboardContent > .trafficImage {
+  height: 35px;
+  width: 35px;
+}
+
+.displayName {
+  font-family: 'Roboto', sans-serif;
+	margin-left: 10px;
+	font-size: 17px;
+}
+
+.navToUsers div, .navToChannels > div, .navToTraffic > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.navToUsers div, .navToChannels > div, .navToTraffic > div {
+  font-size: 1.5em;
+}
+
+.dashChannelsList {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+@media screen and (min-width: 600px) {
+  .dashboardComponent {
+    height: 100%;
+  }
+};

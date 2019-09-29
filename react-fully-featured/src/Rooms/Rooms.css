@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+.roomsComponent {
+	width: 100%;
+}
+
+.roomsComponent > ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+.subscribedRoom {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin-top: 10px;
+}
+
+.roomNameButton {
+	cursor: pointer;
+	outline: none;
+	height: 55px;
+	text-align: left;
+	background: none;
+	width: 100%;
+	border-style: none;
+	margin-top: 10px;
+	border-radius: 4px;
+	padding: 0;
+	margin: 0;
+	font-size: unset;
+}
+
+.roomNameButton > div {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.roomName {
+	font-family: 'Roboto', sans-serif;
+	margin-left: 10px;
+	font-size: 20px;
+}
+
+@media screen and (min-width: 450px) {
+  .subscribedRoom {
+		height: 35px;
+	}
+
+	.roomNameButton {
+		height: 25px;
+		border-radius: 0px;
+		border: 0;
+	}
+
+	.roomName {
+		font-family: 'Roboto', sans-serif;
+		margin-left: 10px;
+		font-size: 15px;
+		font-weight: bold;
+	}
+};

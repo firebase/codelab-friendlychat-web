@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+/* temporary selectors until proper markdown validation is acheived */
+p, h1, h2, h3, h4, h5, h6 {
+  /* margin: 0; */
+}
+
+.visibilityHidden {
+  visibility: hidden;
+}
+
+.messageListItem {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.message {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Roboto', sans-serif;
+  z-index: 3;
+  width: 100%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  overflow-y: scroll;
+  margin: 0;
+}
+
+.messageImage {
+  width: 40px;
+  height: 40px;
+  margin-right: 5px;
+  border-radius: 15%;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.content > p {
+  margin: 0 0 15px 0;
+  padding: unset;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.display-name {
+  font-size: 12px;
+}
+
+.messageList {
+  padding: unset;
+  list-style-type: none;
+}
+
+.messageList:first-child {
+  margin-top: calc(100vh);
+}
+
+.messageList:last-child {
+  margin-bottom: 75px;
+}
+
+.imageMessageContainer {
+  display: flex;
+  overflow-x: auto;
+}
+
+.message .timeago {
+  font-size: 9px;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+.submitTextarea {
+  position: fixed;
+  bottom: 20px;
+  background-color: #fff;
+  width: 95%;
+  margin: unset;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+@media only screen and (min-device-width: 868px) {
+  .firstChild {
+    /* margin-top: calc(100vh - 100px); */
+  }
+  .message, .submitTextarea {
+    width: calc(100vw - 260px);
+  }
+  .messageListItem {
+    width: calc(100vw - 260px);
+  }
+}
