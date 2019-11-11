@@ -124,7 +124,7 @@ function cleanupTokens(response, tokens) {
       // Cleanup the tokens who are not registered anymore.
       if (error.code === 'messaging/invalid-registration-token' ||
           error.code === 'messaging/registration-token-not-registered') {
-        const deleteTask = admin.firestore().collection('messages').doc(tokens[index]).delete();
+        const deleteTask = admin.firestore().collection('fcmTokens').doc(tokens[index]).delete();
         tokensDelete.push(deleteTask);
       }
     }
