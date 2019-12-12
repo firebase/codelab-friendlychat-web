@@ -17,6 +17,7 @@
 
 // Signs-in Friendly Chat.
 function signIn() {
+  alert('TODO: Implement Google Sign-In');
   // TODO 1: Sign in Firebase with credential from the Google user.
 }
 
