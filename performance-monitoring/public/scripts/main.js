@@ -397,9 +397,6 @@ mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 // initialize Firebase
 initFirebaseAuth();
 
-// Remove the warning about timstamps change. 
-var firestore = firebase.firestore();
-
 // TODO: Initialize Firebase Performance Monitoring.
 firebase.performance();
 
