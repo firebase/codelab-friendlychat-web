@@ -2,7 +2,7 @@
   "name": "friendlychat-codelab",
   "description": "Firebase SDK for Cloud Functions codelab",
   "dependencies": {
-    "firebase-admin": "~8.9.0",
+    "firebase-admin": "~8.9.1",
     "firebase-functions": "^3.3.0"
   },
   "devDependencies": {
