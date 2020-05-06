@@ -1,3 +1,5 @@
+rules_version = "2";
+
 // Returns true if the uploaded file is an image and its size is below the given number of MB.
 function isImageBelowMaxSize(maxSizeMB) {
   return request.resource.size < maxSizeMB * 1024 * 1024
