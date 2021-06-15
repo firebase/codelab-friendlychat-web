@@ -15,60 +15,118 @@
  */
 'use strict';
 
+import { initializeApp } from 'https://cdn.skypack.dev/firebase@9.0.0-beta.2/app';
+import {
+  getAuth,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+} from 'https://cdn.skypack.dev/firebase@9.0.0-beta.2/auth';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  doc,
+  serverTimestamp,
+} from 'https://cdn.skypack.dev/firebase@9.0.0-beta.2/firestore';
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from 'https://cdn.skypack.dev/firebase@9.0.0-beta.2/storage';
+import {
+  getMessaging,
+  getToken,
+} from 'https://cdn.skypack.dev/firebase@9.0.0-beta.2/messaging';
+import { getPerformance } from 'https://cdn.skypack.dev/firebase@9.0.0-beta.2/performance';
+
+
+const config = await fetch('/__/firebase/init.json').then(resp => resp.json());
+let firebaseApp = initializeApp(config);
+
+// Checks that the Firebase SDK has been correctly setup and configured.
+function checkSetup() {
+  if (!firebaseApp || !(firebaseApp.name) || !(firebaseApp.options)) {
+    window.alert('You have not configured and imported the Firebase SDK. ' +
+        'Make sure you go through the codelab setup instructions and make ' +
+        'sure you are running the codelab using `firebase serve`');
+  }
+}
+
+// Checks that Firebase has been imported.
+checkSetup();
+
+const auth = getAuth(firebaseApp);
+const firestore = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
+const messaging = getMessaging(firebaseApp);
+const perf = getPerformance();
+
 // Signs-in Friendly Chat.
-function signIn() {
+async function signIn() {
   // Sign in Firebase using popup auth and Google as the identity provider.
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider);
+  var provider = new GoogleAuthProvider();
+  await signInWithPopup(auth, provider);
 }
 
 // Signs-out of Friendly Chat.
-function signOut() {
+function signOutUser() {
   // Sign out of Firebase.
-  firebase.auth().signOut();
+  signOut(auth);
 }
 
 // Initiate firebase auth.
 function initFirebaseAuth() {
   // Listen to auth state changes.
-  firebase.auth().onAuthStateChanged(authStateObserver);
+  onAuthStateChanged(auth, authStateObserver);
 }
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
-  return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
+  return auth.currentUser.photoURL || '/images/profile_placeholder.png';
 }
 
 // Returns the signed-in user's display name.
 function getUserName() {
-  return firebase.auth().currentUser.displayName;
+  return auth.currentUser.displayName;
 }
 
 // Returns true if a user is signed-in.
 function isUserSignedIn() {
-  return !!firebase.auth().currentUser;
+  return !!auth.currentUser;
 }
 
 // Saves a new message on the Cloud Firestore.
-function saveMessage(messageText) {
+async function saveMessage(messageText) {
   // Add a new message entry to the Firebase database.
-  return firebase.firestore().collection('messages').add({
-    name: getUserName(),
-    text: messageText,
-    profilePicUrl: getProfilePicUrl(),
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).catch(function(error) {
+  try {
+    await addDoc(collection(firestore, 'messages'), {
+      name: getUserName(),
+      text: messageText,
+      profilePicUrl: getProfilePicUrl(),
+      timestamp: serverTimestamp()
+    });
+  }
+  catch(error) {
     console.error('Error writing new message to Firebase Database', error);
-  });
+  }
 }
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   // Create the query to load the last 12 messages and listen for new ones.
-  var query = firebase.firestore().collection('messages').orderBy('timestamp', 'desc').limit(12);
+  const recentMessagesQuery = query(collection(firestore, 'messages'), orderBy('timestamp', 'desc'), limit(12));
   
   // Start listening to the query.
-  query.onSnapshot(function(snapshot) {
+  onSnapshot(recentMessagesQuery, function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
       if (change.type === 'removed') {
         deleteMessage(change.doc.id);
@@ -83,57 +141,64 @@ function loadMessages() {
 
 // Saves a new message containing an image in Firebase.
 // This first saves the image in Firebase storage.
-function saveImageMessage(file) {
-  // 1 - We add a message with a loading icon that will get updated with the shared image.
-  firebase.firestore().collection('messages').add({
-    name: getUserName(),
-    imageUrl: LOADING_IMAGE_URL,
-    profilePicUrl: getProfilePicUrl(),
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(messageRef) {
-    // 2 - Upload the image to Cloud Storage.
-    var filePath = firebase.auth().currentUser.uid + '/' + messageRef.id + '/' + file.name;
-    return firebase.storage().ref(filePath).put(file).then(function(fileSnapshot) {
-      // 3 - Generate a public URL for the file.
-      return fileSnapshot.ref.getDownloadURL().then((url) => {
-        // 4 - Update the chat message placeholder with the image’s URL.
-        return messageRef.update({
-          imageUrl: url,
-          storageUri: fileSnapshot.metadata.fullPath
-        });
-      });
+async function saveImageMessage(file) {
+  try {
+    // 1 - We add a message with a loading icon that will get updated with the shared image.
+    const messageRef = await addDoc(collection(firestore, 'messages'), {
+      name: getUserName(),
+      imageUrl: LOADING_IMAGE_URL,
+      profilePicUrl: getProfilePicUrl(),
+      timestamp: serverTimestamp()
     });
-  }).catch(function(error) {
+
+    // 2 - Upload the image to Cloud Storage.
+    const filePath = `${auth.currentUser.uid}/${messageRef.id}/${file.name}`;
+    const newImageRef = ref(storage, filePath);
+    const fileSnapshot = await uploadBytesResumable(ref, file);
+    
+    // 3 - Generate a public URL for the file.
+    const publicImageUrl = await getDownloadURL(newImageRef);
+
+    // 4 - Update the chat message placeholder with the image’s URL.
+    await updateDoc(messageRef,{
+      imageUrl: publicImageUrl,
+      storageUri: fileSnapshot.metadata.fullPath
+    });
+  } catch (error) {
     console.error('There was an error uploading a file to Cloud Storage:', error);
-  });
+  }
 }
 
 // Saves the messaging device token to the datastore.
-function saveMessagingDeviceToken() {
-  firebase.messaging().getToken().then(function(currentToken) {
+async function saveMessagingDeviceToken() {
+  try {
+    const currentToken = await getToken(messaging);
     if (currentToken) {
       console.log('Got FCM device token:', currentToken);
       // Saving the Device Token to the datastore.
-      firebase.firestore().collection('fcmTokens').doc(currentToken)
-          .set({uid: firebase.auth().currentUser.uid});
+      const tokenRef = doc(firestore, 'fcmTokens', currentToken);
+      await setDoc(tokenRef, { uid: auth.currentUser.uid });
     } else {
       // Need to request permissions to show notifications.
       requestNotificationsPermissions();
     }
-  }).catch(function(error){
+  } catch(error) {
     console.error('Unable to get messaging token.', error);
-  });
+  };
 }
 
 // Requests permissions to show notifications.
-function requestNotificationsPermissions() {
+async function requestNotificationsPermissions() {
   console.log('Requesting notifications permission...');
-  firebase.messaging().requestPermission().then(function() {
+  const permission = await Notification.requestPermission();
+  
+  if (permission === 'granted') {
+    console.log('Notification permission granted.');
     // Notification permission granted.
-    saveMessagingDeviceToken();
-  }).catch(function(error) {
-    console.error('Unable to get permission to notify.', error);
-  });
+    await saveMessagingDeviceToken();
+  } else {
+    console.log('Unable to get permission to notify.');
+  }
 }
 
 // Triggered when a file is selected via the media picker.
@@ -335,18 +400,6 @@ function toggleButton() {
   }
 }
 
-// Checks that the Firebase SDK has been correctly setup and configured.
-function checkSetup() {
-  if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
-    window.alert('You have not configured and imported the Firebase SDK. ' +
-        'Make sure you go through the codelab setup instructions and make ' +
-        'sure you are running the codelab using `firebase serve`');
-  }
-}
-
-// Checks that Firebase has been imported.
-checkSetup();
-
 // Shortcuts to DOM Elements.
 var messageListElement = document.getElementById('messages');
 var messageFormElement = document.getElementById('message-form');
@@ -363,7 +416,7 @@ var signInSnackbarElement = document.getElementById('must-signin-snackbar');
 
 // Saves message on form submit.
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
-signOutButtonElement.addEventListener('click', signOut);
+signOutButtonElement.addEventListener('click', signOutUser);
 signInButtonElement.addEventListener('click', signIn);
 
 // Toggle for the button.
@@ -379,9 +432,6 @@ mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
 // initialize Firebase
 initFirebaseAuth();
-
- // TODO: Enable Firebase Performance Monitoring.
-firebase.performance();
 
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
