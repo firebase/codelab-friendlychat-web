@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
+    "start": "webpack --watch --progress",
     "visualize-bundle": "webpack --analyze"
   },
   "author": "jhuleatt",
