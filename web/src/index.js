@@ -45,72 +45,62 @@
  import {
    getMessaging,
    getToken,
- } from 'firebase/messaging';
- import { getPerformance } from 'firebase/performance';
+ } from 'firebase/messaging'; 
+
+ let firebaseApp;
  
- 
- async function setupFirebaseApp() {
-   const config = await fetch('/__/firebase/init.json').then(resp => resp.json());
- let firebaseApp = initializeApp(config);
- }
- 
- // Checks that the Firebase SDK has been correctly setup and configured.
- function checkSetup() {
-   if (!firebaseApp || !(firebaseApp.name) || !(firebaseApp.options)) {
-     window.alert('You have not configured and imported the Firebase SDK. ' +
-         'Make sure you go through the codelab setup instructions and make ' +
-         'sure you are running the codelab using `firebase serve`');
+ async function setupFirebase() {
+   try {
+     const config = await fetch('/__/firebase/init.json').then((resp) =>
+       resp.json()
+     );
+     firebaseApp = initializeApp(config);
+   } catch (e) {
+     window.alert(
+       `Could not find Firebase config file (looked in ${window.location.origin}/__/firebase/init.json). Make sure you are running the codelab using "firebase serve"`
+     );
    }
  }
- 
- // Checks that Firebase has been imported.
- checkSetup();
- 
- const auth = getAuth(firebaseApp);
- const firestore = getFirestore(firebaseApp);
- const storage = getStorage(firebaseApp);
- const messaging = getMessaging(firebaseApp);
- const perf = getPerformance();
  
  // Signs-in Friendly Chat.
  async function signIn() {
    // Sign in Firebase using popup auth and Google as the identity provider.
    var provider = new GoogleAuthProvider();
-   await signInWithPopup(auth, provider);
+   await signInWithPopup(getAuth(), provider);
  }
  
  // Signs-out of Friendly Chat.
  function signOutUser() {
    // Sign out of Firebase.
-   signOut(auth);
+   signOut(getAuth());
  }
  
- // Initiate firebase auth.
+ // Initiate firebase auth
  function initFirebaseAuth() {
    // Listen to auth state changes.
-   onAuthStateChanged(auth, authStateObserver);
+   onAuthStateChanged(getAuth(), authStateObserver);
  }
  
  // Returns the signed-in user's profile Pic URL.
  function getProfilePicUrl() {
-   return auth.currentUser.photoURL || '/images/profile_placeholder.png';
+   return getAuth().currentUser.photoURL || '/images/profile_placeholder.png';
  }
  
  // Returns the signed-in user's display name.
  function getUserName() {
-   return auth.currentUser.displayName;
+   return getAuth().currentUser.displayName;
  }
  
  // Returns true if a user is signed-in.
  function isUserSignedIn() {
-   return !!auth.currentUser;
+   return !!getAuth().currentUser;
  }
  
  // Saves a new message on the Cloud Firestore.
  async function saveMessage(messageText) {
    // Add a new message entry to the Firebase database.
    try {
-     await addDoc(collection(firestore, 'messages'), {
+     await addDoc(collection(getFirestore(), 'messages'), {
        name: getUserName(),
        text: messageText,
        profilePicUrl: getProfilePicUrl(),
@@ -125,7 +115,7 @@
  // Loads chat messages history and listens for upcoming ones.
  function loadMessages() {
    // Create the query to load the last 12 messages and listen for new ones.
-   const recentMessagesQuery = query(collection(firestore, 'messages'), orderBy('timestamp', 'desc'), limit(12));
+   const recentMessagesQuery = query(collection(getFirestore(), 'messages'), orderBy('timestamp', 'desc'), limit(12));
    
    // Start listening to the query.
    onSnapshot(recentMessagesQuery, function(snapshot) {
@@ -146,7 +136,7 @@
  async function saveImageMessage(file) {
    try {
      // 1 - We add a message with a loading icon that will get updated with the shared image.
-     const messageRef = await addDoc(collection(firestore, 'messages'), {
+     const messageRef = await addDoc(collection(getFirestore(), 'messages'), {
        name: getUserName(),
        imageUrl: LOADING_IMAGE_URL,
        profilePicUrl: getProfilePicUrl(),
@@ -154,9 +144,9 @@
      });
  
      // 2 - Upload the image to Cloud Storage.
-     const filePath = `${auth.currentUser.uid}/${messageRef.id}/${file.name}`;
-     const newImageRef = ref(storage, filePath);
-     const fileSnapshot = await uploadBytesResumable(ref, file);
+     const filePath = `${getAuth().currentUser.uid}/${messageRef.id}/${file.name}`;
+     const newImageRef = ref(getStorage(), filePath);
+     const fileSnapshot = await uploadBytesResumable(newImageRef, file);
      
      // 3 - Generate a public URL for the file.
      const publicImageUrl = await getDownloadURL(newImageRef);
@@ -174,12 +164,12 @@
  // Saves the messaging device token to the datastore.
  async function saveMessagingDeviceToken() {
    try {
-     const currentToken = await getToken(messaging);
+     const currentToken = await getToken(getMessaging());
      if (currentToken) {
        console.log('Got FCM device token:', currentToken);
        // Saving the Device Token to the datastore.
-       const tokenRef = doc(firestore, 'fcmTokens', currentToken);
-       await setDoc(tokenRef, { uid: auth.currentUser.uid });
+       const tokenRef = doc(getFirestore(), 'fcmTokens', currentToken);
+       await setDoc(tokenRef, { uid: getAuth().currentUser.uid });
      } else {
        // Need to request permissions to show notifications.
        requestNotificationsPermissions();
@@ -432,9 +422,8 @@
  });
  mediaCaptureElement.addEventListener('change', onMediaFileSelected);
  
- // initialize Firebase
- initFirebaseAuth();
- 
- // We load currently existing chat messages and listen to new ones.
- loadMessages();
+ setupFirebase().then(() => {
+   initFirebaseAuth();
+   loadMessages();
+ });
  
