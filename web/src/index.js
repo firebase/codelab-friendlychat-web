@@ -176,7 +176,7 @@
        // When the app is in the background, firebase-messaging-sw.js will receive the message instead.
        onMessage(getMessaging(), (message) => {
          console.log(
-           'New notification from Firebase Messaging!',
+           'New foreground notification from Firebase Messaging!',
            message.notification
          );
        });
