@@ -47,6 +47,7 @@
    getToken,
    onMessage
  } from 'firebase/messaging'; 
+ import {getPerformance} from 'firebase/performance';
 
  import { getFirebaseConfig } from './firebase-config.js';
  
@@ -420,6 +421,7 @@
  mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
 const firebaseApp = initializeApp(getFirebaseConfig());
+getPerformance();
 initFirebaseAuth();
 loadMessages();
  
