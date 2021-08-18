@@ -16,3 +16,5 @@ firebase-debug.log
 
 */node_modules/**
 web/public/scripts/main.js
+web/public/firebase-messaging-sw.js
+web/public/scripts/firebase-messaging-sw.js
