@@ -48,20 +48,7 @@
    onMessage
  } from 'firebase/messaging'; 
 
- let firebaseApp;
- 
- async function setupFirebase() {
-   try {
-     const config = await fetch('/__/firebase/init.json').then((resp) =>
-       resp.json()
-     );
-     firebaseApp = initializeApp(config);
-   } catch (e) {
-     window.alert(
-       `Could not find Firebase config file (looked in ${window.location.origin}/__/firebase/init.json). Make sure you are running the codelab using "firebase serve"`
-     );
-   }
- }
+ import { getFirebaseConfig } from './firebase-config.js';
  
  // Signs-in Friendly Chat.
  async function signIn() {
@@ -431,9 +418,8 @@
    mediaCaptureElement.click();
  });
  mediaCaptureElement.addEventListener('change', onMediaFileSelected);
- 
- setupFirebase().then(() => {
-   initFirebaseAuth();
-   loadMessages();
- });
+
+const firebaseApp = initializeApp(getFirebaseConfig());
+initFirebaseAuth();
+loadMessages();
  
