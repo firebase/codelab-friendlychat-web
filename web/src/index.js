@@ -45,6 +45,7 @@
  import {
    getMessaging,
    getToken,
+   onMessage
  } from 'firebase/messaging'; 
 
  let firebaseApp;
@@ -170,6 +171,15 @@
        // Saving the Device Token to the datastore.
        const tokenRef = doc(getFirestore(), 'fcmTokens', currentToken);
        await setDoc(tokenRef, { uid: getAuth().currentUser.uid });
+
+       // This will fire when a message is received while the app is in the foreground.
+       // When the app is in the background, firebase-messaging-sw.js will receive the message instead.
+       onMessage(getMessaging(), (message) => {
+         console.log(
+           'New notification from Firebase Messaging!',
+           message.notification
+         );
+       });
      } else {
        // Need to request permissions to show notifications.
        requestNotificationsPermissions();
