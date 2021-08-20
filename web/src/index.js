@@ -64,7 +64,7 @@
    signOut(getAuth());
  }
  
- // Initiate firebase auth
+ // Initialize firebase auth
  function initFirebaseAuth() {
    // Listen to auth state changes.
    onAuthStateChanged(getAuth(), authStateObserver);
@@ -85,7 +85,7 @@
    return !!getAuth().currentUser;
  }
  
- // Saves a new message on the Cloud Firestore.
+ // Saves a new message to Cloud Firestore.
  async function saveMessage(messageText) {
    // Add a new message entry to the Firebase database.
    try {
@@ -150,13 +150,13 @@
    }
  }
  
- // Saves the messaging device token to the datastore.
+ // Saves the messaging device token to Cloud Firestore.
  async function saveMessagingDeviceToken() {
    try {
      const currentToken = await getToken(getMessaging());
      if (currentToken) {
        console.log('Got FCM device token:', currentToken);
-       // Saving the Device Token to the datastore.
+       // Saving the Device Token to Cloud Firestore.
        const tokenRef = doc(getFirestore(), 'fcmTokens', currentToken);
        await setDoc(tokenRef, { uid: getAuth().currentUser.uid });
 

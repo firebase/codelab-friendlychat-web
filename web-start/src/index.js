@@ -94,9 +94,9 @@ async function saveImageMessage(file) {
   // TODO 9: Posts a new image as a message.
 }
 
-// Saves the messaging device token to the datastore.
+// Saves the messaging device token to Cloud Firestore.
 async function saveMessagingDeviceToken() {
-  // TODO 10: Save the device token in the realtime datastore
+  // TODO 10: Save the device token in Cloud Firestore
 }
 
 // Requests permissions to show notifications.

@@ -1,1 +1,1 @@
-// TODO: Set up Firebase Messaging
+// TODO: Set up Firebase Cloud Messaging service worker
