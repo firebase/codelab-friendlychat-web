@@ -47,7 +47,7 @@
    getToken,
    onMessage
  } from 'firebase/messaging'; 
- import {getPerformance} from 'firebase/performance';
+ import { getPerformance } from 'firebase/performance';
 
  import { getFirebaseConfig } from './firebase-config.js';
  
