@@ -13,3 +13,7 @@ cloud-functions/functions/node_modules
 .firebaserc
 firebase-debug.log
 .firebase
+
+*/node_modules/**
+web/public/**/*.js
+web-start/public/**/*.js
