@@ -3,7 +3,7 @@
   "description": "Firebase SDK for Cloud Functions codelab",
   "dependencies": {
     "firebase-admin": "~9.11.1",
-    "firebase-functions": "^3.15.5"
+    "firebase-functions": "^3.15.6"
   },
   "devDependencies": {
     "eslint": "^4.12.0",
