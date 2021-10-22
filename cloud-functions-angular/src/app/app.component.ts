@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 import { Component, Inject } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
-import { MatSnackBar } from '@angular/material';
-import * as firebase from 'firebase';
+import { Observable } from 'rxjs';
+import { AngularFireDatabase, AngularFireList } from '@angular/fire/compat/database';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { User, GoogleAuthProvider } from 'firebase/auth';
+import { getMessaging, getToken } from 'firebase/messaging';
 
 const LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif';
 const PROFILE_PLACEHOLDER_IMAGE_URL = '/assets/images/profile_placeholder.png';
@@ -29,16 +32,19 @@ const PROFILE_PLACEHOLDER_IMAGE_URL = '/assets/images/profile_placeholder.png';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  user: Observable<firebase.User>;
-  currentUser: firebase.User;
+  user: Observable<User>;
+  currentUser: User;
   messages: Observable<any[]>;
   profilePicStyles: {};
   topics = '';
   value = '';
 
-  constructor(public db: AngularFireDatabase, public afAuth: AngularFireAuth, public snackBar: MatSnackBar) {
+  constructor(
+      public db: AngularFireDatabase, public afAuth: AngularFireAuth,
+      public storage: AngularFireStorage, public messaging: AngularFireMessaging,
+      public snackBar: MatSnackBar) {
     this.user = afAuth.authState;
-    this.user.subscribe((user: firebase.User) => {
+    this.user.subscribe((user: User) => {
       console.log(user);
       this.currentUser = user;
 
@@ -93,11 +99,11 @@ export class AppComponent {
   }
 
   login() {
-    this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    this.afAuth.signInWithPopup(new GoogleAuthProvider());
   }
 
   logout() {
-    this.afAuth.auth.signOut();
+    this.afAuth.signOut();
   }
 
   // TODO: Refactor into text message form component
@@ -174,18 +180,17 @@ export class AppComponent {
       }).then((data) => {
         // Upload the image to Cloud Storage.
         const filePath = `${this.currentUser.uid}/${data.key}/${file.name}`;
-        return firebase.storage().ref(filePath).put(file)
+        return this.storage.ref(filePath).put(file)
           .then((snapshot) => {
             // Get the file's Storage URI and update the chat message placeholder.
-            const fullPath = snapshot.metadata.fullPath;
-            const imageUrl = firebase.storage().ref(fullPath).toString();
-            return firebase.storage().refFromURL(imageUrl).getMetadata();
-          }).then((metadata) => {
             // TODO: Instead of saving the download URL, save the GCS URI and
             //       dynamically load the download URL when displaying the image
             //       message.
-            return data.update({
-              imageUrl: metadata.downloadURLs[0]
+            const fullPath = snapshot.metadata.fullPath;
+            this.storage.ref(fullPath).getDownloadURL().subscribe({
+              next(imageUrl) {
+                return data.update({imageUrl});
+              }
             });
           });
       }).then(console.log, (err) => {
@@ -205,13 +210,13 @@ export class AppComponent {
 
   // Saves the messaging device token to the datastore.
   saveMessagingDeviceToken() {
-    return firebase.messaging().getToken()
+    return getToken(getMessaging())
       .then((currentToken) => {
         if (currentToken) {
           console.log('Got FCM device token:', currentToken);
           // Save the Device Token to the datastore.
-          firebase.database()
-            .ref('/fcmTokens')
+          this.db.database  // ref(getDatabase(), '/fcmTokens')
+            .ref('/fcmTokens')  
             .child(currentToken)
             .set(this.currentUser.uid);
         } else {
@@ -229,10 +234,10 @@ export class AppComponent {
   // Requests permissions to show notifications.
   requestNotificationsPermissions() {
     console.log('Requesting notifications permission...');
-    return firebase.messaging().requestPermission()
+    return this.messaging.requestPermission
       // Notification permission granted.
-      .then(() => this.saveMessagingDeviceToken())
-      .catch((err) => {
+      .subscribe(() => this.saveMessagingDeviceToken(),
+      (err) => {
         this.snackBar.open('Unable to get permission to notify.', null, {
           duration: 5000
         });
