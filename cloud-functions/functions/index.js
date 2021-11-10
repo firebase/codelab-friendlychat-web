@@ -20,7 +20,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 const Vision = require('@google-cloud/vision');
-const vision = new Vision();
+const vision = new Vision.ImageAnnotatorClient();
 const spawn = require('child-process-promise').spawn;
 const path = require('path');
 const os = require('os');
@@ -45,14 +45,12 @@ exports.addWelcomeMessages = functions.auth.user().onCreate(async (user) => {
 // Checks if uploaded images are flagged as Adult or Violence and if so blurs them.
 exports.blurOffensiveImages = functions.runWith({memory: '2GB'}).storage.object().onFinalize(
     async (object) => {
-      const image = {
-        source: {imageUri: `gs://${object.bucket}/${object.name}`},
-      };
+      const imageUri = `gs://${object.bucket}/${object.name}`;
 
       // Check the image content using the Cloud Vision API.
-      const batchAnnotateImagesResponse = await vision.safeSearchDetection(image);
+      const batchAnnotateImagesResponse = await vision.safeSearchDetection(imageUri);
       const safeSearchResult = batchAnnotateImagesResponse[0].safeSearchAnnotation;
-      const Likelihood = Vision.types.Likelihood;
+      const Likelihood = Vision.protos.google.cloud.vision.v1.Likelihood;
       if (Likelihood[safeSearchResult.adult] >= Likelihood.LIKELY ||
           Likelihood[safeSearchResult.violence] >= Likelihood.LIKELY) {
         console.log('The image', object.name, 'has been detected as inappropriate.');
