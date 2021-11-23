@@ -119,7 +119,7 @@ function cleanupTokens(response, tokens) {
   response.results.forEach((result, index) => {
     const error = result.error;
     if (error) {
-      console.error('Failure sending notification to', tokens[index], error);
+      functions.logger.error('Failure sending notification to', tokens[index], error);
       // Cleanup the tokens who are not registered anymore.
       if (error.code === 'messaging/invalid-registration-token' ||
           error.code === 'messaging/registration-token-not-registered') {
