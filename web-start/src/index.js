@@ -49,32 +49,38 @@ import { getFirebaseConfig } from './firebase-config.js';
 
 // Signs-in Friendly Chat.
 async function signIn() {
-  alert('TODO: Implement Google Sign-In');
+  var provider = new GoogleAuthProvider();
+  await signInWithPopup(getAuth(), provider);
   // TODO 1: Sign in Firebase with credential from the Google user.
 }
 
 // Signs-out of Friendly Chat.
 function signOutUser() {
+  signOut(getAuth());
   // TODO 2: Sign out of Firebase.
 }
 
 // Initiate firebase auth
 function initFirebaseAuth() {
+  onAuthStateChanged(getAuth(), authStateObserver);
   // TODO 3: Subscribe to the user's signed-in status
 }
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
+  return getAuth().currentUser.photoURL || '/images/profile_placeholder.png';
   // TODO 4: Return the user's profile pic URL.
 }
 
 // Returns the signed-in user's display name.
 function getUserName() {
+  return getAuth().currentUser.displayName;
   // TODO 5: Return the user's display name.
 }
 
 // Returns true if a user is signed-in.
 function isUserSignedIn() {
+  return !!getAuth().currentUser;
   // TODO 6: Return true if a user is signed-in.
 }
 
@@ -343,6 +349,7 @@ imageButtonElement.addEventListener('click', function (e) {
 mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
 const firebaseAppConfig = getFirebaseConfig();
+initializeApp(firebaseAppConfig);
 // TODO 0: Initialize Firebase
 
 // TODO 12: Initialize Firebase Performance Monitoring
