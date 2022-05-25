@@ -354,5 +354,5 @@ initializeApp(firebaseAppConfig);
 
 // TODO 12: Initialize Firebase Performance Monitoring
 
-initFirebaseAuth();
-loadMessages();
+//initFirebaseAuth();
+//loadMessages();
