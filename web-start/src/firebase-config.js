@@ -1,3 +1,7 @@
+// Import the functions you need from the SDKs you need
+import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from 'firebase/app';
+
 /**
  * To find your Firebase config object:
  * 
@@ -8,6 +12,7 @@
  */
 const config = {
   /* TODO: ADD YOUR FIREBASE CONFIGURATION OBJECT HERE */
+  friendlychat-434d8
 };
 
 export function getFirebaseConfig() {
@@ -18,3 +23,23 @@ export function getFirebaseConfig() {
     return config;
   }
 }
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBnbEAMwX1PNg9j76HMH1YoSpc25Eosndc",
+  authDomain: "friendlychat-434d8.firebaseapp.com",
+  projectId: "friendlychat-434d8",
+  storageBucket: "friendlychat-434d8.appspot.com",
+  messagingSenderId: "1015608791166",
+  appId: "1:1015608791166:web:38700aa7bc5081c876082f",
+  measurementId: "G-HGYPTGPYPE"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
