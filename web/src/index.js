@@ -55,9 +55,6 @@
  async function signIn() {
    // Sign in Firebase using popup auth and Google as the identity provider.
    var provider = new GoogleAuthProvider();
-   provider.setCustomParameters({
-     prompt: "select_account"
-   });
    await signInWithPopup(getAuth(), provider);
  }
  
