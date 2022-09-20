@@ -43,9 +43,14 @@ import {
   getDownloadURL,
 } from 'firebase/storage';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { activate, isSupported, fetchAndActivate, fetchConfig, ensureInitialized, getRemoteConfig, getValue } from 'firebase/remote-config';
 import { getPerformance } from 'firebase/performance';
 
 import { getFirebaseConfig } from './firebase-config.js';
+
+const firebaseAppConfig = getFirebaseConfig();
+// TODO 0: Initialize Firebase
+initializeApp(firebaseAppConfig);
 
 // Signs-in Friendly Chat.
 async function signIn() {
@@ -156,13 +161,41 @@ async function requestNotificationsPermissions() {
   // TODO 11: Request permissions to send notifications.
 }
 
+export function initRemoteConfig() {
+  const rc = getRemoteConfig();
+
+  rc.settings.minimumFetchIntervalMillis = 0;
+  rc.defaultConfig = {
+      "add_image_placement": "right"
+  };
+  fetchAndActivate(rc);
+
+  ensureInitialized(rc).then(() => {
+    var imagePlacement = getValue(rc, "add_image_placement").asString();
+    var imageButtonLeftElement = document.getElementById('leftSubmitImage');
+    var imageButtonRightElement = document.getElementById('rightSubmitImage');
+    imageButtonLeftElement.style.display = imagePlacement === 'left' ? 'initial' : 'none';
+    imageButtonRightElement.style.display = (imagePlacement === 'right' ? 'initial' : 'none');
+    var imageButtonElement = imagePlacement === 'left' ? imageButtonLeftElement : imageButtonRightElement;
+    var mediaCaptureElement = document.getElementById(imagePlacement === 'left' ? 'leftMediaCapture' : 'rightMediaCapture');
+  
+    imageButtonElement.addEventListener('click', function (e) {
+      e.preventDefault();
+      mediaCaptureElement.click();
+    });
+    mediaCaptureElement.addEventListener('change', onMediaFileSelected); 
+  })
+}
+
+initRemoteConfig();
+
 // Triggered when a file is selected via the media picker.
 function onMediaFileSelected(event) {
   event.preventDefault();
   var file = event.target.files[0];
 
   // Clear the selection in the file picker input.
-  imageFormElement.reset();
+  mediaCaptureElement.value = '';
 
   // Check if the file is an image.
   if (!file.type.match('image.*')) {
@@ -369,9 +402,7 @@ var messageListElement = document.getElementById('messages');
 var messageFormElement = document.getElementById('message-form');
 var messageInputElement = document.getElementById('message');
 var submitButtonElement = document.getElementById('submit');
-var imageButtonElement = document.getElementById('submitImage');
-var imageFormElement = document.getElementById('image-form');
-var mediaCaptureElement = document.getElementById('mediaCapture');
+
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
@@ -387,16 +418,7 @@ signInButtonElement.addEventListener('click', signIn);
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);
 
-// Events for image upload.
-imageButtonElement.addEventListener('click', function (e) {
-  e.preventDefault();
-  mediaCaptureElement.click();
-});
-mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
-const firebaseAppConfig = getFirebaseConfig();
-// TODO 0: Initialize Firebase
-initializeApp(firebaseAppConfig);
 
 // TODO 12: Initialize Firebase Performance Monitoring
 
