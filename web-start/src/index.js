@@ -172,12 +172,16 @@ async function requestNotificationsPermissions() {
 
 // Sets up Remote Config
 export function initRemoteConfig() {
-  // TODO 3: Set up Remote Config and get the paramater value
+  // TODO: Initialize Remote Config
+
+  // TODO: Get a parameter value
+
+  // TODO: Fetch config from the server
 }
 
 initRemoteConfig();
 
-function displayImageButton(imagePlacement) {
+function renderImageButton(imagePlacement) {
   const imageButtonLeftElement = document.getElementById('leftSubmitImage');
   const imageButtonRightElement = document.getElementById('rightSubmitImage');
   imageButtonLeftElement.style.display = imagePlacement === 'left' ? 'initial' : 'none';
