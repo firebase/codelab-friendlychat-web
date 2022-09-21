@@ -43,7 +43,7 @@ import {
   getDownloadURL,
 } from 'firebase/storage';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { activate, isSupported, fetchAndActivate, fetchConfig, ensureInitialized, getRemoteConfig, getValue } from 'firebase/remote-config';
+import { fetchAndActivate, ensureInitialized, getRemoteConfig, getValue } from 'firebase/remote-config';
 import { getPerformance } from 'firebase/performance';
 
 import { getFirebaseConfig } from './firebase-config.js';
@@ -180,41 +180,39 @@ export function initRemoteConfig() {
 initRemoteConfig();
 
 function displayImageButton(imagePlacement) {
-  var imageButtonLeftElement = document.getElementById('leftSubmitImage');
-  var imageButtonRightElement = document.getElementById('rightSubmitImage');
+  const imageButtonLeftElement = document.getElementById('leftSubmitImage');
+  const imageButtonRightElement = document.getElementById('rightSubmitImage');
   imageButtonLeftElement.style.display = imagePlacement === 'left' ? 'initial' : 'none';
   imageButtonRightElement.style.display = (imagePlacement === 'right' ? 'initial' : 'none');
-  var imageButtonElement = imagePlacement === 'left' ? imageButtonLeftElement : imageButtonRightElement;
+  const imageButtonElement = imagePlacement === 'left' ? imageButtonLeftElement : imageButtonRightElement;
   var mediaCaptureElement = document.getElementById(imagePlacement === 'left' ? 'leftMediaCapture' : 'rightMediaCapture');
 
   imageButtonElement.addEventListener('click', function (e) {
     e.preventDefault();
     mediaCaptureElement.click();
   });
-  mediaCaptureElement.addEventListener('change', onMediaFileSelected); 
-}
 
-// Triggered when a file is selected via the media picker.
-function onMediaFileSelected(event) {
-  event.preventDefault();
-  var file = event.target.files[0];
+  mediaCaptureElement.addEventListener('change', (event) => {
+    event.preventDefault();
+    var file = event.target.files[0];
 
-  // Clear the selection in the file picker input.
-  mediaCaptureElement.value = '';
+    // Clear the selection in the file picker input.
+    mediaCaptureElement.value = '';
 
-  // Check if the file is an image.
-  if (!file.type.match('image.*')) {
-    var data = {
-      message: 'You can only share images',
-      timeout: 2000,
-    };
-    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
-    return;
-  }
-  // Check if the user is signed-in
-  if (checkSignedInWithMessage()) {
-    saveImageMessage(file);
-  }
+    // Check if the file is an image.
+    if (!file.type.match('image.*')) {
+      var data = {
+        message: 'You can only share images',
+        timeout: 2000,
+      };
+      signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
+      return;
+    }
+    // Check if the user is signed-in
+    if (checkSignedInWithMessage()) {
+      saveImageMessage(file);
+    }
+  }); 
 }
 
 // Triggered when the send new message form is submitted.
