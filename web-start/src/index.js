@@ -49,6 +49,7 @@ import { getPerformance } from 'firebase/performance';
 import { getFirebaseConfig } from './firebase-config.js';
 
 const firebaseAppConfig = getFirebaseConfig();
+
 // TODO 0: Initialize Firebase
 initializeApp(firebaseAppConfig);
 
@@ -394,7 +395,6 @@ var messageListElement = document.getElementById('messages');
 var messageFormElement = document.getElementById('message-form');
 var messageInputElement = document.getElementById('message');
 var submitButtonElement = document.getElementById('submit');
-
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
@@ -409,10 +409,6 @@ signInButtonElement.addEventListener('click', signIn);
 // Toggle for the button.
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);
-
-
-
-// TODO 12: Initialize Firebase Performance Monitoring
 
 initFirebaseAuth();
 loadMessages();
