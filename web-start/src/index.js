@@ -56,10 +56,7 @@ import { getPerformance } from 'firebase/performance';
 
 import { getFirebaseConfig } from './firebase-config.js';
 
-const firebaseAppConfig = getFirebaseConfig();
-
-// TODO 0: Initialize Firebase
-initializeApp(firebaseAppConfig);
+// TODO: Initialize Firebase
 
 // Signs-in Friendly Chat.
 async function signIn() {
@@ -162,12 +159,12 @@ async function saveImageMessage(file) {
 
 // Saves the messaging device token to Cloud Firestore.
 async function saveMessagingDeviceToken() {
-  // TODO 1: Save the device token in Cloud Firestore
+  // TODO: Save the device token in Cloud Firestore
 }
 
 // Requests permissions to show notifications.
 async function requestNotificationsPermissions() {
-  // TODO 2: Request permissions to send notifications.
+  // TODO: Request permissions to send notifications.
 }
 
 // Sets up Remote Config

@@ -56,7 +56,10 @@ import { getPerformance } from 'firebase/performance';
 
 import { getFirebaseConfig } from './firebase-config.js';
 
-const firebaseApp = initializeApp(getFirebaseConfig());
+import { getFirebaseConfig } from './firebase-config.js';
+
+const firebaseAppConfig = getFirebaseConfig();
+initializeApp(firebaseAppConfig);
 
 // Signs-in Friendly Chat.
 async function signIn() {
