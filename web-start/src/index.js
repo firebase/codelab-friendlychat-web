@@ -172,22 +172,27 @@ export function initRemoteConfig() {
 
   ensureInitialized(rc).then(() => {
     var imagePlacement = getValue(rc, "add_image_placement").asString();
-    var imageButtonLeftElement = document.getElementById('leftSubmitImage');
-    var imageButtonRightElement = document.getElementById('rightSubmitImage');
-    imageButtonLeftElement.style.display = imagePlacement === 'left' ? 'initial' : 'none';
-    imageButtonRightElement.style.display = (imagePlacement === 'right' ? 'initial' : 'none');
-    var imageButtonElement = imagePlacement === 'left' ? imageButtonLeftElement : imageButtonRightElement;
-    var mediaCaptureElement = document.getElementById(imagePlacement === 'left' ? 'leftMediaCapture' : 'rightMediaCapture');
-  
-    imageButtonElement.addEventListener('click', function (e) {
-      e.preventDefault();
-      mediaCaptureElement.click();
-    });
-    mediaCaptureElement.addEventListener('change', onMediaFileSelected); 
+
+    displayImageButton(imagePlacement);
   })
 }
 
 initRemoteConfig();
+
+function displayImageButton(imagePlacement) {
+  var imageButtonLeftElement = document.getElementById('leftSubmitImage');
+  var imageButtonRightElement = document.getElementById('rightSubmitImage');
+  imageButtonLeftElement.style.display = imagePlacement === 'left' ? 'initial' : 'none';
+  imageButtonRightElement.style.display = (imagePlacement === 'right' ? 'initial' : 'none');
+  var imageButtonElement = imagePlacement === 'left' ? imageButtonLeftElement : imageButtonRightElement;
+  var mediaCaptureElement = document.getElementById(imagePlacement === 'left' ? 'leftMediaCapture' : 'rightMediaCapture');
+
+  imageButtonElement.addEventListener('click', function (e) {
+    e.preventDefault();
+    mediaCaptureElement.click();
+  });
+  mediaCaptureElement.addEventListener('change', onMediaFileSelected); 
+}
 
 // Triggered when a file is selected via the media picker.
 function onMediaFileSelected(event) {
