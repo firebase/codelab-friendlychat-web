@@ -153,28 +153,17 @@ async function saveImageMessage(file) {
 
 // Saves the messaging device token to Cloud Firestore.
 async function saveMessagingDeviceToken() {
-  // TODO 10: Save the device token in Cloud Firestore
+  // TODO 1: Save the device token in Cloud Firestore
 }
 
 // Requests permissions to show notifications.
 async function requestNotificationsPermissions() {
-  // TODO 11: Request permissions to send notifications.
+  // TODO 2: Request permissions to send notifications.
 }
 
+// Sets up Remote Config
 export function initRemoteConfig() {
-  const rc = getRemoteConfig();
-
-  rc.settings.minimumFetchIntervalMillis = 0;
-  rc.defaultConfig = {
-      "add_image_placement": "right"
-  };
-  fetchAndActivate(rc);
-
-  ensureInitialized(rc).then(() => {
-    var imagePlacement = getValue(rc, "add_image_placement").asString();
-
-    displayImageButton(imagePlacement);
-  })
+  // TODO 3: Set up Remote Config and get the paramater value
 }
 
 initRemoteConfig();
