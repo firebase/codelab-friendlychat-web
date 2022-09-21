@@ -42,8 +42,16 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from 'firebase/storage';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { fetchAndActivate, ensureInitialized, getRemoteConfig, getValue } from 'firebase/remote-config';
+import {
+  getMessaging,
+  getToken,
+  onMessage
+} from 'firebase/messaging'; 
+import {
+  fetchAndActivate, 
+  getRemoteConfig,
+  getValue
+} from 'firebase/remote-config';
 import { getPerformance } from 'firebase/performance';
 
 import { getFirebaseConfig } from './firebase-config.js';

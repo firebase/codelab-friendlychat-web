@@ -49,7 +49,6 @@ import {
 } from 'firebase/messaging'; 
 import {
   fetchAndActivate, 
-  ensureInitialized,
   getRemoteConfig,
   getValue
 } from 'firebase/remote-config';
@@ -209,11 +208,9 @@ export function initRemoteConfig() {
   };
   fetchAndActivate(rc);
 
-  ensureInitialized(rc).then(() => {
-    var imagePlacement = getValue(rc, "add_image_placement").asString();
+  var imagePlacement = getValue(rc, "add_image_placement").asString();
 
-    displayImageButton(imagePlacement);
-  })
+  displayImageButton(imagePlacement);
 }
 
 initRemoteConfig();
