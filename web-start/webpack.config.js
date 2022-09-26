@@ -5,7 +5,7 @@ const rootConfig = {
   optimization: {
     usedExports: true, // tells webpack to tree-shake
   },
-  devtool: 'eval-source-map'
+  devtool: 'source-map'
 };
 
 const appConfig = {
