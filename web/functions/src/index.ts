@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
- import * as admin from 'firebase-admin';
- import {
-   beforeUserCreated, HttpsError,
- } from "firebase-functions/v2/identity";
- 
- admin.initializeApp();
- 
- export const beforeCreated = beforeUserCreated((event) => {
-   const user = event.data;
-   // Only users of a specific domain can sign up.
-   if (!user?.email?.includes('@example.com')) {
-     throw new HttpsError('invalid-argument', "Unauthorized email");
-   }
- });
- 
+import * as admin from "firebase-admin";
+import { beforeUserCreated, HttpsError } from "firebase-functions/v2/identity";
+
+admin.initializeApp();
+
+export const beforecreated = beforeUserCreated((event) => {
+  const user = event.data;
+  // Only users of a specific domain can sign up.
+  if (user?.email && !/^[^@]+@example\.com$/.test(user?.email)) {
+    throw new HttpsError("invalid-argument", "Unauthorized email");
+  }
+});

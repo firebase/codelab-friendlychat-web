@@ -22,8 +22,6 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   connectAuthEmulator,
 } from "firebase/auth";
 import {
@@ -52,31 +50,11 @@ import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 import { getFirebaseConfig } from "./firebase-config.js";
 
-// Signs-in Friendly Chat with Google account.
-async function signInWithGoogle() {
+// Signs-in Friendly Chat.
+async function signIn() {
   // Sign in Firebase using popup auth and Google as the identity provider.
   var provider = new GoogleAuthProvider();
   await signInWithPopup(getAuth(), provider);
-}
-
-// Creates a Friendly Chat account with an email and password.
-async function createEmailAndPasswordUser(email, password) {
-  await createUserWithEmailAndPassword(getAuth(), email, password).catch(
-    (error) => {
-      console.error("Error creating a new email/password user", error);
-      // TODO: Display the error to user
-    }
-  );
-}
-
-// Signs-in Friendly Chat with email and password.
-async function signInEmailAndPasswordUser(email, password) {
-  await signInWithEmailAndPassword(getAuth(), email, password).catch(
-    (error) => {
-      console.error("Error signing in email/password user", error);
-      // TODO: Display the error to user
-    }
-  );
 }
 
 // Signs-out of Friendly Chat.
@@ -262,30 +240,6 @@ function onMessageFormSubmit(e) {
   }
 }
 
-// Triggered when sign in button is clicked.
-function onSignInSubmit(e) {
-  e.preventDefault();
-  // Check that the user entered both email and password.
-  if (emailFormElement.value && passwordFormElement.value) {
-    signInEmailAndPasswordUser(
-      emailFormElement.value,
-      passwordFormElement.value
-    );
-  }
-}
-
-// Triggered when create account button is clicked.
-function onCreateAccountSubmit(e) {
-  e.preventDefault();
-  // Check that the user entered both email and password.
-  if (emailFormElement.value && passwordFormElement.value) {
-    createEmailAndPasswordUser(
-      emailFormElement.value,
-      passwordFormElement.value
-    );
-  }
-}
-
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) {
@@ -305,8 +259,7 @@ function authStateObserver(user) {
     signOutButtonElement.removeAttribute("hidden");
 
     // Hide sign-in buttons.
-    signInWithGoogleButtonElement.setAttribute("hidden", "true");
-    signInFormElement.setAttribute("hidden", "true");
+    signInButtonElement.setAttribute("hidden", "true");
 
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
@@ -318,9 +271,7 @@ function authStateObserver(user) {
     signOutButtonElement.setAttribute("hidden", "true");
 
     // Show sign-in buttons.
-    // TODO: Add SignInWithGoogle back in
-    // signInWithGoogleButtonElement.removeAttribute("hidden");
-    signInFormElement.removeAttribute("hidden");
+    signInButtonElement.removeAttribute("hidden");
   }
 }
 
@@ -471,36 +422,16 @@ var imageFormElement = document.getElementById("image-form");
 var mediaCaptureElement = document.getElementById("mediaCapture");
 var userPicElement = document.getElementById("user-pic");
 var userNameElement = document.getElementById("user-name");
-var signInFormElement = document.getElementById("sign-in-form");
-var emailFormElement = document.getElementById("email");
-var passwordFormElement = document.getElementById("password");
-var signInWithEmailAndPasswordButtonElement = document.getElementById(
-  "sign-in-with-email-password"
-);
-var createAccountWithEmailAndPasswordButtonElement = document.getElementById(
-  "create-account-with-email-password"
-);
-var signInWithGoogleButtonElement = document.getElementById(
-  "sign-in-with-google"
-);
+var signInButtonElement = document.getElementById("sign-in");
 var signOutButtonElement = document.getElementById("sign-out");
-// TODO: Change snackbar to a warning, since emulator banner hides the message
 var signInSnackbarElement = document.getElementById("must-signin-snackbar");
 
 // Saves message on form submit.
 messageFormElement.addEventListener("submit", onMessageFormSubmit);
 
-// Buttons for sign up, sign in, and sign out.
-signInWithEmailAndPasswordButtonElement.addEventListener(
-  "click",
-  onSignInSubmit
-);
-createAccountWithEmailAndPasswordButtonElement.addEventListener(
-  "click",
-  onCreateAccountSubmit
-);
+// Buttons for sign in and sign out.
 signOutButtonElement.addEventListener("click", signOutUser);
-signInWithGoogleButtonElement.addEventListener("click", signInWithGoogle);
+signInButtonElement.addEventListener("click", signIn);
 
 // Toggle for the button.
 messageInputElement.addEventListener("keyup", toggleButton);
