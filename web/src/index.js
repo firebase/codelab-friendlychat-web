@@ -22,10 +22,13 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  connectAuthEmulator,
 } from "firebase/auth";
 import {
   getFirestore,
+  connectFirestoreEmulator,
   collection,
   addDoc,
   query,
@@ -45,29 +48,35 @@ import {
 } from "firebase/storage";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { getPerformance } from "firebase/performance";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 import { getFirebaseConfig } from "./firebase-config.js";
 
-// Signs-in Friendly Chat.
+// Signs-in Friendly Chat with Google account.
 async function signInWithGoogle() {
   // Sign in Firebase using popup auth and Google as the identity provider.
   var provider = new GoogleAuthProvider();
   await signInWithPopup(getAuth(), provider);
 }
 
+// Creates a Friendly Chat account with an email and password.
 async function createEmailAndPasswordUser(email, password) {
   await createUserWithEmailAndPassword(getAuth(), email, password).catch(
     (error) => {
       console.error("Error creating a new email/password user", error);
+      // TODO: Display the error to user
     }
   );
 }
 
+// Signs-in Friendly Chat with email and password.
 async function signInEmailAndPasswordUser(email, password) {
-  await signInWithEmailAndPassword(getAuth(), email, password)
-    .catch((error) => {
+  await signInWithEmailAndPassword(getAuth(), email, password).catch(
+    (error) => {
       console.error("Error signing in email/password user", error);
-    });
+      // TODO: Display the error to user
+    }
+  );
 }
 
 // Signs-out of Friendly Chat.
@@ -89,7 +98,7 @@ function getProfilePicUrl() {
 
 // Returns the signed-in user's display name.
 function getUserName() {
-  return getAuth().currentUser.displayName;
+  return getAuth().currentUser.displayName || getAuth().currentUser.email;
 }
 
 // Returns true if a user is signed-in.
@@ -253,6 +262,30 @@ function onMessageFormSubmit(e) {
   }
 }
 
+// Triggered when sign in button is clicked.
+function onSignInSubmit(e) {
+  e.preventDefault();
+  // Check that the user entered both email and password.
+  if (emailFormElement.value && passwordFormElement.value) {
+    signInEmailAndPasswordUser(
+      emailFormElement.value,
+      passwordFormElement.value
+    );
+  }
+}
+
+// Triggered when create account button is clicked.
+function onCreateAccountSubmit(e) {
+  e.preventDefault();
+  // Check that the user entered both email and password.
+  if (emailFormElement.value && passwordFormElement.value) {
+    createEmailAndPasswordUser(
+      emailFormElement.value,
+      passwordFormElement.value
+    );
+  }
+}
+
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) {
@@ -271,8 +304,9 @@ function authStateObserver(user) {
     userPicElement.removeAttribute("hidden");
     signOutButtonElement.removeAttribute("hidden");
 
-    // Hide sign-in button.
+    // Hide sign-in buttons.
     signInWithGoogleButtonElement.setAttribute("hidden", "true");
+    signInFormElement.setAttribute("hidden", "true");
 
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
@@ -283,8 +317,10 @@ function authStateObserver(user) {
     userPicElement.setAttribute("hidden", "true");
     signOutButtonElement.setAttribute("hidden", "true");
 
-    // Show sign-in button.
-    signInWithGoogleButtonElement.removeAttribute("hidden");
+    // Show sign-in buttons.
+    // TODO: Add SignInWithGoogle back in
+    // signInWithGoogleButtonElement.removeAttribute("hidden");
+    signInFormElement.removeAttribute("hidden");
   }
 }
 
@@ -435,12 +471,34 @@ var imageFormElement = document.getElementById("image-form");
 var mediaCaptureElement = document.getElementById("mediaCapture");
 var userPicElement = document.getElementById("user-pic");
 var userNameElement = document.getElementById("user-name");
-var signInWithGoogleButtonElement = document.getElementById("sign-in-with-google");
+var signInFormElement = document.getElementById("sign-in-form");
+var emailFormElement = document.getElementById("email");
+var passwordFormElement = document.getElementById("password");
+var signInWithEmailAndPasswordButtonElement = document.getElementById(
+  "sign-in-with-email-password"
+);
+var createAccountWithEmailAndPasswordButtonElement = document.getElementById(
+  "create-account-with-email-password"
+);
+var signInWithGoogleButtonElement = document.getElementById(
+  "sign-in-with-google"
+);
 var signOutButtonElement = document.getElementById("sign-out");
+// TODO: Change snackbar to a warning, since emulator banner hides the message
 var signInSnackbarElement = document.getElementById("must-signin-snackbar");
 
 // Saves message on form submit.
 messageFormElement.addEventListener("submit", onMessageFormSubmit);
+
+// Buttons for sign up, sign in, and sign out.
+signInWithEmailAndPasswordButtonElement.addEventListener(
+  "click",
+  onSignInSubmit
+);
+createAccountWithEmailAndPasswordButtonElement.addEventListener(
+  "click",
+  onCreateAccountSubmit
+);
 signOutButtonElement.addEventListener("click", signOutUser);
 signInWithGoogleButtonElement.addEventListener("click", signInWithGoogle);
 
@@ -456,6 +514,10 @@ imageButtonElement.addEventListener("click", function (e) {
 mediaCaptureElement.addEventListener("change", onMediaFileSelected);
 
 const firebaseApp = initializeApp(getFirebaseConfig());
+connectAuthEmulator(getAuth(), "http://localhost:9199");
+connectFunctionsEmulator(getFunctions(), "localhost", 5011);
+connectFirestoreEmulator(getFirestore(), "localhost", 8080);
+
 getPerformance();
 initFirebaseAuth();
 loadMessages();
