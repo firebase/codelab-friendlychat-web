@@ -7,12 +7,52 @@
   },
   "hosting": {
     "public": "./public",
-    "headers": [{
-      "source" : "**/*.@(js|html)",
-      "headers" : [ {
-        "key" : "Cache-Control",
-        "value" : "max-age=0"
-      } ]
-    }]
+    "headers": [
+      {
+        "source": "**/*.@(js|html)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=0"
+          }
+        ]
+      }
+    ]
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ],
+  "emulators": {
+    "auth": {
+      "port": 9199
+    },
+    "functions": {
+      "port": 5011
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "hosting": {
+      "port": 5170
+    },
+    "storage": {
+      "port": 9139
+    },
+    "ui": {
+      "enabled": true
+    }
   }
 }
