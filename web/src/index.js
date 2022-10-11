@@ -23,6 +23,11 @@ import {
   signInWithPopup,
   signOut,
   connectAuthEmulator,
+  getMultiFactorResolver,
+  multiFactor,
+  PhoneAuthProvider,
+  PhoneMultiFactorGenerator,
+  RecaptchaVerifier,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -54,7 +59,113 @@ import { getFirebaseConfig } from "./firebase-config.js";
 async function signIn() {
   // Sign in Firebase using popup auth and Google as the identity provider.
   var provider = new GoogleAuthProvider();
-  await signInWithPopup(getAuth(), provider);
+  await signInWithPopup(getAuth(), provider)
+    .then(function (userCredential) {
+      // User successfully signed in and is not enrolled with a second factor.
+    })
+    .catch(function (error) {
+      if (error.code == "auth/multi-factor-auth-required") {
+        // The user is a multi-factor user. Second factor challenge is required.
+        multiFactorResolver = getMultiFactorResolver(getAuth(), error);
+        displaySecondFactor(multiFactorResolver.hints);
+      } else {
+        alert(`Error signing in user. ${error}`);
+      }
+      throw error;
+    });
+}
+
+// Starts MFA sign in flow by sending a verification code to the user.
+async function startMultiFactorSignIn(multiFactorHint, session) {
+  if (multiFactorHint.factorId === PhoneMultiFactorGenerator.FACTOR_ID) {
+    const recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha",
+      { size: "invisible" },
+      getAuth()
+    );
+    const phoneInfoOptions = { multiFactorHint, session };
+    const phoneAuthProvider = new PhoneAuthProvider(getAuth());
+    // Send SMS verification code
+    verificationId = await phoneAuthProvider
+      .verifyPhoneNumber(phoneInfoOptions, recaptchaVerifier)
+      .catch(function (error) {
+        alert(`Error verifying phone number. ${error}`);
+        throw error;
+      });
+  } else {
+    alert("Only phone number second factors are supported.");
+  }
+}
+
+// Completes MFA sign in flow once verification code is obtained.
+async function finishMultiFactorSignIn(verificationCode) {
+  // Get SMS verification code sent to user.
+  const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
+  const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
+
+  // Complete sign-in.
+  await multiFactorResolver
+    .resolveSignIn(multiFactorAssertion)
+    .catch(function (error) {
+      alert(`Error completing sign in. ${error}`);
+      throw error;
+    });
+
+  multiFactorResolver = null;
+  verificationId = null;
+}
+
+// Starts MFA enrollment for phone number provider by sending a verification code to the user.
+async function startEnrollMultiFactor(phoneNumber) {
+  const recaptchaVerifier = new RecaptchaVerifier(
+    "recaptcha",
+    { size: "invisible" },
+    getAuth()
+  );
+
+  verificationId = await multiFactor(getAuth().currentUser)
+    .getSession()
+    .then(function (multiFactorSession) {
+      // Specify the phone number and pass the MFA session.
+      const phoneInfoOptions = {
+        phoneNumber: phoneNumber,
+        session: multiFactorSession,
+      };
+
+      const phoneAuthProvider = new PhoneAuthProvider(getAuth());
+
+      // Send SMS verification code.
+      return phoneAuthProvider.verifyPhoneNumber(
+        phoneInfoOptions,
+        recaptchaVerifier
+      );
+    })
+    .catch(function (error) {
+      if (error.code == "auth/invalid-phone-number") {
+        alert(
+          `Error with phone number formatting. Phone numbers must start with +. ${error}`
+        );
+      } else {
+        alert(`Error enrolling second factor. ${error}`);
+      }
+      throw error;
+    });
+}
+
+// Completes MFA enrollment once verification code is obtained.
+async function finishEnrollMultiFactor(verificationCode) {
+  // Ask user for the verification code. Then:
+  const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
+  const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
+
+  // Complete enrollment.
+  await multiFactor(getAuth().currentUser)
+    .enroll(multiFactorAssertion)
+    .catch(function (error) {
+      alert(`Error finishing second factor enrollment. ${error}`);
+      throw error;
+    });
+  verificationId = null;
 }
 
 // Signs-out of Friendly Chat.
@@ -240,6 +351,122 @@ function onMessageFormSubmit(e) {
   }
 }
 
+// Triggered when "enroll a second factor" button is clicked.
+function displayMfaEnrollment(e) {
+  e.preventDefault();
+
+  userSettingsButtonElement.setAttribute("hidden", "true");
+  signOutButtonElement.setAttribute("hidden", "true");
+
+  enrollSecondFactorFormElement.removeAttribute("hidden");
+}
+
+// Triggered when "enroll as second factor" button is clicked.
+function startMfaEnrollment(e) {
+  e.preventDefault();
+
+  // Check that the user entered a phone number.
+  if (phoneNumberElement.value) {
+    startEnrollMultiFactor(phoneNumberElement.value).then(function () {
+      enrollSecondFactorFormElement.reset();
+      enrollSecondFactorFormElement.setAttribute("hidden", "true");
+      verificationCodeFormElement.removeAttribute("hidden");
+      enrollVerificationCodeSubmitButtonElement.removeAttribute("hidden");
+    });
+  }
+}
+
+// Triggered when user submits verification code to complete MFA enrollment.
+function finishMfaEnrollment(e) {
+  e.preventDefault();
+
+  // Check that the user entered a verification number.
+  if (verificationCodeElement.value) {
+    finishEnrollMultiFactor(verificationCodeElement.value).then(function () {
+      verificationCodeFormElement.reset();
+      verificationCodeFormElement.setAttribute("hidden", "true");
+      enrollVerificationCodeSubmitButtonElement.setAttribute("hidden", "true");
+
+      userSettingsButtonElement.removeAttribute("hidden");
+      signOutButtonElement.removeAttribute("hidden");
+    });
+  }
+}
+
+// Display second factor options for current user.
+function displaySecondFactor(multiFactorInfoHints) {
+  for (var i = 0; i < multiFactorInfoHints.length; i++) {
+    const hint = multiFactorInfoHints[i];
+
+    // Create element
+    const selection = document.createElement("li");
+    selection.textContent = hint.displayName
+      ? `${hint.displayName} - ${hint.phoneNumber}`
+      : hint.phoneNumber;
+    selection.classList.add("mdl-menu__item");
+
+    // Add event listener for each selection
+    selection.addEventListener("click", onSelectSecondFactor);
+
+    // Add to second factor drop down menu
+    selectSecondFactorDropDownElement.appendChild(selection);
+  }
+
+  signInButtonElement.setAttribute("hidden", "true");
+
+  selectSecondFactorTextElement.removeAttribute("hidden");
+  selectSecondFactorButtonElement.removeAttribute("hidden");
+  selectSecondFactorElement.removeAttribute("hidden");
+}
+
+// Triggered when multi-factor is selected for sign-in.
+async function onSelectSecondFactor(e) {
+  e.preventDefault();
+
+  const selectedIndex = Array.prototype.indexOf.call(
+    selectSecondFactorDropDownElement.children,
+    e.target
+  );
+
+  await startMultiFactorSignIn(
+    multiFactorResolver.hints[selectedIndex],
+    multiFactorResolver.session
+  ).then(function () {
+    // Hide selection panel
+    selectSecondFactorTextElement.setAttribute("hidden", "true");
+    selectSecondFactorButtonElement.setAttribute("hidden", "true");
+    selectSecondFactorElement.setAttribute("hidden", "true");
+
+    // Display verification code form
+    verificationCodeFormElement.removeAttribute("hidden");
+    verificationCodeSubmitButtonElement.removeAttribute("hidden");
+
+    // Clear list for future sign in's
+    while (selectSecondFactorDropDownElement.lastElementChild) {
+      selectSecondFactorDropDownElement.removeChild(
+        selectSecondFactorDropDownElement.lastElementChild
+      );
+    }
+  });
+}
+
+// Triggered when user submits verification code to complete MFA sign in.
+function finishMfaSignIn(e) {
+  e.preventDefault();
+
+  // Check that the user entered a verification number.
+  if (verificationCodeElement.value) {
+    finishMultiFactorSignIn(verificationCodeElement.value).then(function () {
+      verificationCodeFormElement.reset();
+      verificationCodeFormElement.setAttribute("hidden", "true");
+      verificationCodeSubmitButtonElement.setAttribute("hidden", "true");
+
+      userSettingsButtonElement.removeAttribute("hidden");
+      signOutButtonElement.removeAttribute("hidden");
+    });
+  }
+}
+
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) {
@@ -261,6 +488,9 @@ function authStateObserver(user) {
     // Hide sign-in buttons.
     signInButtonElement.setAttribute("hidden", "true");
 
+    // Display user settings hamburger button.
+    userSettingsButtonElement.removeAttribute("hidden");
+
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
   } else {
@@ -269,6 +499,9 @@ function authStateObserver(user) {
     userNameElement.setAttribute("hidden", "true");
     userPicElement.setAttribute("hidden", "true");
     signOutButtonElement.setAttribute("hidden", "true");
+
+    // Hide user settings hamburger button.
+    userSettingsButtonElement.setAttribute("hidden", "true");
 
     // Show sign-in buttons.
     signInButtonElement.removeAttribute("hidden");
@@ -412,6 +645,11 @@ function toggleButton() {
   }
 }
 
+// Used in multi-factor sign in flow.
+var multiFactorResolver = null;
+// Used in multi-factor enrollment and sign in flows.
+var verificationId = null;
+
 // Shortcuts to DOM Elements.
 var messageListElement = document.getElementById("messages");
 var messageFormElement = document.getElementById("message-form");
@@ -425,6 +663,39 @@ var userNameElement = document.getElementById("user-name");
 var signInButtonElement = document.getElementById("sign-in");
 var signOutButtonElement = document.getElementById("sign-out");
 var signInSnackbarElement = document.getElementById("must-signin-snackbar");
+var userSettingsButtonElement = document.getElementById("user-settings");
+var startEnrollSecondFactorElement = document.getElementById(
+  "start-enroll-second-factor"
+);
+var phoneNumberElement = document.getElementById("phone-number");
+var enrollSecondFactorFormElement = document.getElementById(
+  "enroll-second-factor-form"
+);
+var enrollSecondFactorSubmitButtonElement = document.getElementById(
+  "enroll-second-factor-submit"
+);
+var selectSecondFactorTextElement = document.getElementById(
+  "select-second-factor-text"
+);
+var selectSecondFactorButtonElement = document.getElementById(
+  "select-second-factor-button"
+);
+const selectSecondFactorElement = document.getElementById(
+  "select-second-factor"
+);
+var selectSecondFactorDropDownElement = document.getElementById(
+  "select-second-factor-drop-down"
+);
+var verificationCodeFormElement = document.getElementById(
+  "verification-code-form"
+);
+var verificationCodeElement = document.getElementById("verification-code");
+var enrollVerificationCodeSubmitButtonElement = document.getElementById(
+  "enroll-verification-code-submit"
+);
+var verificationCodeSubmitButtonElement = document.getElementById(
+  "verification-code-submit"
+);
 
 // Saves message on form submit.
 messageFormElement.addEventListener("submit", onMessageFormSubmit);
@@ -432,6 +703,18 @@ messageFormElement.addEventListener("submit", onMessageFormSubmit);
 // Buttons for sign in and sign out.
 signOutButtonElement.addEventListener("click", signOutUser);
 signInButtonElement.addEventListener("click", signIn);
+
+// Buttons for MFA flows.
+startEnrollSecondFactorElement.addEventListener("click", displayMfaEnrollment);
+enrollSecondFactorSubmitButtonElement.addEventListener(
+  "click",
+  startMfaEnrollment
+);
+enrollVerificationCodeSubmitButtonElement.addEventListener(
+  "click",
+  finishMfaEnrollment
+);
+verificationCodeSubmitButtonElement.addEventListener("click", finishMfaSignIn);
 
 // Toggle for the button.
 messageInputElement.addEventListener("keyup", toggleButton);
