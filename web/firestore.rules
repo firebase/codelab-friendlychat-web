@@ -15,13 +15,6 @@ service cloud.firestore {
                       && request.resource.data.imageUrl.matches('https?://.*'));
       allow delete: if false;
     }
-    // FCM Tokens:
-    //   - Anyone can write their token.
-    //   - Reading list of tokens is not allowed.
-    match /fcmTokens/{token} {
-      allow read: if false;
-      allow write;
-    }
     // PublicRoom:
     //   - Anyone can write their room members.
     //   - Reading list of room members is allowed.

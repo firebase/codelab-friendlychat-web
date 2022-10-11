@@ -38,9 +38,7 @@ import {
   orderBy,
   limit,
   onSnapshot,
-  setDoc,
   updateDoc,
-  doc,
   serverTimestamp,
 } from "firebase/firestore";
 import {
@@ -49,8 +47,6 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
-import { getPerformance } from "firebase/performance";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 import { getFirebaseConfig } from "./firebase-config.js";
@@ -71,7 +67,6 @@ async function signIn() {
       } else {
         alert(`Error signing in user. ${error}`);
       }
-      throw error;
     });
 }
 
@@ -275,47 +270,6 @@ async function saveImageMessage(file) {
   }
 }
 
-// Saves the messaging device token to Cloud Firestore.
-async function saveMessagingDeviceToken() {
-  try {
-    const currentToken = await getToken(getMessaging());
-    if (currentToken) {
-      console.log("Got FCM device token:", currentToken);
-      // Saving the Device Token to Cloud Firestore.
-      const tokenRef = doc(getFirestore(), "fcmTokens", currentToken);
-      await setDoc(tokenRef, { uid: getAuth().currentUser.uid });
-
-      // This will fire when a message is received while the app is in the foreground.
-      // When the app is in the background, firebase-messaging-sw.js will receive the message instead.
-      onMessage(getMessaging(), (message) => {
-        console.log(
-          "New foreground notification from Firebase Messaging!",
-          message.notification
-        );
-      });
-    } else {
-      // Need to request permissions to show notifications.
-      requestNotificationsPermissions();
-    }
-  } catch (error) {
-    console.error("Unable to get messaging token.", error);
-  }
-}
-
-// Requests permissions to show notifications.
-async function requestNotificationsPermissions() {
-  console.log("Requesting notifications permission...");
-  const permission = await Notification.requestPermission();
-
-  if (permission === "granted") {
-    console.log("Notification permission granted.");
-    // Notification permission granted.
-    await saveMessagingDeviceToken();
-  } else {
-    console.log("Unable to get permission to notify.");
-  }
-}
-
 // Triggered when a file is selected via the media picker.
 function onMediaFileSelected(event) {
   event.preventDefault();
@@ -491,9 +445,6 @@ function authStateObserver(user) {
 
     // Display user settings hamburger button.
     userSettingsButtonElement.removeAttribute("hidden");
-
-    // We save the Firebase Messaging Device token and enable notifications.
-    saveMessagingDeviceToken();
   } else {
     // User is signed out!
     // Hide user's profile and sign-out button.
@@ -787,5 +738,4 @@ connectAuthEmulator(getAuth(), "http://localhost:9199");
 connectFunctionsEmulator(getFunctions(), "localhost", 5011);
 connectFirestoreEmulator(getFirestore(), "localhost", 8080);
 
-getPerformance();
 initFirebaseAuth();

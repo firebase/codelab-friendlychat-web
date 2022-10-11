@@ -17,24 +17,4 @@ const appConfig = {
   },
 };
 
-const serviceWorkerConfig = {
-  ...rootConfig,
-  entry: './src/firebase-messaging-sw.js',
-  // TODO(jhuleatt): Remove this once https://github.com/firebase/firebase-js-sdk/issues/5314 is resolved
-  module: {
-    rules: [
-      {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false,
-        },
-      },
-    ],
-  },
-  output: {
-    filename: 'firebase-messaging-sw.js',
-    path: path.resolve(__dirname, 'public'),
-  },
-};
-
-module.exports = [appConfig, serviceWorkerConfig];
+module.exports = [appConfig];
