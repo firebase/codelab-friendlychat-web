@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import * as admin from "firebase-admin";
-import { beforeUserCreated, HttpsError } from "firebase-functions/v2/identity";
+// Import the Firebase SDK for Google Cloud Functions.
+const functions = require("firebase-functions");
 
+// Import and initialize the Firebase Admin SDK.
+const admin = require('firebase-admin');
 admin.initializeApp();
 
-export const beforecreated = beforeUserCreated((event) => {
-  const user = event.data;
+exports.beforeCreate = functions.auth.user().beforeCreate((user, context) => {
   // Only users of a specific domain can sign up.
   if (user?.email && !/^[^@]+@example\.com$/.test(user?.email)) {
-    throw new HttpsError("invalid-argument", "Unauthorized email");
+    throw new functions.auth.HttpsError("invalid-argument", "Unauthorized email");
   }
 });
