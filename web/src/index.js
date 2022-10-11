@@ -69,8 +69,9 @@ async function signIn() {
         multiFactorResolver = getMultiFactorResolver(getAuth(), error);
         displaySecondFactor(multiFactorResolver.hints);
       } else {
-        console.error("Error signing in user", error);
+        alert(`Error signing in user. ${error}`);
       }
+      throw error;
     });
 }
 
@@ -85,12 +86,14 @@ async function startMultiFactorSignIn(multiFactorHint, session) {
     const phoneInfoOptions = { multiFactorHint, session };
     const phoneAuthProvider = new PhoneAuthProvider(getAuth());
     // Send SMS verification code
-    verificationId = await phoneAuthProvider.verifyPhoneNumber(
-      phoneInfoOptions,
-      recaptchaVerifier
-    );
+    verificationId = await phoneAuthProvider
+      .verifyPhoneNumber(phoneInfoOptions, recaptchaVerifier)
+      .catch(function (error) {
+        alert(`Error verifying phone number. ${error}`);
+        throw error;
+      });
   } else {
-    console.error("Only phone number second factors are supported");
+    alert("Only phone number second factors are supported.");
   }
 }
 
@@ -101,7 +104,12 @@ async function finishMultiFactorSignIn(verificationCode) {
   const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
 
   // Complete sign-in.
-  await multiFactorResolver.resolveSignIn(multiFactorAssertion);
+  await multiFactorResolver
+    .resolveSignIn(multiFactorAssertion)
+    .catch(function (error) {
+      alert(`Error completing sign in. ${error}`);
+      throw error;
+    });
 
   multiFactorResolver = null;
   verificationId = null;
@@ -134,7 +142,11 @@ async function startEnrollMultiFactor(phoneNumber) {
     })
     .catch(function (error) {
       if (error.code == "auth/invalid-phone-number") {
-        console.error("Phone number must start with +");
+        alert(
+          `Error with phone number formatting. Phone numbers must start with +. ${error}`
+        );
+      } else {
+        alert(`Error enrolling second factor. ${error}`);
       }
       throw error;
     });
@@ -147,7 +159,12 @@ async function finishEnrollMultiFactor(verificationCode) {
   const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
 
   // Complete enrollment.
-  await multiFactor(getAuth().currentUser).enroll(multiFactorAssertion);
+  await multiFactor(getAuth().currentUser)
+    .enroll(multiFactorAssertion)
+    .catch(function (error) {
+      alert(`Error finishing second factor enrollment. ${error}`);
+      throw error;
+    });
   verificationId = null;
 }
 
@@ -414,23 +431,23 @@ async function onSelectSecondFactor(e) {
   await startMultiFactorSignIn(
     multiFactorResolver.hints[selectedIndex],
     multiFactorResolver.session
-  );
+  ).then(function () {
+    // Hide selection panel
+    selectSecondFactorTextElement.setAttribute("hidden", "true");
+    selectSecondFactorButtonElement.setAttribute("hidden", "true");
+    selectSecondFactorElement.setAttribute("hidden", "true");
 
-  // Hide selection panel
-  selectSecondFactorTextElement.setAttribute("hidden", "true");
-  selectSecondFactorButtonElement.setAttribute("hidden", "true");
-  selectSecondFactorElement.setAttribute("hidden", "true");
+    // Display verification code form
+    verificationCodeFormElement.removeAttribute("hidden");
+    verificationCodeSubmitButtonElement.removeAttribute("hidden");
 
-  // Display verification code form
-  verificationCodeFormElement.removeAttribute("hidden");
-  verificationCodeSubmitButtonElement.removeAttribute("hidden");
-
-  // Clear list for future sign in's
-  while (selectSecondFactorDropDownElement.lastElementChild) {
-    selectSecondFactorDropDownElement.removeChild(
-      selectSecondFactorDropDownElement.lastElementChild
-    );
-  }
+    // Clear list for future sign in's
+    while (selectSecondFactorDropDownElement.lastElementChild) {
+      selectSecondFactorDropDownElement.removeChild(
+        selectSecondFactorDropDownElement.lastElementChild
+      );
+    }
+  });
 }
 
 // Triggered when user submits verification code to complete MFA sign in.
