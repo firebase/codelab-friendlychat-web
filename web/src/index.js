@@ -88,7 +88,7 @@ function isUserSignedIn() {
 async function saveMessage(messageText) {
   // Add a new message entry to the Firebase database.
   try {
-    await addDoc(collection(getFirestore(), "messages"), {
+    await addDoc(collection(getFirestore(), "chatrooms/"+selectedRoom+"/messages"), {
       name: getUserName(),
       text: messageText,
       profilePicUrl: getProfilePicUrl(),
@@ -100,10 +100,10 @@ async function saveMessage(messageText) {
 }
 
 // Loads chat messages history and listens for upcoming ones.
-function loadMessages() {
+function loadMessages(messageListElementType) {
   // Create the query to load the last 12 messages and listen for new ones.
   const recentMessagesQuery = query(
-    collection(getFirestore(), "messages"),
+    collection(getFirestore(), "chatrooms/"+selectedRoom+"/messages"),
     orderBy("timestamp", "desc"),
     limit(12)
   );
@@ -121,7 +121,8 @@ function loadMessages() {
           message.name,
           message.text,
           message.profilePicUrl,
-          message.imageUrl
+          message.imageUrl,
+          messageListElementType
         );
       }
     });
@@ -133,7 +134,7 @@ function loadMessages() {
 async function saveImageMessage(file) {
   try {
     // 1 - We add a message with a loading icon that will get updated with the shared image.
-    const messageRef = await addDoc(collection(getFirestore(), "messages"), {
+    const messageRef = await addDoc(collection(getFirestore(), "chatrooms/"+selectedRoom+"/messages"), {
       name: getUserName(),
       imageUrl: LOADING_IMAGE_URL,
       profilePicUrl: getProfilePicUrl(),
@@ -226,15 +227,49 @@ function onMediaFileSelected(event) {
     saveImageMessage(file);
   }
 }
+function onPrivateMediaFileSelected(event) {
+  event.preventDefault();
+  var file = event.target.files[0];
+
+  // Clear the selection in the file picker input.
+  privateImageFormElement.reset();
+
+  // Check if the file is an image.
+  if (!file.type.match("image.*")) {
+    var data = {
+      message: "You can only share images",
+      timeout: 2000,
+    };
+    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
+    return;
+  }
+  // Check if the user is signed-in
+  if (checkSignedInWithMessage()) {
+    saveImageMessage(file);
+  }
+}
 
 // Triggered when the send new message form is submitted.
 function onMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
   if (messageInputElement.value && checkSignedInWithMessage()) {
-    saveMessage(messageInputElement.value).then(function () {
+    saveMessage(messageInputElement.value,selectedRoom).then(function () {
       // Clear message text field and re-enable the SEND button.
       resetMaterialTextfield(messageInputElement);
+      toggleButton();
+    });
+  }
+}
+
+// Triggered when the send new private message form is submitted.
+function onPrivateMessageFormSubmit(e) {
+  e.preventDefault();
+  // Check that the user entered a private message and is signed in.
+  if (privateMessageInputElement.value && checkSignedInWithMessage()) {
+    saveMessage(privateMessageInputElement.value,selectedRoom).then(function () {
+      // Clear message text field and re-enable the SEND button.
+      resetMaterialTextfield(privateMessageInputElement);
       toggleButton();
     });
   }
@@ -325,7 +360,7 @@ function deleteMessage(id) {
   }
 }
 
-function createAndInsertMessage(id, timestamp) {
+function createAndInsertMessage(id, timestamp, messageListElementType) {
   const container = document.createElement("div");
   container.innerHTML = MESSAGE_TEMPLATE;
   const div = container.firstChild;
@@ -337,9 +372,9 @@ function createAndInsertMessage(id, timestamp) {
   div.setAttribute("timestamp", timestamp);
 
   // figure out where to insert new message
-  const existingMessages = messageListElement.children;
+  const existingMessages = messageListElementType.children;
   if (existingMessages.length === 0) {
-    messageListElement.appendChild(div);
+    messageListElementType.appendChild(div);
   } else {
     let messageListNode = existingMessages[0];
 
@@ -359,16 +394,16 @@ function createAndInsertMessage(id, timestamp) {
       messageListNode = messageListNode.nextSibling;
     }
 
-    messageListElement.insertBefore(div, messageListNode);
+    messageListElementType.insertBefore(div, messageListNode);
   }
 
   return div;
 }
 
 // Displays a Message in the UI.
-function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
+function displayMessage(id, timestamp, name, text, picUrl, imageUrl,messageListElementType) {
   var div =
-    document.getElementById(id) || createAndInsertMessage(id, timestamp);
+    document.getElementById(id) || createAndInsertMessage(id, timestamp, messageListElementType);
 
   // profile picture
   if (picUrl) {
@@ -388,7 +423,7 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
     // If the message is an image.
     var image = document.createElement("img");
     image.addEventListener("load", function () {
-      messageListElement.scrollTop = messageListElement.scrollHeight;
+      messageListElementType.scrollTop = messageListElementType.scrollHeight;
     });
     image.src = imageUrl + "&" + new Date().getTime();
     messageElement.innerHTML = "";
@@ -398,7 +433,7 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
   setTimeout(function () {
     div.classList.add("visible");
   }, 1);
-  messageListElement.scrollTop = messageListElement.scrollHeight;
+  messageListElementType.scrollTop = messageListElementType.scrollHeight;
   messageInputElement.focus();
 }
 
@@ -412,22 +447,81 @@ function toggleButton() {
   }
 }
 
+function togglePrivateButton(){
+  if (privateMessageInputElement.value) {
+    privateSubmitButtonElement.removeAttribute("disabled");
+  } else {
+    privateSubmitButtonElement.setAttribute("disabled", "true");
+  }
+}
+
+//onclick event for public room button and private room button
+function onClickPublicRoom() {
+  selectedRoom = "publicRoom";
+  privateMessageCardElement.setAttribute("hidden",true);
+  messageCardElement.removeAttribute("hidden");
+  loadMessages(messageListElement);
+  saveMember(selectedRoom);
+}
+
+function onClickPrivateRoom() {
+  selectedRoom = "privateRoom";
+  privateMessageCardElement.removeAttribute("hidden");
+  messageCardElement.setAttribute("hidden",true);
+  loadMessages(privateMessageListElement);
+  saveMember(selectedRoom);
+}
+
+async function saveMember(roomName) {
+  // Add a new member to selected chatroom.
+  try {
+    const memberUid = getAuth().currentUser.uid;
+    await setDoc(doc(getFirestore(), "chatrooms/"+roomName+"/members/"+memberUid), {
+      uid:memberUid,
+      email:getAuth().currentUser.email,
+    });
+    privatePermissionErrorElement.setAttribute("hidden", true);
+  } catch (error) {
+    if (error){
+      privatePermissionErrorElement.removeAttribute("hidden");
+      privateMessageCardElement.setAttribute("hidden",true);
+    }
+    console.error("Error adding new member to Firebase Database", error);
+  }
+}
+
 // Shortcuts to DOM Elements.
 var messageListElement = document.getElementById("messages");
+var privateMessageListElement = document.getElementById("private-messages");
 var messageFormElement = document.getElementById("message-form");
+var privateMessageFormElement = document.getElementById("private-message-form");
 var messageInputElement = document.getElementById("message");
+var privateMessageInputElement = document.getElementById("private-message");
 var submitButtonElement = document.getElementById("submit");
+var privateSubmitButtonElement = document.getElementById("private-submit");
 var imageButtonElement = document.getElementById("submitImage");
 var imageFormElement = document.getElementById("image-form");
+var privateImageButtonElement = document.getElementById("private-submitImage");
+var privateImageFormElement = document.getElementById("private-image-form");
 var mediaCaptureElement = document.getElementById("mediaCapture");
+var privateMediaCaptureElement = document.getElementById("private-mediaCapture");
 var userPicElement = document.getElementById("user-pic");
 var userNameElement = document.getElementById("user-name");
 var signInButtonElement = document.getElementById("sign-in");
 var signOutButtonElement = document.getElementById("sign-out");
 var signInSnackbarElement = document.getElementById("must-signin-snackbar");
+var publicRoomButtonElement = document.getElementById("public-room");
+var privateRoomButtonElement = document.getElementById("private-room");
+var messageCardElement = document.getElementById("messages-card-container");
+var privateMessageCardElement = document.getElementById("private-messages-card-container");
+var privatePermissionErrorElement = document.getElementById("mdl-no-permission-error-container");
+
+//state of selectd room that will be updated when room button is collected.
+var selectedRoom = "publicRoom";
 
 // Saves message on form submit.
 messageFormElement.addEventListener("submit", onMessageFormSubmit);
+privateMessageFormElement.addEventListener("submit", onPrivateMessageFormSubmit);
 
 // Buttons for sign in and sign out.
 signOutButtonElement.addEventListener("click", signOutUser);
@@ -436,6 +530,8 @@ signInButtonElement.addEventListener("click", signIn);
 // Toggle for the button.
 messageInputElement.addEventListener("keyup", toggleButton);
 messageInputElement.addEventListener("change", toggleButton);
+privateMessageInputElement.addEventListener("keyup", togglePrivateButton);
+privateMessageInputElement.addEventListener("change", togglePrivateButton);
 
 // Events for image upload.
 imageButtonElement.addEventListener("click", function (e) {
@@ -443,6 +539,15 @@ imageButtonElement.addEventListener("click", function (e) {
   mediaCaptureElement.click();
 });
 mediaCaptureElement.addEventListener("change", onMediaFileSelected);
+privateImageButtonElement.addEventListener("click", function (e) {
+  e.preventDefault();
+  privateMediaCaptureElement.click();
+});
+privateMediaCaptureElement.addEventListener("change", onPrivateMediaFileSelected);
+
+//Events for public room and private room button
+publicRoomButtonElement.addEventListener("click", onClickPublicRoom);
+privateRoomButtonElement.addEventListener("click", onClickPrivateRoom);
 
 const firebaseApp = initializeApp(getFirebaseConfig());
 connectAuthEmulator(getAuth(), "http://localhost:9199");
@@ -451,4 +556,4 @@ connectFirestoreEmulator(getFirestore(), "localhost", 8080);
 
 getPerformance();
 initFirebaseAuth();
-loadMessages();
+
