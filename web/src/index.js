@@ -196,12 +196,15 @@ function isUserSignedIn() {
 async function saveMessage(messageText) {
   // Add a new message entry to the Firebase database.
   try {
-    await addDoc(collection(getFirestore(), `chatrooms/${selectedRoom}/messages`), {
-      name: getUserName(),
-      text: messageText,
-      profilePicUrl: getProfilePicUrl(),
-      timestamp: serverTimestamp(),
-    });
+    await addDoc(
+      collection(getFirestore(), `chatrooms/${selectedRoom}/messages`),
+      {
+        name: getUserName(),
+        text: messageText,
+        profilePicUrl: getProfilePicUrl(),
+        timestamp: serverTimestamp(),
+      }
+    );
   } catch (error) {
     console.error("Error writing new message to Firebase Database", error);
   }
@@ -230,7 +233,7 @@ function loadMessages(messageListElementType) {
           message.text,
           message.profilePicUrl,
           message.imageUrl,
-          messageListElementType,
+          messageListElementType
         );
       }
     });
@@ -242,12 +245,15 @@ function loadMessages(messageListElementType) {
 async function saveImageMessage(file) {
   try {
     // 1 - We add a message with a loading icon that will get updated with the shared image.
-    const messageRef = await addDoc(collection(getFirestore(), `chatrooms/${selectedRoom}/messages`), {
-      name: getUserName(),
-      imageUrl: LOADING_IMAGE_URL,
-      profilePicUrl: getProfilePicUrl(),
-      timestamp: serverTimestamp(),
-    });
+    const messageRef = await addDoc(
+      collection(getFirestore(), `chatrooms/${selectedRoom}/messages`),
+      {
+        name: getUserName(),
+        imageUrl: LOADING_IMAGE_URL,
+        profilePicUrl: getProfilePicUrl(),
+        timestamp: serverTimestamp(),
+      }
+    );
 
     // 2 - Upload the image to Cloud Storage.
     const filePath = `${getAuth().currentUser.uid}/${messageRef.id}/${
@@ -512,7 +518,7 @@ function deleteMessage(id) {
   }
 }
 
-function createAndInsertMessage(id, timestamp,messageListElementType) {
+function createAndInsertMessage(id, timestamp, messageListElementType) {
   const container = document.createElement("div");
   container.innerHTML = MESSAGE_TEMPLATE;
   const div = container.firstChild;
@@ -553,9 +559,18 @@ function createAndInsertMessage(id, timestamp,messageListElementType) {
 }
 
 // Displays a Message in the UI.
-function displayMessage(id, timestamp, name, text, picUrl, imageUrl, messageListElementType) {
+function displayMessage(
+  id,
+  timestamp,
+  name,
+  text,
+  picUrl,
+  imageUrl,
+  messageListElementType
+) {
   var div =
-    document.getElementById(id) || createAndInsertMessage(id, timestamp, messageListElementType);
+    document.getElementById(id) ||
+    createAndInsertMessage(id, timestamp, messageListElementType);
 
   // profile picture
   if (picUrl) {
@@ -615,7 +630,6 @@ function onClickPrivateRoom() {
   messageListElement.setAttribute("hidden", true);
   loadMessages(privateMessageListElement);
   saveMember();
-
 }
 
 async function saveMember() {
@@ -623,19 +637,22 @@ async function saveMember() {
   if (isUserSignedIn()) {
     try {
       const memberUid = getAuth().currentUser.uid;
-      await setDoc(doc(getFirestore(), `chatrooms/${selectedRoom}/members/${memberUid}`), {
-        uid:memberUid,
-        email:getAuth().currentUser.email,
-      });
+      await setDoc(
+        doc(getFirestore(), `chatrooms/${selectedRoom}/members/${memberUid}`),
+        {
+          uid: memberUid,
+          email: getAuth().currentUser.email,
+        }
+      );
       privatePermissionErrorElement.setAttribute("hidden", true);
     } catch (error) {
-      if (error){
+      if (error) {
         privatePermissionErrorElement.removeAttribute("hidden");
-        messageCardElement.setAttribute("hidden",true);
+        messageCardElement.setAttribute("hidden", true);
       }
       console.error("Error adding new member to Firebase Database", error);
     }
-  } else{
+  } else {
     messageCardElement.setAttribute("hidden", true);
   }
 }
@@ -644,7 +661,6 @@ async function saveMember() {
 var multiFactorResolver = null;
 // Used in multi-factor enrollment and sign in flows.
 var verificationId = null;
-
 
 // Shortcuts to DOM Elements.
 var messageListElement = document.getElementById("messages");
@@ -663,7 +679,9 @@ var signInSnackbarElement = document.getElementById("must-signin-snackbar");
 var publicRoomButtonElement = document.getElementById("public-room");
 var privateRoomButtonElement = document.getElementById("private-room");
 var messageCardElement = document.getElementById("messages-card-container");
-var privatePermissionErrorElement = document.getElementById("mdl-no-permission-error-container");
+var privatePermissionErrorElement = document.getElementById(
+  "mdl-no-permission-error-container"
+);
 var userSettingsButtonElement = document.getElementById("user-settings");
 var startEnrollSecondFactorElement = document.getElementById(
   "start-enroll-second-factor"
