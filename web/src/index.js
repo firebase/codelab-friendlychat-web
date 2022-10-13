@@ -199,7 +199,7 @@ function isUserSignedIn() {
 async function saveMessage(messageText) {
   // Add a new message entry to the Firebase database.
   try {
-    await addDoc(collection(getFirestore(), "messages"), {
+    await addDoc(collection(getFirestore(), `chatrooms/${selectedRoom}/messages`), {
       name: getUserName(),
       text: messageText,
       profilePicUrl: getProfilePicUrl(),
@@ -211,10 +211,10 @@ async function saveMessage(messageText) {
 }
 
 // Loads chat messages history and listens for upcoming ones.
-function loadMessages() {
+function loadMessages(messageListElementType) {
   // Create the query to load the last 12 messages and listen for new ones.
   const recentMessagesQuery = query(
-    collection(getFirestore(), "messages"),
+    collection(getFirestore(), `chatrooms/${selectedRoom}/messages`),
     orderBy("timestamp", "desc"),
     limit(12)
   );
@@ -232,7 +232,8 @@ function loadMessages() {
           message.name,
           message.text,
           message.profilePicUrl,
-          message.imageUrl
+          message.imageUrl,
+          messageListElementType,
         );
       }
     });
@@ -244,7 +245,7 @@ function loadMessages() {
 async function saveImageMessage(file) {
   try {
     // 1 - We add a message with a loading icon that will get updated with the shared image.
-    const messageRef = await addDoc(collection(getFirestore(), "messages"), {
+    const messageRef = await addDoc(collection(getFirestore(), `chatrooms/${selectedRoom}/messages`), {
       name: getUserName(),
       imageUrl: LOADING_IMAGE_URL,
       profilePicUrl: getProfilePicUrl(),
@@ -558,7 +559,7 @@ function deleteMessage(id) {
   }
 }
 
-function createAndInsertMessage(id, timestamp) {
+function createAndInsertMessage(id, timestamp,messageListElementType) {
   const container = document.createElement("div");
   container.innerHTML = MESSAGE_TEMPLATE;
   const div = container.firstChild;
@@ -570,9 +571,9 @@ function createAndInsertMessage(id, timestamp) {
   div.setAttribute("timestamp", timestamp);
 
   // figure out where to insert new message
-  const existingMessages = messageListElement.children;
+  const existingMessages = messageListElementType.children;
   if (existingMessages.length === 0) {
-    messageListElement.appendChild(div);
+    messageListElementType.appendChild(div);
   } else {
     let messageListNode = existingMessages[0];
 
@@ -592,16 +593,16 @@ function createAndInsertMessage(id, timestamp) {
       messageListNode = messageListNode.nextSibling;
     }
 
-    messageListElement.insertBefore(div, messageListNode);
+    messageListElementType.insertBefore(div, messageListNode);
   }
 
   return div;
 }
 
 // Displays a Message in the UI.
-function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
+function displayMessage(id, timestamp, name, text, picUrl, imageUrl, messageListElementType) {
   var div =
-    document.getElementById(id) || createAndInsertMessage(id, timestamp);
+    document.getElementById(id) || createAndInsertMessage(id, timestamp, messageListElementType);
 
   // profile picture
   if (picUrl) {
@@ -621,7 +622,7 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
     // If the message is an image.
     var image = document.createElement("img");
     image.addEventListener("load", function () {
-      messageListElement.scrollTop = messageListElement.scrollHeight;
+      messageListElementType.scrollTop = messageListElementType.scrollHeight;
     });
     image.src = imageUrl + "&" + new Date().getTime();
     messageElement.innerHTML = "";
@@ -631,7 +632,7 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
   setTimeout(function () {
     div.classList.add("visible");
   }, 1);
-  messageListElement.scrollTop = messageListElement.scrollHeight;
+  messageListElementType.scrollTop = messageListElementType.scrollHeight;
   messageInputElement.focus();
 }
 
@@ -645,13 +646,56 @@ function toggleButton() {
   }
 }
 
+//onclick event for public room button and private room button
+function onClickPublicRoom() {
+  selectedRoom = "publicRoom";
+  messageCardElement.removeAttribute("hidden");
+  messageListElement.removeAttribute("hidden");
+  privateMessageListElement.setAttribute("hidden", true);
+  loadMessages(messageListElement);
+  saveMember(); 
+}
+
+function onClickPrivateRoom() {
+  selectedRoom = "privateRoom";
+  privateMessageListElement.removeAttribute("hidden");
+  messageListElement.setAttribute("hidden", true);
+  loadMessages(privateMessageListElement);
+  saveMember();
+
+}
+
+async function saveMember() {
+  // Add a new member to selected chatroom.
+  if (isUserSignedIn()) {
+    try {
+      const memberUid = getAuth().currentUser.uid;
+      await setDoc(doc(getFirestore(), `chatrooms/${selectedRoom}/members/${memberUid}`), {
+        uid:memberUid,
+        email:getAuth().currentUser.email,
+      });
+      privatePermissionErrorElement.setAttribute("hidden", true);
+    } catch (error) {
+      if (error){
+        privatePermissionErrorElement.removeAttribute("hidden");
+        messageCardElement.setAttribute("hidden",true);
+      }
+      console.error("Error adding new member to Firebase Database", error);
+    }
+  } else{
+    messageCardElement.setAttribute("hidden", true);
+  }
+}
+
 // Used in multi-factor sign in flow.
 var multiFactorResolver = null;
 // Used in multi-factor enrollment and sign in flows.
 var verificationId = null;
 
+
 // Shortcuts to DOM Elements.
 var messageListElement = document.getElementById("messages");
+var privateMessageListElement = document.getElementById("private-messages");
 var messageFormElement = document.getElementById("message-form");
 var messageInputElement = document.getElementById("message");
 var submitButtonElement = document.getElementById("submit");
@@ -663,6 +707,10 @@ var userNameElement = document.getElementById("user-name");
 var signInButtonElement = document.getElementById("sign-in");
 var signOutButtonElement = document.getElementById("sign-out");
 var signInSnackbarElement = document.getElementById("must-signin-snackbar");
+var publicRoomButtonElement = document.getElementById("public-room");
+var privateRoomButtonElement = document.getElementById("private-room");
+var messageCardElement = document.getElementById("messages-card-container");
+var privatePermissionErrorElement = document.getElementById("mdl-no-permission-error-container");
 var userSettingsButtonElement = document.getElementById("user-settings");
 var startEnrollSecondFactorElement = document.getElementById(
   "start-enroll-second-factor"
@@ -697,8 +745,8 @@ var verificationCodeSubmitButtonElement = document.getElementById(
   "verification-code-submit"
 );
 
-// Saves message on form submit.
-messageFormElement.addEventListener("submit", onMessageFormSubmit);
+//state of selectd room that will be updated when room button is collected.
+var selectedRoom = "publicRoom";
 
 // Buttons for sign in and sign out.
 signOutButtonElement.addEventListener("click", signOutUser);
@@ -720,12 +768,19 @@ verificationCodeSubmitButtonElement.addEventListener("click", finishMfaSignIn);
 messageInputElement.addEventListener("keyup", toggleButton);
 messageInputElement.addEventListener("change", toggleButton);
 
+//Event for message submission.
+messageFormElement.addEventListener("submit", onMessageFormSubmit);
+
 // Events for image upload.
 imageButtonElement.addEventListener("click", function (e) {
   e.preventDefault();
   mediaCaptureElement.click();
 });
 mediaCaptureElement.addEventListener("change", onMediaFileSelected);
+
+//Events for public room and private room button
+publicRoomButtonElement.addEventListener("click", onClickPublicRoom);
+privateRoomButtonElement.addEventListener("click", onClickPrivateRoom);
 
 const firebaseApp = initializeApp(getFirebaseConfig());
 connectAuthEmulator(getAuth(), "http://localhost:9199");
@@ -734,4 +789,3 @@ connectFirestoreEmulator(getFirestore(), "localhost", 8080);
 
 getPerformance();
 initFirebaseAuth();
-loadMessages();

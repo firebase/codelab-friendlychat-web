@@ -51,7 +51,7 @@ main, #messages-card {
   padding-top: 0;
   padding-bottom: 0;
 }
-#messages {
+#messages, #private-messages {
   overflow-y: auto;
   margin-bottom: 10px;
   height: calc(100% - 80px);
@@ -169,6 +169,11 @@ main, #messages-card {
 }
 #mediaCapture {
   display: none;
+}
+#mdl-no-permission-error-container {
+  margin-left: 24px;
+  margin-top: 24px;
+  color: red;
 }
 @media screen and (max-width: 610px) {
   header {

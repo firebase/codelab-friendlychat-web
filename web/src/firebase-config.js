@@ -8,6 +8,10 @@
  */
 const config = {
   /* TODO: ADD YOUR FIREBASE CONFIGURATION OBJECT HERE */
+  apiKey: "fake-api-key",
+  projectId: "demo-example",
+  authDomain: "demo-example.firebaseapp.com",
+  appId: "fakeid"
 };
 
 export function getFirebaseConfig() {
