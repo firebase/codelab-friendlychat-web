@@ -166,9 +166,10 @@ async function finishEnrollMultiFactor(verificationCode) {
 }
 
 // Signs-out of Friendly Chat.
-function signOutUser() {
+async function signOutUser() {
   // Sign out of Firebase.
-  signOut(getAuth());
+  await signOut(getAuth());
+  await saveMember();
 }
 
 // Initialize firebase auth
@@ -256,9 +257,9 @@ async function saveImageMessage(file) {
     );
 
     // 2 - Upload the image to Cloud Storage.
-    const filePath = `${getAuth().currentUser.uid}/${selectedRoom}/${messageRef.id}/${
-      file.name
-    }`;
+    const filePath = `${getAuth().currentUser.uid}/${selectedRoom}/${
+      messageRef.id
+    }/${file.name}`;
     const newImageRef = ref(getStorage(), filePath);
     const fileSnapshot = await uploadBytesResumable(newImageRef, file);
 
@@ -318,10 +319,10 @@ function onMessageFormSubmit(e) {
 function displayMfaEnrollment(e) {
   e.preventDefault();
 
-  userSettingsButtonElement.setAttribute("hidden", "true");
-  signOutButtonElement.setAttribute("hidden", "true");
+  userSettingsButtonElement.hidden = true;
+  signOutButtonElement.hidden = true;
 
-  enrollSecondFactorFormElement.removeAttribute("hidden");
+  enrollSecondFactorFormElement.hidden = false;
 }
 
 // Triggered when "enroll as second factor" button is clicked.
@@ -332,9 +333,9 @@ function startMfaEnrollment(e) {
   if (phoneNumberElement.value) {
     startEnrollMultiFactor(phoneNumberElement.value).then(function () {
       enrollSecondFactorFormElement.reset();
-      enrollSecondFactorFormElement.setAttribute("hidden", "true");
-      verificationCodeFormElement.removeAttribute("hidden");
-      enrollVerificationCodeSubmitButtonElement.removeAttribute("hidden");
+      enrollSecondFactorFormElement.hidden = true;
+      verificationCodeFormElement.hidden = false;
+      enrollVerificationCodeSubmitButtonElement.hidden = false;
     });
   }
 }
@@ -347,11 +348,11 @@ function finishMfaEnrollment(e) {
   if (verificationCodeElement.value) {
     finishEnrollMultiFactor(verificationCodeElement.value).then(function () {
       verificationCodeFormElement.reset();
-      verificationCodeFormElement.setAttribute("hidden", "true");
-      enrollVerificationCodeSubmitButtonElement.setAttribute("hidden", "true");
+      verificationCodeFormElement.hidden = true;
+      enrollVerificationCodeSubmitButtonElement.hidden = true;
 
-      userSettingsButtonElement.removeAttribute("hidden");
-      signOutButtonElement.removeAttribute("hidden");
+      userSettingsButtonElement.hidden = false;
+      signOutButtonElement.hidden = false;
     });
   }
 }
@@ -375,11 +376,11 @@ function displaySecondFactor(multiFactorInfoHints) {
     selectSecondFactorDropDownElement.appendChild(selection);
   }
 
-  signInButtonElement.setAttribute("hidden", "true");
+  signInButtonElement.hidden = true;
 
-  selectSecondFactorTextElement.removeAttribute("hidden");
-  selectSecondFactorButtonElement.removeAttribute("hidden");
-  selectSecondFactorElement.removeAttribute("hidden");
+  selectSecondFactorTextElement.hidden = false;
+  selectSecondFactorButtonElement.hidden = false;
+  selectSecondFactorElement.hidden = false;
 }
 
 // Triggered when multi-factor is selected for sign-in.
@@ -396,13 +397,13 @@ async function onSelectSecondFactor(e) {
     multiFactorResolver.session
   ).then(function () {
     // Hide selection panel
-    selectSecondFactorTextElement.setAttribute("hidden", "true");
-    selectSecondFactorButtonElement.setAttribute("hidden", "true");
-    selectSecondFactorElement.setAttribute("hidden", "true");
+    selectSecondFactorTextElement.hidden = true;
+    selectSecondFactorButtonElement.hidden = true;
+    selectSecondFactorElement.hidden = true;
 
     // Display verification code form
-    verificationCodeFormElement.removeAttribute("hidden");
-    verificationCodeSubmitButtonElement.removeAttribute("hidden");
+    verificationCodeFormElement.hidden = false;
+    verificationCodeSubmitButtonElement.hidden = false;
 
     // Clear list for future sign in's
     while (selectSecondFactorDropDownElement.lastElementChild) {
@@ -421,11 +422,11 @@ function finishMfaSignIn(e) {
   if (verificationCodeElement.value) {
     finishMultiFactorSignIn(verificationCodeElement.value).then(function () {
       verificationCodeFormElement.reset();
-      verificationCodeFormElement.setAttribute("hidden", "true");
-      verificationCodeSubmitButtonElement.setAttribute("hidden", "true");
+      verificationCodeFormElement.hidden = true;
+      verificationCodeSubmitButtonElement.hidden = true;
 
-      userSettingsButtonElement.removeAttribute("hidden");
-      signOutButtonElement.removeAttribute("hidden");
+      userSettingsButtonElement.hidden = false;
+      signOutButtonElement.hidden = false;
     });
   }
 }
@@ -444,27 +445,27 @@ function authStateObserver(user) {
     userNameElement.textContent = userName;
 
     // Show user's profile and sign-out button.
-    userNameElement.removeAttribute("hidden");
-    userPicElement.removeAttribute("hidden");
-    signOutButtonElement.removeAttribute("hidden");
+    userNameElement.hidden = false;
+    userPicElement.hidden = false;
+    signOutButtonElement.hidden = false;
 
     // Hide sign-in buttons.
-    signInButtonElement.setAttribute("hidden", "true");
+    signInButtonElement.hidden = true;
 
     // Display user settings hamburger button.
-    userSettingsButtonElement.removeAttribute("hidden");
+    userSettingsButtonElement.hidden = false;
   } else {
     // User is signed out!
     // Hide user's profile and sign-out button.
-    userNameElement.setAttribute("hidden", "true");
-    userPicElement.setAttribute("hidden", "true");
-    signOutButtonElement.setAttribute("hidden", "true");
+    userNameElement.hidden = true;
+    userPicElement.hidden = true;
+    signOutButtonElement.hidden = true;
 
     // Hide user settings hamburger button.
-    userSettingsButtonElement.setAttribute("hidden", "true");
+    userSettingsButtonElement.hidden = true;
 
     // Show sign-in buttons.
-    signInButtonElement.removeAttribute("hidden");
+    signInButtonElement.hidden = false;
   }
 }
 
@@ -617,24 +618,26 @@ function toggleButton() {
 //onclick event for public room button and private room button
 function onClickPublicRoom() {
   selectedRoom = "publicRoom";
-  messageCardElement.removeAttribute("hidden");
-  messageListElement.removeAttribute("hidden");
-  privateMessageListElement.setAttribute("hidden", true);
+  messageListElement.hidden = false;
+  privateMessageListElement.hidden = true;
   loadMessages(messageListElement);
   saveMember();
 }
 
 function onClickPrivateRoom() {
   selectedRoom = "privateRoom";
-  privateMessageListElement.removeAttribute("hidden");
-  messageListElement.setAttribute("hidden", true);
+  privateMessageListElement.hidden = false;
+  messageListElement.hidden = true;
   loadMessages(privateMessageListElement);
   saveMember();
 }
 
 async function saveMember() {
+  messageCardElement.hidden = true;
+  privatePermissionErrorElement.hidden = true;
   // Add a new member to selected chatroom.
   if (isUserSignedIn()) {
+    notSignedInErrorElement.hidden = true;
     try {
       const memberUid = getAuth().currentUser.uid;
       await setDoc(
@@ -644,16 +647,16 @@ async function saveMember() {
           email: getAuth().currentUser.email,
         }
       );
-      privatePermissionErrorElement.setAttribute("hidden", true);
+      messageCardElement.hidden = false;
     } catch (error) {
       if (error) {
-        privatePermissionErrorElement.removeAttribute("hidden");
-        messageCardElement.setAttribute("hidden", true);
+        privatePermissionErrorElement.hidden = false;
+        messageCardElement.hidden = true;
       }
-      console.error("Error adding new member to Firebase Database", error);
+      console.error("Error adding new member to Firestore", error);
     }
   } else {
-    messageCardElement.setAttribute("hidden", true);
+    notSignedInErrorElement.hidden = false;
   }
 }
 
@@ -679,6 +682,9 @@ var signInSnackbarElement = document.getElementById("must-signin-snackbar");
 var publicRoomButtonElement = document.getElementById("public-room");
 var privateRoomButtonElement = document.getElementById("private-room");
 var messageCardElement = document.getElementById("messages-card-container");
+var notSignedInErrorElement = document.getElementById(
+  "mdl-not-signed-in-error-container"
+);
 var privatePermissionErrorElement = document.getElementById(
   "mdl-no-permission-error-container"
 );

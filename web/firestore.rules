@@ -8,7 +8,7 @@ service cloud.firestore {
     match /chatrooms/{chatroom}/messages/{messageId} {
       allow read;
       allow create, update: if request.auth != null
-                    && request.resource.data.name == request.auth.token.name 
+                    && request.resource.data.name == request.auth.token.get('name', request.auth.token.email)
                     && (request.resource.data.text is string
                       && request.resource.data.text.size() <= 300
                       || request.resource.data.imageUrl is string
@@ -22,6 +22,7 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write;
     }
+
     // PrivateRoom:
     //   - only a certain user can read and write.
     match /chatrooms/privateRoom/members/{memberId} {

@@ -147,8 +147,14 @@
         </div>
       </div>
     </div>
-    <div hidden id="mdl-no-permission-error-container" class="mdl-error-container">
-      <div id="mdl-no-permission-error">you do not have permission to join the private room.</div>
+    <div hidden id="mdl-no-permission-error-container" class="mdl-error-container mdl-cell mdl-cell--12-col mdl-grid">
+      <div class="mdl-cell--12-col">
+        <p class="mdl-typography--body-2 mdl-color-text--red">You do not have permission to join the private room.</p>
+        <p class="mdl-typography--body-1">Hint: Only <b>private@example.com</b> is allowed. Try signing in with that specific email address.</p>
+      </div>
+    </div>
+    <div id="mdl-not-signed-in-error-container" class="mdl-error-container mdl-cell mdl-cell--12-col mdl-grid">
+      <p class="mdl-typography--body-1">To start, sign into an account via the top-right corner and then select a chat room above to join.</p>
     </div>
   </main>
 </div>

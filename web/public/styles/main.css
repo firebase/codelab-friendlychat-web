@@ -170,10 +170,8 @@ main, #messages-card {
 #mediaCapture {
   display: none;
 }
-#mdl-no-permission-error-container {
-  margin-left: 24px;
+.mdl-error-container {
   margin-top: 24px;
-  color: red;
 }
 @media screen and (max-width: 610px) {
   header {
