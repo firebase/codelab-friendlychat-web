@@ -40,6 +40,8 @@ import {
   onSnapshot,
   updateDoc,
   serverTimestamp,
+  setDoc,
+  doc,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -604,7 +606,7 @@ function onClickPublicRoom() {
   messageListElement.removeAttribute("hidden");
   privateMessageListElement.setAttribute("hidden", true);
   loadMessages(messageListElement);
-  saveMember(); 
+  saveMember();
 }
 
 function onClickPrivateRoom() {
