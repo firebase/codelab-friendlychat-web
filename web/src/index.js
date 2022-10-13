@@ -256,7 +256,7 @@ async function saveImageMessage(file) {
     );
 
     // 2 - Upload the image to Cloud Storage.
-    const filePath = `${getAuth().currentUser.uid}/${messageRef.id}/${
+    const filePath = `${getAuth().currentUser.uid}/${selectedRoom}/${messageRef.id}/${
       file.name
     }`;
     const newImageRef = ref(getStorage(), filePath);
