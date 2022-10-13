@@ -89,9 +89,9 @@ describe("Our demo friendly chat app", () => {
       await setDoc(doc(context.firestore(), 'chatrooms/testroom/members/alice'), { uid: 'alice', email: 'alice@gmail.com' });
     });
     const aliceStorage = testEnv.authenticatedContext('alice').storage();
-    const guitarRef = ref(aliceStorage, 'chatrooms/testroom/guitar.jpg');
+    const guitarRef = ref(aliceStorage, 'alice/testroom/message123/guitar.jpg');
     const bytes = new Uint8Array([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x21]);
-    await assertSucceeds(uploadBytes(guitarRef, bytes, { contentType: 'application/octet-stream' }));
+    await assertSucceeds(uploadBytes(guitarRef, bytes, { contentType: 'image/jpeg' }));
   });
 
   it('should not allow non-members to write storage objects under the chat room directory', async function () {
@@ -100,7 +100,7 @@ describe("Our demo friendly chat app", () => {
       await setDoc(doc(context.firestore(), 'chatrooms/testroom'), { owner: 'alice', name: 'testroom' });
     });
     const aliceStorage = testEnv.authenticatedContext('alice').storage();
-    const guitarRef = ref(aliceStorage, 'chatrooms/testroom/guitar.jpg');
+    const guitarRef = ref(aliceStorage, 'alice/testroom/message123/guitar.jpg');
     await assertFails(deleteObject(guitarRef));
   });
 });
