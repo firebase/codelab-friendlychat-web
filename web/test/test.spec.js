@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 const { readFileSync } = require('fs');
+const { join } = require('path');
 
 const testing = require('@firebase/rules-unit-testing');
 const { initializeTestEnvironment, RulesTestEnvironment, assertFails, assertSucceeds } = testing;
@@ -30,8 +31,8 @@ before(async () => {
   setLogLevel('error');
 
   testEnv = await initializeTestEnvironment({
-    firestore: { rules: readFileSync('../firestore.rules', 'utf8') },
-    storage: { rules: readFileSync('../storage.rules', 'utf8') },
+    firestore: { rules: readFileSync(join(__dirname, '../firestore.rules'), 'utf8') },
+    storage: { rules: readFileSync(join(__dirname, '../storage.rules'), 'utf8') },
   });
 
 });
@@ -44,7 +45,7 @@ after(async () => {
 
 beforeEach(async () => {
   await testEnv.clearFirestore();
-  await testEnv.clearStorage();
+  // await testEnv.clearStorage();
 });
 
 
