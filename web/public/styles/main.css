@@ -204,3 +204,17 @@ main, #messages-card {
   top: -1px;
   margin-right: 5px;
 }
+#select-second-factor-button.mdl-button .material-icons, #user-settings.mdl-button .material-icons {
+  top: 50%;
+  left: 10px;
+}
+#select-second-factor-text {
+  margin: 0px;
+  position: relative;
+  top: 8px;
+  right: 8px;
+}
+.mfa-submit {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
