@@ -17,15 +17,15 @@
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
 }
-main, #messages-card, #private-messages-card {
+main, #messages-card {
   height: 100%;
   padding-bottom: 0;
 }
-#messages-card-container, #private-message-card-container {
+#messages-card-container {
   height: calc(100% - 35px);
   padding-bottom: 0;
 }
-#messages-card, #private-message-card {
+#messages-card {
   margin-top: 15px;
 }
 .mdl-layout__header-row span {
@@ -101,22 +101,22 @@ main, #messages-card, #private-messages-card {
   font-size: 12px;
   box-sizing: border-box;
 }
-#message-form, #private-message-form {
+#message-form {
   display: flex;
   flex-direction: row;
   width: calc(100% - 48px);
   float: left;
 }
-#image-form, #private-image-form {
+#image-form {
   display: flex;
   flex-direction: row;
   width: 48px;
   float: right;
 }
-#message-form .mdl-textfield, #private-message-form .mdl-textfield {
+#message-form .mdl-textfield {
   width: calc(100% - 100px);
 }
-#message-form button, #image-form button, #private-message-form button, #private-image-form button {
+#message-form button, #image-form button {
   width: 100px;
   margin: 15px 0 0 10px;
 }
@@ -155,7 +155,7 @@ main, #messages-card, #private-messages-card {
   padding-right: 10px;
   padding-left: 20px;
 }
-#image-form #submitImage, #private-image-form #private-submitImage {
+#image-form #submitImage {
   width: auto;
   padding: 0 6px 0 1px;
   min-width: 0;
@@ -163,14 +163,11 @@ main, #messages-card, #private-messages-card {
 #image-form #submitImage .material-icons {
   top: -1px;
 }
-#private-image-form #private-submitImage .material-icons {
-  top: -1px;
-}
 .message img {
   max-width: 300px;
   max-height: 200px;
 }
-#mediaCapture, #private-mediaCapture {
+#mediaCapture {
   display: none;
 }
 #mdl-no-permission-error-container {

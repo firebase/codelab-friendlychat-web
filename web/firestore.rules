@@ -5,22 +5,7 @@ service cloud.firestore {
     //   - Authenticated users can add and edit messages.
     //   - Validation: Check name is same as auth token and text length below 300 char or that imageUrl is a URL.
     //   - Deletes are not allowed.
-    match /chatrooms/publicRoom/messages/{messageId} {
-      allow read;
-      allow create, update: if request.auth != null
-                    && request.resource.data.name == request.auth.token.name 
-                    && (request.resource.data.text is string
-                      && request.resource.data.text.size() <= 300
-                      || request.resource.data.imageUrl is string
-                      && request.resource.data.imageUrl.matches('https?://.*'));
-      allow delete: if false;
-    }
-    // privateMessages:
-    //   - Anyone can read.
-    //   - Authenticated users can add and edit messages.
-    //   - Validation: Check name is same as auth token and text length below 300 char or that imageUrl is a URL.
-    //   - Deletes are not allowed.
-    match /chatrooms/privateRoom/messages/{messageId} {
+    match /chatrooms/{chatroom}/messages/{messageId} {
       allow read;
       allow create, update: if request.auth != null
                     && request.resource.data.name == request.auth.token.name 
@@ -44,11 +29,11 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write;
     }
-    // privateRoom:
-    //   - only private uid can read and write
+    // PrivateRoom:
+    //   - only a certain user can read and write.
     match /chatrooms/privateRoom/members/{memberId} {
       //allow read, write;
-      allow read, writ,create: if request.auth != null && request.auth.token.email == "private@example.com";
+      allow read, write: if request.auth != null && request.auth.token.email == "private@example.com";
     }
   }
 }
