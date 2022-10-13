@@ -13,11 +13,11 @@ service cloud.firestore {
     match /chatrooms/{chatroom} {
       allow read: if request.auth.uid != null;
       allow create: if request.resource.data.owner == request.auth.uid;
-      
+
       // Only the room owner is allowed to modify it, and owner mustn't be able to assign their room to other user.
       allow update: if resource.data.owner == request.auth.uid && request.resource.data.owner == request.auth.uid;
     }
-    
+
     // Messages:
     //   - Chatroom members can read messages.
     //   - Writers can edit their own messages.
@@ -26,14 +26,14 @@ service cloud.firestore {
     match /chatrooms/{chatroom}/messages/{messageId} {
       allow read: if exists(/databases/(default)/documents/chatrooms/(chatroom)/members/$(request.auth.uid))
       allow create, update: if exists(/databases/(default)/documents/chatrooms/(chatroom)/members/$(request.auth.uid))
-                    && request.resource.data.name == request.auth.token.name 
+                    && request.resource.data.name == request.auth.token.get('name', request.auth.token.email)
                     && (request.resource.data.text is string
                       && request.resource.data.text.size() <= 300
                       || request.resource.data.imageUrl is string
                       && request.resource.data.imageUrl.matches('https?://.*'));
       allow delete: if false;
     }
-    
+
     // PublicRoom:
     //   - Anyone can write their room members.
     //   - Reading list of room members is allowed.
@@ -41,7 +41,7 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write;
     }
-    
+
     // PrivateRoom:
     //   - only a certain user can read and write.
     match /chatrooms/privateRoom/members/{memberId} {
