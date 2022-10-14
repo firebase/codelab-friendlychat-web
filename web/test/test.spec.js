@@ -45,7 +45,7 @@ after(async () => {
 
 beforeEach(async () => {
   await testEnv.clearFirestore();
-  await testEnv.clearStorage();
+  // await testEnv.clearStorage();
 });
 
 

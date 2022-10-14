@@ -170,10 +170,8 @@ main, #messages-card {
 #mediaCapture {
   display: none;
 }
-#mdl-no-permission-error-container {
-  margin-left: 24px;
+.mdl-error-container {
   margin-top: 24px;
-  color: red;
 }
 @media screen and (max-width: 610px) {
   header {
@@ -204,6 +202,11 @@ main, #messages-card {
   top: -1px;
   margin-right: 5px;
 }
+
+#user-settings .material-icons {
+  top: auto;
+}
+
 #select-second-factor-button.mdl-button .material-icons, #user-settings.mdl-button .material-icons {
   top: 50%;
   left: 10px;

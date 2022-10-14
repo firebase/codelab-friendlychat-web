@@ -15,16 +15,15 @@
  */
 
 // Import the Firebase SDK for Google Cloud Functions v2.
-const identity = require("firebase-functions/v2/identity");
+const {
+  beforeUserCreated,
+  HttpsError,
+} = require("firebase-functions/v2/identity");
 
-// Import and initialize the Firebase Admin SDK.
-const admin = require("firebase-admin");
-admin.initializeApp();
-
-exports.beforecreated = identity.beforeUserCreated((event) => {
+exports.beforecreated = beforeUserCreated((event) => {
   const user = event.data;
   // Only users of a specific domain can sign up.
-  if (user?.email && !/^[^@]+@example\.com$/.test(user?.email)) {
-    throw new identity.HttpsError("invalid-argument", "Unauthorized email");
+  if (!user.email || !user.email.endsWith("@example.com")) {
+    throw new HttpsError("invalid-argument", "Unauthorized email");
   }
 });
