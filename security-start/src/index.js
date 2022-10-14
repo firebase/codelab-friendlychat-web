@@ -64,9 +64,14 @@ async function signIn() {
     })
     .catch(function (error) {
       if (error.code == "auth/multi-factor-auth-required") {
-        // The user is a multi-factor user. Second factor challenge is required.
-        multiFactorResolver = getMultiFactorResolver(getAuth(), error);
-        displaySecondFactor(multiFactorResolver.hints);
+        alert(`MFA is required. ${error}`);
+
+        // TODO 2: Remove the alert above and uncomment the following code block
+        // to handle MFA sign in.
+
+        // // The user is a multi-factor user. Second factor challenge is required.
+        // multiFactorResolver = getMultiFactorResolver(getAuth(), error);
+        // displaySecondFactor(multiFactorResolver.hints);
       } else {
         alert(`Error signing in user. ${error}`);
       }
@@ -115,55 +120,61 @@ async function finishMultiFactorSignIn(verificationCode) {
 
 // Starts MFA enrollment for phone number provider by sending a verification code to the user.
 async function startEnrollMultiFactor(phoneNumber) {
-  const recaptchaVerifier = new RecaptchaVerifier(
-    "recaptcha",
-    { size: "invisible" },
-    getAuth()
-  );
+  // TODO 1: Uncomment the following code block, which is necessary for MFA
+  // enrollment.
 
-  verificationId = await multiFactor(getAuth().currentUser)
-    .getSession()
-    .then(function (multiFactorSession) {
-      // Specify the phone number and pass the MFA session.
-      const phoneInfoOptions = {
-        phoneNumber: phoneNumber,
-        session: multiFactorSession,
-      };
+  // const recaptchaVerifier = new RecaptchaVerifier(
+  //   "recaptcha",
+  //   { size: "invisible" },
+  //   getAuth()
+  // );
 
-      const phoneAuthProvider = new PhoneAuthProvider(getAuth());
+  // verificationId = await multiFactor(getAuth().currentUser)
+  //   .getSession()
+  //   .then(function (multiFactorSession) {
+  //     // Specify the phone number and pass the MFA session.
+  //     const phoneInfoOptions = {
+  //       phoneNumber: phoneNumber,
+  //       session: multiFactorSession,
+  //     };
 
-      // Send SMS verification code.
-      return phoneAuthProvider.verifyPhoneNumber(
-        phoneInfoOptions,
-        recaptchaVerifier
-      );
-    })
-    .catch(function (error) {
-      if (error.code == "auth/invalid-phone-number") {
-        alert(
-          `Error with phone number formatting. Phone numbers must start with +. ${error}`
-        );
-      } else {
-        alert(`Error enrolling second factor. ${error}`);
-      }
-      throw error;
-    });
+  //     const phoneAuthProvider = new PhoneAuthProvider(getAuth());
+
+  //     // Send SMS verification code.
+  //     return phoneAuthProvider.verifyPhoneNumber(
+  //       phoneInfoOptions,
+  //       recaptchaVerifier
+  //     );
+  //   })
+  //   .catch(function (error) {
+  //     if (error.code == "auth/invalid-phone-number") {
+  //       alert(
+  //         `Error with phone number formatting. Phone numbers must start with +. ${error}`
+  //       );
+  //     } else {
+  //       alert(`Error enrolling second factor. ${error}`);
+  //     }
+  //     throw error;
+  //   });
 }
 
 // Completes MFA enrollment once verification code is obtained.
 async function finishEnrollMultiFactor(verificationCode) {
-  // Ask user for the verification code. Then:
-  const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
-  const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
+  // TODO 1: Uncomment the following code block, which is necessary for MFA
+  // enrollment.
 
-  // Complete enrollment.
-  await multiFactor(getAuth().currentUser)
-    .enroll(multiFactorAssertion)
-    .catch(function (error) {
-      alert(`Error finishing second factor enrollment. ${error}`);
-      throw error;
-    });
-  verificationId = null;
+  // // Ask user for the verification code. Then:
+  // const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
+  // const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
+
+  // // Complete enrollment.
+  // await multiFactor(getAuth().currentUser)
+  //   .enroll(multiFactorAssertion)
+  //   .catch(function (error) {
+  //     alert(`Error finishing second factor enrollment. ${error}`);
+  //     throw error;
+  //   });
+  // verificationId = null;
 }
 
 // Signs-out of Friendly Chat.

@@ -20,10 +20,13 @@ const {
   HttpsError,
 } = require("firebase-functions/v2/identity");
 
-exports.beforecreated = beforeUserCreated((event) => {
-  const user = event.data;
-  // Only users of a specific domain can sign up.
-  if (!user.email || !user.email.endsWith("@example.com")) {
-    throw new HttpsError("invalid-argument", "Unauthorized email");
-  }
-});
+// TODO 3: Uncomment the following auth blocking function that gets triggered
+// before any account is created.
+
+// exports.beforecreated = beforeUserCreated((event) => {
+//   const user = event.data;
+
+//   // TODO 3: Replace this with logic that blocks email registration from any
+//   // domain other than `example.com`.
+//   console.log(user.email);
+// });

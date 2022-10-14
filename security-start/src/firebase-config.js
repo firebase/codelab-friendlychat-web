@@ -7,7 +7,9 @@
  * 4. Copy the config object snippet, then add it here.
  */
 const config = {
-  /* TODO: ADD YOUR FIREBASE CONFIGURATION OBJECT HERE */
+  // This is a fake Firebase config object that can be used to test against
+  // the emulator suite. In a production environment, you would follow the steps
+  // above prior to deploying your app.
   apiKey: "fake-api-key",
   projectId: "demo-example",
   authDomain: "demo-example.firebaseapp.com",

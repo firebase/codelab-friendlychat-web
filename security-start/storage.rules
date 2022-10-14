@@ -1,5 +1,7 @@
 rules_version = '2';
 
+// TODO 4: Update rules in this file to pass the tests in test/test.spec.js.
+
 service firebase.storage {
   // Returns true if the uploaded file is an image and its size is below the given number of MB.
   function isImageBelowMaxSize(maxSizeMB) {

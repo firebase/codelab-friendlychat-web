@@ -64,6 +64,9 @@ async function signIn() {
     })
     .catch(function (error) {
       if (error.code == "auth/multi-factor-auth-required") {
+        // SOLUTION 2: Removed the alert and uncommented the following code
+        // block to handle MFA sign in.
+
         // The user is a multi-factor user. Second factor challenge is required.
         multiFactorResolver = getMultiFactorResolver(getAuth(), error);
         displaySecondFactor(multiFactorResolver.hints);
@@ -115,6 +118,9 @@ async function finishMultiFactorSignIn(verificationCode) {
 
 // Starts MFA enrollment for phone number provider by sending a verification code to the user.
 async function startEnrollMultiFactor(phoneNumber) {
+  // SOLUTION 1: Uncommented the following code block, which is necessary for
+  // MFA enrollment.
+
   const recaptchaVerifier = new RecaptchaVerifier(
     "recaptcha",
     { size: "invisible" },
@@ -152,6 +158,9 @@ async function startEnrollMultiFactor(phoneNumber) {
 
 // Completes MFA enrollment once verification code is obtained.
 async function finishEnrollMultiFactor(verificationCode) {
+  // SOLUTION 1: Uncommented the following code block, which is necessary for
+  // MFA enrollment.
+
   // Ask user for the verification code. Then:
   const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
   const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);

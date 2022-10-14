@@ -20,6 +20,9 @@ const {
   HttpsError,
 } = require("firebase-functions/v2/identity");
 
+// SOLUTION 3: Uncommented the following auth blocking function and added logic
+// that blocks email registration from any domain other than `example.com`.
+
 exports.beforecreated = beforeUserCreated((event) => {
   const user = event.data;
   // Only users of a specific domain can sign up.

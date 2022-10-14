@@ -1,5 +1,7 @@
 rules_version = '2';
 
+// SOLUTION 4: Updated rules in this file to pass the tests in test/test.spec.js.
+
 service cloud.firestore {
   match /databases/{database}/documents {
     // Returns true if the user is a listed as a member in Firestore
@@ -48,7 +50,7 @@ service cloud.firestore {
 
     // Members:
     //  - Chatroom members can see and modify members, except in privateRoom.
-    //  - all signed in users and see and modify members in publicRoom.
+    //  - All signed in users and see and modify members in publicRoom.
     match /chatrooms/{chatroom}/members/{userId} {
       allow read, write: if request.auth != null && chatroom == 'publicRoom';
       allow read, write: if request.auth != null

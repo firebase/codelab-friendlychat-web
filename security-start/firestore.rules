@@ -1,5 +1,7 @@
 rules_version = '2';
 
+// TODO 4: Update rules in this file to pass the tests in test/test.spec.js.
+
 service cloud.firestore {
   match /databases/{database}/documents {
     match /chatrooms/{chatroom} {
