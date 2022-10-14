@@ -31,7 +31,7 @@ service cloud.firestore {
     //   - Deletes are not allowed.
     match /chatrooms/{chatroom}/messages/{messageId} {
       allow read: if request.auth != null && isChatroomMember(request.auth.uid, chatroom);
-      allow create, update: if isChatroomMember(userId, chatroom)
+      allow create, update: if request.auth != null && isChatroomMember(request.auth.uid, chatroom)
                     && request.resource.data.name == request.auth.token.get('name', request.auth.token.email)
                     && (request.resource.data.text is string
                       && request.resource.data.text.size() <= 300
@@ -51,7 +51,8 @@ service cloud.firestore {
     //  - all signed in users and see and modify members in publicRoom.
     match /chatrooms/{chatroom}/members/{userId} {
       allow read, write: if request.auth != null && chatroom == 'publicRoom';
-      allow read, write: if request.auth != null && isChatroomMember(request.auth.uid, chatroom)
+      allow read, write: if request.auth != null
+                         && (request.auth.uid == userId || isChatroomMember(request.auth.uid, chatroom))
                          && (chatroom != 'privateRoom' || request.auth.token.email == "private@example.com");
     }
   }

@@ -48,6 +48,7 @@ import {
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  connectStorageEmulator,
 } from "firebase/storage";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
@@ -763,5 +764,6 @@ const firebaseApp = initializeApp(getFirebaseConfig());
 connectAuthEmulator(getAuth(), "http://localhost:9199");
 connectFunctionsEmulator(getFunctions(), "localhost", 5011);
 connectFirestoreEmulator(getFirestore(), "localhost", 8080);
+connectStorageEmulator(getStorage(), "localhost", 9139);
 
 initFirebaseAuth();

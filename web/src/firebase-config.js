@@ -11,7 +11,8 @@ const config = {
   apiKey: "fake-api-key",
   projectId: "demo-example",
   authDomain: "demo-example.firebaseapp.com",
-  appId: "fakeid"
+  appId: "fakeid",
+  storageBucket: "demo-example.appspot.com"
 };
 
 export function getFirebaseConfig() {
