@@ -1,13 +1,13 @@
 rules_version = '2';
 
-// Returns true if the uploaded file is an image and its size is below the given number of MB.
-function isImageBelowMaxSize(maxSizeMB) {
-  return request.resource != null
-      && request.resource.size < maxSizeMB * 1024 * 1024
-      && request.resource.contentType.matches('image/.*');
-}
-
 service firebase.storage {
+  // Returns true if the uploaded file is an image and its size is below the given number of MB.
+  function isImageBelowMaxSize(maxSizeMB) {
+    return request.resource != null
+        && request.resource.size < maxSizeMB * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+  }
+  
   // Returns true if the user is a listed as a member in Firestore
   function isChatroomMember(userId, chatroom) {
     return firestore.exists(/databases/(default)/documents/chatrooms/$(chatroom)/members/$(userId));
