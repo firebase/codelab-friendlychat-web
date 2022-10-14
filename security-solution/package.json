@@ -1,7 +1,7 @@
 {
-  "name": "friendlychat",
+  "name": "security",
   "version": "1.0.0",
-  "description": "[Firebase Web Codelab](https://firebase.google.com/codelabs/firebase-web)",
+  "description": "This contains the final code of the Security Codelab",
   "private": true,
   "scripts": {
     "build": "webpack",
