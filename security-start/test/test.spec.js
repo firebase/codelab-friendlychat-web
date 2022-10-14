@@ -45,7 +45,7 @@ after(async () => {
 
 beforeEach(async () => {
   await testEnv.clearFirestore();
-  // await testEnv.clearStorage();
+  await testEnv.clearStorage();
 });
 
 
@@ -75,7 +75,6 @@ describe("Our demo friendly chat app", () => {
     });
     await testEnv.withSecurityRulesDisabled(async (context) => {
       await setDoc(doc(context.firestore(), 'chatrooms/testroom/members/alice'), { uid: 'alice', email: 'alice@gmail.com' });
-      // await setDoc(doc(context.firestore(), 'chatrooms/testroom/admins/user_loc_admin'), { uid: 'user_loc_admin', email: 'locAdmin@gmail.com' });
     });
     const globAdminDb = testEnv.authenticatedContext('globAdmin', { globAdmin: true }).firestore();
     await assertSucceeds(deleteDoc(doc(globAdminDb, 'chatrooms/testroom/members/alice')));
