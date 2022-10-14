@@ -20,7 +20,7 @@ const testing = require('@firebase/rules-unit-testing');
 const { initializeTestEnvironment, RulesTestEnvironment, assertFails, assertSucceeds } = testing;
 
 const { doc, getDoc, setDoc, deleteDoc, setLogLevel } = require('firebase/firestore');
-const { ref, deleteObject, uploadBytes } = require('firebase/storage');
+const { ref, uploadBytes } = require('firebase/storage');
 
 /** @type testing.RulesTestEnvironment */
 let testEnv;
@@ -102,19 +102,18 @@ describe("Our demo friendly chat app", () => {
     });
     const aliceStorage = testEnv.authenticatedContext('alice').storage();
     const guitarRef = ref(aliceStorage, 'alice/testroom/message123/guitar.jpg');
-    await assertFails(deleteObject(guitarRef));
+    const bytes = new Uint8Array([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x21]);
+    await assertFails(uploadBytes(guitarRef, bytes, { contentType: 'image/jpeg' }));
   });
 });
 
 describe("Extra credit tests", () => {
-
   it('should ONLY allow users to create a room they own', async function () {
     const aliceDb = testEnv.authenticatedContext('alice').firestore();
     await assertSucceeds(setDoc(doc(aliceDb, 'chatrooms/musicclub'), {
       owner: "alice",
       name: "Music Club",
     }));
-
   });
 
   it('should not allow room creation by a non-owner', async function () {
@@ -131,5 +130,49 @@ describe("Extra credit tests", () => {
       owner: "bob",
       name: "Music Club",
     }));
+  });
+
+  it('should allow only members to read messages in a chat room, except for public room', async function () {
+    // Setup: Create one test chat room with a member (bypassing Security Rules).
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'chatrooms/testroom'), { owner: 'alice', name: 'testroom' });
+    });
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'chatrooms/testroom/members/alice'), { uid: 'alice', email: 'alice@gmail.com' });
+    });
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'chatrooms/testroom/messages/message123'), { name: 'mesaage123', email: 'I love sparky' });
+    });
+
+    // Attempt to read messages by an unauthed user fails
+    const unauthedDb = testEnv.unauthenticatedContext().firestore();
+    await assertFails(getDoc(doc(unauthedDb, 'chatrooms/testroom/members/alice')));
+
+    // Attempt to read messages by a member succeeds
+    const aliceDb = testEnv.authenticatedContext('alice').firestore();
+    await assertSucceeds(getDoc(doc(aliceDb, 'chatrooms/testroom/messages/message123')));
+
+    // Attempt to read messages by a non-member fails
+    const bobDb = testEnv.authenticatedContext('bob').firestore();
+    await assertFails(getDoc(doc(bobDb, 'chatrooms/testroom/messages/message123')));
+
+    // Attempt to read messages in public room succeeds for non-members
+    await assertSucceeds(getDoc(doc(bobDb, 'chatrooms/publicRoom/messages/message123')));
+  });
+
+  it('should not allow non-members to read members list, except in public room', async function () {
+    // Setup: Create one test chat room with a member (bypassing Security Rules).
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'chatrooms/testroom'), { owner: 'alice', name: 'testroom' });
+    });
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'chatrooms/testroom/members/alice'), { uid: 'alice', email: 'alice@gmail.com' });
+    });
+    // Attempt to read members by a non-member fails
+    const bobDb = testEnv.authenticatedContext('bob').firestore();
+    await assertFails(getDoc(doc(bobDb, 'chatrooms/testroom/members/alice')));
+
+    // Attempt to read members in public room succeeds for non-members
+    await assertSucceeds(getDoc(doc(bobDb, 'chatrooms/publicRoom/members/alice')));
   });
 });
