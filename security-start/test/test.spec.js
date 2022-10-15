@@ -34,7 +34,8 @@ before(async () => {
     firestore: { rules: readFileSync(join(__dirname, '../firestore.rules'), 'utf8') },
     storage: { rules: readFileSync(join(__dirname, '../storage.rules'), 'utf8') },
   });
-
+  // HACK(b/253696973): Workaround for Storage JS SDK Node.js 18+ compatibility.
+  delete global.Blob;
 });
 
 after(async () => {
