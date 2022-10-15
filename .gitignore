@@ -6,16 +6,12 @@ Podfile.lock
 xcuserdata/
 *.xcworkspace/
 GoogleService-Info.plist
-web/functions/node_modules
-web-start/functions/node_modules
-cloud-functions-start/functions/node_modules
-cloud-functions/functions/node_modules
+security-solution/functions/node_modules
+security-start/functions/node_modules
 .firebaserc
 firebase-debug.log
 .firebase
 
 */node_modules/**
-web/public/**/*.js
-web-start/public/**/*.js
-performance-monitoring/public/**/*.js
-performance-monitoring-start/public/**/*.js
+security-solution/public/**/*.js
+security-start/public/**/*.js

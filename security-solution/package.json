@@ -1,0 +1,24 @@
+{
+  "name": "security",
+  "version": "1.0.0",
+  "description": "This contains the final code of the Security Codelab",
+  "private": true,
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack --watch --progress",
+    "visualize-bundle": "webpack --analyze",
+    "test-demo-app": "mocha --exit test/test.spec.js"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "webpack": "^5.48.0",
+    "webpack-bundle-analyzer": "^4.4.2",
+    "webpack-cli": "^4.7.2",
+    "@firebase/rules-unit-testing": "^2.0.4",
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "firebase": "^9.0.0"
+  }
+}

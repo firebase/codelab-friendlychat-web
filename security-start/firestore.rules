@@ -1,0 +1,34 @@
+rules_version = '2';
+
+// TODO 4: Update rules in this file to pass the tests in test/test.spec.js.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /chatrooms/{chatroom} {
+      allow read, write: if true;
+    }
+
+    // Messages:
+    //   - Anyone can read.
+    //   - Authenticated users can add and edit messages.
+    //   - Validation: Check name is same as auth token and text length below 300 char or that imageUrl is a URL.
+    //   - Deletes are not allowed.
+    match /chatrooms/{chatroom}/messages/{messageId} {
+      allow read;
+      allow create, update: if request.auth != null
+                    && request.resource.data.name == request.auth.token.get('name', request.auth.token.email)
+                    && (request.resource.data.text is string
+                      && request.resource.data.text.size() <= 300
+                      || request.resource.data.imageUrl is string
+                      && request.resource.data.imageUrl.matches('https?://.*'));
+      allow delete: if false;
+    }
+
+    // Members:
+    //  - Any signed in user can read/write their own membership, except in privateRoom.
+    match /chatrooms/{chatroom}/members/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId
+                            && (chatroom != 'privateRoom' || request.auth.token.email == "private@example.com");
+    }
+  }
+}

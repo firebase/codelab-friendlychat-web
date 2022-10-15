@@ -1,0 +1,26 @@
+rules_version = '2';
+
+// SOLUTION 4: Updated rules in this file to pass the tests in test/test.spec.js.
+
+service firebase.storage {
+  // Returns true if the uploaded file is an image and its size is below the given number of MB.
+  function isImageBelowMaxSize(maxSizeMB) {
+    return request.resource != null
+        && request.resource.size < maxSizeMB * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+  }
+  
+  // Returns true if the user is a listed as a member in Firestore
+  function isChatroomMember(userId, chatroom) {
+    return firestore.exists(/databases/(default)/documents/chatrooms/$(chatroom)/members/$(userId));
+  }
+
+  match /b/{bucket}/o {
+    match /{userId}/{chatroom}/{messageId}/{filename} {
+      allow read: if request.auth != null && request.auth.uid == userId && isChatroomMember(request.auth.uid, chatroom);
+      allow write: if request.auth != null && request.auth.uid == userId
+        && isImageBelowMaxSize(5)
+        && isChatroomMember(request.auth.uid, chatroom);
+    }
+  }
+}
