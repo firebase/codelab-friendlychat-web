@@ -137,6 +137,7 @@ main, #messages-card {
   padding-left: 10px;
   justify-content: flex-end;
   padding-right: 10px;
+  align-items: center;
 }
 #user-container #user-pic {
   top: -3px;
@@ -144,6 +145,7 @@ main, #messages-card {
   display: inline-block;
   background-image: url('/images/profile_placeholder.png');
   background-repeat: no-repeat;
+  border: 1px solid white;
   width: 40px;
   height: 40px;
   background-size: 40px;
@@ -220,4 +222,22 @@ main, #messages-card {
 .mfa-submit {
   margin-left: 10px;
   margin-bottom: 10px;
+}
+
+.enroll-second-factor-form, .verification-code-form {
+  align-items: center;
+  display: flex;
+  margin-left: 12px;
+}
+
+.enroll-second-factor-form .mdl-textfield, .verification-code-form .mdl-textfield {
+  width: 200px;
+}
+
+.enroll-second-factor-form .mdl-textfield__input, .verification-code-form .mdl-textfield__input  {
+  color: white;
+}
+
+.enroll-second-factor-form .mdl-textfield__label, .verification-code-form .mdl-textfield__label {
+  color: white;
 }
