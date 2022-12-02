@@ -56,26 +56,7 @@ import { getFirebaseConfig } from "./firebase-config.js";
 
 // Signs-in Friendly Chat.
 async function signIn() {
-  // Sign in Firebase using popup auth and Google as the identity provider.
-  var provider = new GoogleAuthProvider();
-  await signInWithPopup(getAuth(), provider)
-    .then(function (userCredential) {
-      // User successfully signed in and is not enrolled with a second factor.
-    })
-    .catch(function (error) {
-      if (error.code == "auth/multi-factor-auth-required") {
-        alert(`MFA is required. ${error}`);
-
-        // TODO 2: Remove the alert above and uncomment the following code block
-        // to handle MFA sign in.
-
-        // // The user is a multi-factor user. Second factor challenge is required.
-        // multiFactorResolver = getMultiFactorResolver(getAuth(), error);
-        // displaySecondFactor(multiFactorResolver.hints);
-      } else {
-        alert(`Error signing in user. ${error}`);
-      }
-    });
+  // TODO
 }
 
 // Starts MFA sign in flow by sending a verification code to the user.
@@ -120,61 +101,12 @@ async function finishMultiFactorSignIn(verificationCode) {
 
 // Starts MFA enrollment for phone number provider by sending a verification code to the user.
 async function startEnrollMultiFactor(phoneNumber) {
-  // TODO 1: Uncomment the following code block, which is necessary for MFA
-  // enrollment.
-
-  // const recaptchaVerifier = new RecaptchaVerifier(
-  //   "recaptcha",
-  //   { size: "invisible" },
-  //   getAuth()
-  // );
-
-  // verificationId = await multiFactor(getAuth().currentUser)
-  //   .getSession()
-  //   .then(function (multiFactorSession) {
-  //     // Specify the phone number and pass the MFA session.
-  //     const phoneInfoOptions = {
-  //       phoneNumber: phoneNumber,
-  //       session: multiFactorSession,
-  //     };
-
-  //     const phoneAuthProvider = new PhoneAuthProvider(getAuth());
-
-  //     // Send SMS verification code.
-  //     return phoneAuthProvider.verifyPhoneNumber(
-  //       phoneInfoOptions,
-  //       recaptchaVerifier
-  //     );
-  //   })
-  //   .catch(function (error) {
-  //     if (error.code == "auth/invalid-phone-number") {
-  //       alert(
-  //         `Error with phone number formatting. Phone numbers must start with +. ${error}`
-  //       );
-  //     } else {
-  //       alert(`Error enrolling second factor. ${error}`);
-  //     }
-  //     throw error;
-  //   });
+// TODO
 }
 
 // Completes MFA enrollment once verification code is obtained.
 async function finishEnrollMultiFactor(verificationCode) {
-  // TODO 1: Uncomment the following code block, which is necessary for MFA
-  // enrollment.
-
-  // // Ask user for the verification code. Then:
-  // const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
-  // const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
-
-  // // Complete enrollment.
-  // await multiFactor(getAuth().currentUser)
-  //   .enroll(multiFactorAssertion)
-  //   .catch(function (error) {
-  //     alert(`Error finishing second factor enrollment. ${error}`);
-  //     throw error;
-  //   });
-  // verificationId = null;
+  // TODO
 }
 
 // Signs-out of Friendly Chat.
