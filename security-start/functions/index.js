@@ -20,13 +20,7 @@ const {
   HttpsError,
 } = require("firebase-functions/v2/identity");
 
-// TODO 3: Uncomment the following auth blocking function that gets triggered
-// before any account is created.
-
 // exports.beforecreated = beforeUserCreated((event) => {
 //   const user = event.data;
-
-//   // TODO 3: Replace this with logic that blocks email registration from any
-//   // domain other than `example.com`.
 //   console.log(user.email);
 // });
