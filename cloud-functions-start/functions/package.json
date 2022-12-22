@@ -3,7 +3,7 @@
   "description": "Firebase SDK for Cloud Functions codelab",
   "dependencies": {
     "@google-cloud/vision": "^2.4.0",
-    "firebase-admin": "~9.9.0",
+    "firebase-admin": "~11.4.1",
     "firebase-functions": "^3.14.1"
   },
   "devDependencies": {
