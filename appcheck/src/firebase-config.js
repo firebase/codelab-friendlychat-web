@@ -23,3 +23,17 @@ export function getFirebaseConfig() {
     return config;
   }
 }
+
+const reCAPTCHAEnterpriseKey = {
+  // Replace with your recaptcha enterprise site key
+  key: ""
+};
+
+export function getReCaptchaKey() {
+  if (!reCAPTCHAEnterpriseKey || !reCAPTCHAEnterpriseKey.key) {
+    throw new Error('No enterprise reCaptcha key found.' + '\n' +
+    'Add pme om the web app\'s config in firebase-config.js');
+  } else {
+    return reCAPTCHAEnterpriseKey.key;
+  }
+}

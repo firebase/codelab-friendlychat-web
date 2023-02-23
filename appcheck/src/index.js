@@ -49,7 +49,21 @@
  } from 'firebase/messaging'; 
  import { getPerformance } from 'firebase/performance';
 
- import { getFirebaseConfig } from './firebase-config.js';
+ import {
+   initializeAppCheck,
+   ReCaptchaEnterpriseProvider
+ } from 'firebase/app-check';
+
+ import { getFirebaseConfig, getReCaptchaKey } from './firebase-config.js';
+
+ function setupAppCheck(app) {
+   // Create a ReCaptchaEnterpriseProvider instance using your reCAPTCHA Enterprise
+   // site key and pass it to initializeAppCheck().
+   const appCheck = initializeAppCheck(app, {
+     provider: new ReCaptchaEnterpriseProvider(getReCaptchaKey()),
+     isTokenAutoRefreshEnabled: true // Set to true to allow auto-refresh.
+   });
+ }
  
  // Signs-in Friendly Chat.
  async function signIn() {
@@ -421,6 +435,7 @@
  mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
 const firebaseApp = initializeApp(getFirebaseConfig());
+setupAppCheck(firebaseApp);
 getPerformance();
 initFirebaseAuth();
 loadMessages();
