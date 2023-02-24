@@ -1,7 +1,6 @@
 const path = require('path');
 
 const rootConfig = {
-  mode: 'development',
   optimization: {
     usedExports: true, // tells webpack to tree-shake
   },
@@ -37,4 +36,14 @@ const serviceWorkerConfig = {
   },
 };
 
-module.exports = [appConfig, serviceWorkerConfig];
+const devServerConfig = {
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
+    compress: true,
+    port: 8080,
+  }
+};
+
+module.exports = [appConfig, serviceWorkerConfig, devServerConfig];

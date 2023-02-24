@@ -51,18 +51,29 @@
 
  import {
    initializeAppCheck,
-   ReCaptchaEnterpriseProvider
+   ReCaptchaEnterpriseProvider,
  } from 'firebase/app-check';
 
  import { getFirebaseConfig, getReCaptchaKey } from './firebase-config.js';
 
+ console.log(process.env.NODE_ENV);
+
  function setupAppCheck(app) {
+  if(process.env.NODE_ENV === 'development') {
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    // const appCheck = 
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(),
+      isTokenAutoRefreshEnabled: true // Set to true to allow auto-refresh.
+    });
+  } else {
    // Create a ReCaptchaEnterpriseProvider instance using your reCAPTCHA Enterprise
    // site key and pass it to initializeAppCheck().
    const appCheck = initializeAppCheck(app, {
-     provider: new ReCaptchaEnterpriseProvider(getReCaptchaKey()),
-     isTokenAutoRefreshEnabled: true // Set to true to allow auto-refresh.
-   });
+    provider: new ReCaptchaEnterpriseProvider(getReCaptchaKey()),
+    isTokenAutoRefreshEnabled: true // Set to true to allow auto-refresh.
+  });
+  }
  }
  
  // Signs-in Friendly Chat.
