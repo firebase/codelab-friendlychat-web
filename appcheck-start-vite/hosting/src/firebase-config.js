@@ -7,12 +7,6 @@
  * 4. Copy the config object snippet, then add it here.
  */
 const config = {
-  apiKey: "AIzaSyCsPiMQWrMWQKB0PrQDfHbxokTcR4TRxGc",
-  authDomain: "qs-nohe-fb-func.firebaseapp.com",
-  projectId: "qs-nohe-fb-func",
-  storageBucket: "qs-nohe-fb-func.appspot.com",
-  messagingSenderId: "668582889497",
-  appId: "1:668582889497:web:daa041767d60d39b964288"
 };
 
 export function getFirebaseConfig() {
