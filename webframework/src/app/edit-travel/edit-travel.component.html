@@ -1,0 +1,39 @@
+<form #travel="ngForm" class="form-group">
+  <div class="travel-row">
+    <div class="form-control">
+      <label>Title</label>
+      <input name="travel-title" type="text" class="form-control" [(ngModel)]="travelData.title"
+        (change)="onUpdate(travelData)" />
+    </div>
+  </div>
+  <div class="travel-row">
+    <div class="form-control">
+      <label>Display to public?</label>
+      <mat-slide-toggle [checked]="travelData.isPublic" (change)="onPublicToggle($event)" name="isPublic"></mat-slide-toggle>
+    </div>
+  </div>
+  <div class="stop-row">
+    <div class="form-control">
+      <mat-form-field appearance="fill">
+        <mat-label>Choose the start date</mat-label>
+        <input matInput [(ngModel)]="travelData.startDate" [value]="travelData.startDate" name="startDate"
+          [matDatepicker]="startDatePicker" (dateChange)="onUpdate(travelData)" class="form-control"  />
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #startDatePicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="stop-row">
+    <div class="form-control">
+      <mat-form-field appearance="fill">
+        <mat-label>Choose the end date</mat-label>
+        <input matInput [(ngModel)]="travelData.endDate" [value]="travelData.endDate" name="endDate"
+          [matDatepicker]="endDatePicker" (dateChange)="onUpdate(travelData)" class="form-control"  />
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #endDatePicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+</form>

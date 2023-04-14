@@ -1,0 +1,64 @@
+<div class="action-bar">
+  <h3>STOPS</h3>
+  <button (click)="addStop(travelId)" class="add">Add</button>
+</div>
+
+<div class="edit-card" *ngFor="let st of stops; let i = index" [attr.data-index]="i">
+  <div>
+    <button (click)="deleteStop(st.id)">Delete</button>
+  </div>
+  <div>
+
+    <form #stops="ngForm" class="form-group">
+
+      <div class="stop-row">
+        <div class="form-control">
+          <label>Title</label>
+          <input name="stop-title" type="text" class="form-control" [(ngModel)]="st.title" (change)="onUpdate(st)" />
+        </div>
+      </div>
+
+      <div class="stop-row">
+        <div class="form-control">
+          <mat-form-field appearance="fill">
+            <mat-label>Choose the visit date</mat-label>
+            <input matInput [(ngModel)]="st.visitDate" [value]="st.visitDate.toDate()" name="visitDate"
+              [matDatepicker]="visitPicker" (dateChange)="onUpdate(st)" class="form-control" />
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="visitPicker"></mat-datepicker-toggle>
+            <mat-datepicker #visitPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="stop-row">
+        <div class="form-control">
+          <mat-label>Upload a picture of your travels!</mat-label>
+          <input id="fileUpload" type="file" #upload>
+          <button (click)="uploadFile(upload, st)">Upload</button>
+        </div>
+      </div>
+      <div class="stop-row">
+        <div class="form-control">
+          <label>Travel Notes</label>
+          <input name="stop-blogText" type="text" class="form-control" [(ngModel)]="st.blogText"
+            (change)="onUpdate(st)" />
+        </div>
+      </div>
+
+      <div class="stop-row">
+        <div class="form-control">
+          <label>Stop Type</label>
+          <mat-label>Select an option</mat-label>
+          <select class="form-control" id="stop-type" [(ngModel)]="st.type" name="stop-type">
+            <option value="STOP">Stop</option>
+            <option value="ATTRACTION">Attraction</option>
+            <option value="FOOD">Food</option>
+            <option vvalue="LODGING">Lodging</option>
+          </select>
+        </div>
+      </div>
+
+
+    </form>
+  </div>
+</div>
