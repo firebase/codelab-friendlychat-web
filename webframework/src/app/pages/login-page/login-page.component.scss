@@ -1,0 +1,33 @@
+.title {
+    font-size: 64px;
+    font-weight: bold;
+    color: var(--theme-surface-dark);
+  }
+  
+  .description {
+    font-size: 32px;
+    font-weight: lighter;
+  }
+  
+  .login-button {
+    width: 184px;
+    height: 56px;
+    font-size: 32px;
+    background-color: var(--theme-surface-dark);
+    color: var(--theme-text-on-dark);
+  }
+  
+  :host {
+    display: grid;
+    grid-template-columns: var(--site-grid);
+    padding-block: 64px;
+  }
+  
+  :host > * {
+    grid-column: main;
+  }
+  
+  main {
+    display: grid;
+    gap: 32px;
+  }

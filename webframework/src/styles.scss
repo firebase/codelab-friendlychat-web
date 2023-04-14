@@ -1,0 +1,128 @@
+:root {
+  --hue: 215;
+  --white: hsl(0, 0%, 0%);
+  --off-white: hsl(0, 0%, 96%);
+  --black-2: hsl(var(--hue), 0%, 32%);
+  --black-3: hsl(var(--hue), 0%, 44%);
+  --black-4: hsl(var(--hue), 0%, 25%);
+  --black-9: hsl(var(--hue), 100%, 7%);
+  --color-6: hsl(var(--hue), 31%, 24%);
+  --color-7: hsl(var(--hue), 19%, 23%);
+  --color-8: hsl(var(--hue), 27%, 15%);
+  --red-5: hsl(360, 69%, 62%);
+  --teal-5: hsl(2007, 100%, 50%);
+
+  --font-body: 'Noto Sans', sans-serif;
+
+  --theme-text: var(--black-9);
+  --theme-text-on-dark: var(--off-white);
+  --theme-surface: var(--off-white);
+  --theme-surface-dark: var(--color-8);
+
+  --font-heading-lg: bold clamp(1.25rem, 8vw + 1rem, 4rem) var(--font-body);
+  --font-heading-md: bold 1.25rem var(--font-body);
+  --font-heading-sm: bold 1rem var(--font-body);
+  --font-placeholder: normal .875rem var(--font-body);
+  --font-one-thing: 300 clamp(1.25rem, 8vw + 1rem, 3.5rem) var(--font-body);
+
+  --theme-text-on-dark: var(--off-white);
+  --theme-text-lg: var(--theme-text);
+  --theme-text-md:  var(--theme-text);
+  --theme-text-sm: var(--color-7);
+  --theme-text-placeholder: var(--black-3);
+  --theme-one-thing: var(--black-2);
+  --theme-checkmark: var(--teal-5);
+  --theme-delete: var(--red-5);
+
+  --theme-card: var(--white);
+
+  --theme-home-stripe: var(--color-7);
+  --theme-home-under-stripe: var(--color-6);
+
+  --container-width: 1620px;
+  --site-grid: [full-start] 1fr [container-start main-start] 3fr [main-end aside-start] 2fr [container-end] 1fr [aside-end full-end];
+}
+
+* {
+  box-sizing: border-box;
+  font-family: var(--font-body);
+}
+
+.site-layout {
+  width: 100%;
+  max-width: var(--container-width);
+  margin: 0 auto;
+}
+
+html, body {
+  background: var(--off-white);
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+h3, h4, h5, button {
+  text-transform: uppercase;
+}
+
+h3 {
+  color: var(--theme-text-md);
+  font: var(--font-heading-md);
+  letter-spacing: 0.25px;
+}
+
+h5 {
+  color: var(--theme-text-sm);
+  font: var(--font-heading-sm);
+  letter-spacing: 0.5px;
+}
+
+input[type='text'] {
+  background: transparent;
+  font-family: var(--font-body);
+  color: var(--color-6);
+  border: 0;
+  border-bottom: 2px solid var(--black-4);
+  padding: 8px;
+}
+
+button {
+  border: 1px solid var(--color-6); 
+  padding: 2px 6px;
+  position: relative;
+  background: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+button.add::before {
+  content: '+';
+  position: relative;
+  left: 0;
+}
+
+.form-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.form-group input {
+  width: 88%;
+}
+
+.edit-card {
+  background: white;
+  margin: -16px;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-block-end: -32px;
+}
