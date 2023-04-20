@@ -4,7 +4,7 @@ resource "google_project" "staging" {
 
   name       = "<PROJECT_NAME_OF_YOUR_STAGING_PROJECT>"
   project_id = "<PROJECT_ID_OF_YOUR_STAGING_PROJECT>"
-  # Uncomment below if you if you set up Firebase Authentication using Terraform in the previous step
+  # UNCOMMENT BELOW IF YOU IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
   # billing_account = "<BILLING_ACCOUNT_ID>"
 
   # Required for the project to display in any list of Firebase projects.
@@ -57,7 +57,7 @@ resource "google_firebase_web_app" "staging" {
   deletion_policy = "DELETE"
 }
 
-# Un comment below if you set up Firebase Authentication using Terraform in the previous step
+# UNCOMMENT BELOW IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
 ## Enable the Identity Toolkit API.
 # resource "google_project_service" "auth_staging" {
 #   provider = google-beta

@@ -88,7 +88,7 @@ resource "google_firebase_web_app" "default" {
   deletion_policy = "DELETE"
 }
 
-# Uncomment below if you set up Firebase Authentication using Terraform in the previous step
+# UNCOMMENT BELOW IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
 # # Enable the Identity Toolkit API.
 # resource "google_project_service" "auth" {
 #   provider = google-beta
