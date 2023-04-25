@@ -24,6 +24,7 @@ provider "google-beta" {
 resource "google_project" "default" {
   provider = google-beta.no_user_project_override
 
+  # TODO: REPLACE WITH YOUR OWN VALUES
   name       = "<PROJECT_NAME_OF_YOUR_PROJECT>"
   project_id = "<PROJECT_ID_OF_YOUR_PROJECT>"
 

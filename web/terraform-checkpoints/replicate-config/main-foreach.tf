@@ -24,6 +24,7 @@ provider "google-beta" {
 resource "google_project" "default" {
   provider = google-beta.no_user_project_override
   name     = each.value
+  # TODO: REPLACE WITH YOUR OWN VALUES
   # Create a unique project ID for each project, with each ID starting with <PROJECT_ID>.
   project_id = "<PROJECT_ID>-${each.key}"
   # Required if you want to set up Authentication via Terraform
@@ -34,6 +35,7 @@ resource "google_project" "default" {
     "firebase" = "enabled"
   }
 
+  # TODO: REPLACE WITH YOUR OWN VALUES
   for_each = {
     prod    = "<PROJECT_NAME_OF_PROD_PROJECT>"
     staging = "<PROJECT_NAME_OF_STAGING_PROJECT>"
@@ -84,6 +86,7 @@ resource "google_firebase_web_app" "default" {
   for_each = google_firebase_project.default
 
   project         = each.value.project
+  # TODO: REPLACE WITH YOUR OWN VALUE
   display_name    = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
   deletion_policy = "DELETE"
 }
@@ -132,6 +135,7 @@ resource "google_firebase_web_app" "default" {
 #   project       = each.value.project
 #   enabled       = true
 #   idp_id        = "google.com"
+#   # TODO: REPLACE WITH YOUR OWN VALUES 
 #   client_id     = "<YOUR_OAUTH_CLIENT_ID>"
 #   client_secret = var.oauth_client_secret
 
@@ -173,6 +177,7 @@ resource "google_firestore_database" "default" {
   name    = "(default)"
   # See available locations:
   # https://firebase.google.com/docs/firestore/locations
+  # TODO: REPLACE WITH YOUR OWN VALUE
   location_id = "<NAME_OF_DESIRED_REGION>"
   # "FIRESTORE_NATIVE" is required to use Firestore with Firebase SDKs,
   # authentication, and Firebase Security Rules.
@@ -259,6 +264,7 @@ resource "google_app_engine_application" "default" {
   project = each.value.project
   # See available locations: https://firebase.google.com/docs/projects/locations#default-cloud-location
   # This will set the location for the default Storage bucket and the App Engine App.
+  # TODO: REPLACE WITH YOUR OWN VALUE
   location_id = "<NAME_OF_DESIRED_REGION_FOR_DEFAULT_BUCKET>" # Must be in the same location as Firestore (above)
 
   # Wait until Firestore is provisioned first.

@@ -24,6 +24,7 @@ provider "google-beta" {
 resource "google_project" "default" {
   provider = google-beta.no_user_project_override
 
+  # TODO: REPLACE WITH YOUR OWN VALUES
   name       = "<PROJECT_NAME_OF_YOUR_PROJECT>"
   project_id = "<PROJECT_ID_OF_YOUR_PROJECT>"
   billing_account = "<BILLING_ACCOUNT_ID>"
@@ -74,6 +75,7 @@ resource "google_firebase_web_app" "default" {
   provider = google-beta
 
   project         = google_firebase_project.default.project
+  # TODO: REPLACE WITH YOUR OWN VALUE
   display_name    = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
   deletion_policy = "DELETE"
 }
@@ -118,6 +120,7 @@ resource "google_identity_platform_default_supported_idp_config" "google_sign_in
 
   enabled       = true
   idp_id        = "google.com"
+  # TODO: REPLACE WITH YOUR OWN VALUE
   client_id     = "<YOUR_OAUTH_CLIENT_ID>"
   client_secret = var.oauth_client_secret
 

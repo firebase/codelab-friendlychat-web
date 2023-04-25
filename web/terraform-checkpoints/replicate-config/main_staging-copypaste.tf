@@ -2,6 +2,7 @@
 resource "google_project" "staging" {
   provider = google-beta.no_user_project_override
 
+  # TODO: REPLACE WITH YOUR OWN VALUES
   name       = "<PROJECT_NAME_OF_YOUR_STAGING_PROJECT>"
   project_id = "<PROJECT_ID_OF_YOUR_STAGING_PROJECT>"
   # UNCOMMENT BELOW IF YOU IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
@@ -53,6 +54,7 @@ resource "google_firebase_web_app" "staging" {
   provider = google-beta
 
   project         = google_firebase_project.staging.project
+  # TODO: REPLACE WITH YOUR OWN VALUE
   display_name    = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
   deletion_policy = "DELETE"
 }
@@ -98,6 +100,7 @@ resource "google_firebase_web_app" "staging" {
 
 #   enabled       = true
 #   idp_id        = "google.com"
+#   # TODO: REPLACE WITH YOUR OWN VALUE
 #   client_id     = "<YOUR_OAUTH_CLIENT_ID>"
 #   client_secret = var.oauth_client_secret_staging
 
@@ -129,6 +132,7 @@ resource "google_firestore_database" "staging" {
   name    = "(default)"
   # See available locations:
   # https://firebase.google.com/docs/firestore/locations
+  # TODO: REPLACE WITH YOUR OWN VALUE
   location_id = "<NAME_OF_DESIRED_REGION>"
   # "FIRESTORE_NATIVE" is required to use Firestore with Firebase SDKs,
   # authentication, and Firebase Security Rules.
@@ -203,7 +207,8 @@ resource "google_app_engine_application" "staging" {
   project = google_firebase_project.staging.project
   # See available locations: https://firebase.google.com/docs/projects/locations#default-cloud-location
   # This will set the location for the default Storage bucket and the App Engine App.
-  location_id = "<NAME_OF_DESIRED_REGION_FOR_DEFAULT_BUCKET>"  # Must be in the same location as Firestore (above)
+  # TODO: REPLACE WITH YOUR OWN VALUE
+  location_id = "<NAME_OF_DESIRED_REGION_FOR_DEFAULT_BUCKET>" # Must be in the same location as Firestore (above)
 
   # Wait until Firestore is provisioned first.
   depends_on = [
