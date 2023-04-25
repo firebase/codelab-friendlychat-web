@@ -135,7 +135,7 @@ resource "google_firebase_web_app" "default" {
 #   project       = each.value.project
 #   enabled       = true
 #   idp_id        = "google.com"
-#   # TODO: REPLACE WITH YOUR OWN VALUES 
+#   # TODO: REPLACE WITH YOUR OWN VALUE
 #   client_id     = "<YOUR_OAUTH_CLIENT_ID>"
 #   client_secret = var.oauth_client_secret
 
