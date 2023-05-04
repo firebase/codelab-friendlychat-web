@@ -7,7 +7,13 @@
  * 4. Copy the config object snippet, then add it here.
  */
 const config = {
-  /* TODO: ADD YOUR FIREBASE CONFIGURATION OBJECT HERE */
+  apiKey: "AIzaSyBeq1ogeWBzfv6Uyrb3sI8DsQie68PDrw4",
+  authDomain: "ecv-hockey.firebaseapp.com",
+  projectId: "ecv-hockey",
+  storageBucket: "ecv-hockey.appspot.com",
+  messagingSenderId: "552780137444",
+  appId: "1:552780137444:web:a2b26b3346f4b7d4bbfdf1",
+  measurementId: "G-HVPHL8RFSJ"
 };
 
 export function getFirebaseConfig() {
