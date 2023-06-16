@@ -8,9 +8,5 @@ export const environment = {
     messagingSenderId: 'SENDER_ID',
     appId: 'APP_ID',
     measurementId: 'G-MEASUREMENT_ID',
-  },
-  reCAPTCHAEnterpriseKey: {
-    // Replace with your recaptcha enterprise site key
-    key: "Replace with your recaptcha enterprise site key"
-  },
+  }
 };
