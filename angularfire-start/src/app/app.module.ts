@@ -1,28 +1,49 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
-import { provideAuth,getAuth, connectAuthEmulator } from '@angular/fire/auth';
-import { provideFirestore,getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
-import { provideFunctions,getFunctions, connectFunctionsEmulator } from '@angular/fire/functions';
-import { provideMessaging,getMessaging } from '@angular/fire/messaging';
-import { provideStorage,getStorage, connectStorageEmulator } from '@angular/fire/storage';
+import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
+import {
+  provideFirestore,
+  getFirestore,
+  connectFirestoreEmulator,
+} from '@angular/fire/firestore';
+import {
+  provideFunctions,
+  getFunctions,
+  connectFunctionsEmulator,
+} from '@angular/fire/functions';
+import { provideMessaging, getMessaging } from '@angular/fire/messaging';
+import {
+  provideStorage,
+  getStorage,
+  connectStorageEmulator,
+} from '@angular/fire/storage';
+import {
+  ReCaptchaEnterpriseProvider,
+  initializeAppCheck,
+  provideAppCheck,
+} from '@angular/fire/app-check';
 
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { ChatPageComponent } from './pages/chat-page/chat-page.component';
 import { HeaderComponent } from './components/header/header.component';
+
+declare global {
+  var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean;
+}
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginPageComponent,
     ChatPageComponent,
-    HeaderComponent
+    HeaderComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,10 +51,24 @@ import { HeaderComponent } from './components/header/header.component';
     CommonModule,
     FormsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAppCheck(() => {
+      const appCheck = initializeAppCheck(getApp(), {
+        provider: new ReCaptchaEnterpriseProvider(
+          environment.reCAPTCHAEnterpriseKey.key
+        ),
+        isTokenAutoRefreshEnabled: true,
+      });
+      if (location.hostname === 'localhost') {
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+      }
+      return appCheck;
+    }),
     provideAuth(() => {
       const auth = getAuth();
       if (location.hostname === 'localhost') {
-        connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+        connectAuthEmulator(auth, 'http://127.0.0.1:9099', {
+          disableWarnings: true,
+        });
       }
       return auth;
     }),
@@ -63,6 +98,6 @@ import { HeaderComponent } from './components/header/header.component';
     }),
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
