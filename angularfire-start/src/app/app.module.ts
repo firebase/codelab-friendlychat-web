@@ -24,19 +24,10 @@ import {
   getStorage,
   connectStorageEmulator,
 } from '@angular/fire/storage';
-import {
-  ReCaptchaEnterpriseProvider,
-  initializeAppCheck,
-  provideAppCheck,
-} from '@angular/fire/app-check';
 
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { ChatPageComponent } from './pages/chat-page/chat-page.component';
 import { HeaderComponent } from './components/header/header.component';
-
-declare global {
-  var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean;
-}
 
 @NgModule({
   declarations: [

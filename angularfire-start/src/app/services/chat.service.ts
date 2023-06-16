@@ -47,7 +47,6 @@ export class ChatService {
   auth: Auth = inject(Auth);
   storage: Storage = inject(Storage);
   messaging: Messaging = inject(Messaging);
-  appCheck: AppCheck = inject(AppCheck);
   router: Router = inject(Router);
   private provider = new GoogleAuthProvider();
   LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
