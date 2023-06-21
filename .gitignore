@@ -10,6 +10,10 @@ web/functions/node_modules
 web-start/functions/node_modules
 cloud-functions-start/functions/node_modules
 cloud-functions/functions/node_modules
+angularfire-start/functions/node_modules
+angularfire-start/.angular
+angularfire-start/.vscode
+angularfire-start/.firebase
 .firebaserc
 firebase-debug.log
 .firebase
