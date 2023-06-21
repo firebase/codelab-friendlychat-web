@@ -6,18 +6,17 @@ import { ChatService } from 'src/app/services/chat.service';
 @Component({
   selector: 'app-chat-page',
   templateUrl: './chat-page.component.html',
-  styleUrls: ['./chat-page.component.css']
+  styleUrls: ['./chat-page.component.css'],
 })
 export class ChatPageComponent {
-
   chatService = inject(ChatService);
   messages$ = this.chatService.loadMessages() as Observable<DocumentData[]>;
   user$ = this.chatService.user$;
-  text = "";
+  text = '';
 
   sendTextMessage() {
     this.chatService.saveTextMessage(this.text);
-    this.text = "";
+    this.text = '';
   }
 
   uploadImage(event: any) {
