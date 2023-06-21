@@ -1,23 +1,20 @@
 import { Component, inject } from '@angular/core';
-import { DocumentData } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
 import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
   selector: 'app-chat-page',
   templateUrl: './chat-page.component.html',
-  styleUrls: ['./chat-page.component.css']
+  styleUrls: ['./chat-page.component.css'],
 })
 export class ChatPageComponent {
-
   chatService = inject(ChatService);
-  messages$ = this.chatService.loadMessages() as Observable<DocumentData[]>;
+  messages$ = this.chatService.loadMessages();
   user$ = this.chatService.user$;
-  text = "";
+  text = '';
 
   sendTextMessage() {
     this.chatService.saveTextMessage(this.text);
-    this.text = "";
+    this.text = '';
   }
 
   uploadImage(event: any) {
