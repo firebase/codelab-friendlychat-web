@@ -34,6 +34,10 @@ import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { ChatPageComponent } from './pages/chat-page/chat-page.component';
 import { HeaderComponent } from './components/header/header.component';
 
+declare global {
+  var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean;
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -47,6 +51,18 @@ import { HeaderComponent } from './components/header/header.component';
     CommonModule,
     FormsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAppCheck(() => {
+      const appCheck = initializeAppCheck(getApp(), {
+        provider: new ReCaptchaEnterpriseProvider(
+          environment.reCAPTCHAEnterpriseKey.key
+        ),
+        isTokenAutoRefreshEnabled: true,
+      });
+      if (location.hostname === 'localhost') {
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+      }
+      return appCheck;
+    }),
     provideAuth(() => {
       const auth = getAuth();
       if (location.hostname === 'localhost') {
