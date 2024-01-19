@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^4.1.0"
+    "vite": "^4.5.2"
   },
   "dependencies": {
     "firebase": "^9.17.1"
