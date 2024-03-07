@@ -63,10 +63,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "friendlychat:build:production"
+              "buildTarget": "friendlychat:build:production"
             },
             "development": {
-              "browserTarget": "friendlychat:build:development"
+              "buildTarget": "friendlychat:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -74,7 +74,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "friendlychat:build"
+            "buildTarget": "friendlychat:build"
           }
         },
         "test": {
