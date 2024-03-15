@@ -5,6 +5,7 @@
   },
   "hosting": [
     {
+      "target": "friendlychat",
       "source": ".",
       "ignore": [
         "firebase.json",
