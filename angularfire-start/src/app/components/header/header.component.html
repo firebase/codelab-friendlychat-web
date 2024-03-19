@@ -7,7 +7,7 @@
                     Friendly Chat
                 </span>
             </a>
-            @if(user$ | async as user) {
+            @if(user$ | async; as user) {
                 <div class="flex flex-wrap items-end auth">
                     <div class="flex flex-wrap justify-between text-white">
                         <img class="w-10 h-10 rounded-full" [src]="user?.photoURL"
