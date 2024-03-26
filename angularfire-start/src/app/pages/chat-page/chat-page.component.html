@@ -1,9 +1,9 @@
 <div class="min-h-screen h-full w-full bg-navy-30">
     <div class="w-3/4 bg-navy-10 min-h-screen h-full mx-auto flex flex-col flex-grow pb-56">
-        @for (let message of (messages$ | async)?.reverse() as messages; track message) {
+        @for (message of (messages$ | async)?.reverse(); track message) {
         <div> <!-- TODO: I think this div can be removed-->
             <div class="flex flex-col flex-grow p-4 overflow-scroll space-x-3">
-                @if (user$ | async as user) {
+                @if (user$ | async; as user) {
                     <div>
                         <div class="flex flex-wrap min-h-[50px] mt-4">
                             <img class="w-10 h-10 rounded-full" [src]="message['profilePicUrl']"
