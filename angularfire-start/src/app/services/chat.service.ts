@@ -68,7 +68,7 @@ export class ChatService {
 
   // Saves a new message to Cloud Firestore.
   saveTextMessage = async (messageText: string) => {
-    return null;
+    return this.addMessage(messageText, null);
   };
 
   // Loads chat messages history and listens for upcoming ones.
