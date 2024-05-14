@@ -1,4 +1,3 @@
-import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import {
   AuthGuard,
@@ -11,7 +10,7 @@ import { ChatPageComponent } from './pages/chat-page/chat-page.component';
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 const redirectLoggedInToHome = () => redirectLoggedInTo(['chat']);
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: '',
     component: LoginPageComponent,
@@ -31,9 +30,3 @@ const routes: Routes = [
     data: { authGuardPipe: redirectUnauthorizedToLogin },
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}

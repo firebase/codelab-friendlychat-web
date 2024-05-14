@@ -9,7 +9,7 @@ import {
   getAuth,
   User,
 } from '@angular/fire/auth';
-import { map, switchMap, firstValueFrom, filter, Observable } from 'rxjs';
+import { map, switchMap, firstValueFrom, filter, Observable, Subscription } from 'rxjs';
 import {
   doc,
   docData,
@@ -29,6 +29,7 @@ import {
   limit,
   onSnapshot,
   DocumentData,
+  FieldValue,
 } from '@angular/fire/firestore';
 import {
   Storage,
@@ -38,6 +39,16 @@ import {
 } from '@angular/fire/storage';
 import { getToken, Messaging, onMessage } from '@angular/fire/messaging';
 import { Router } from '@angular/router';
+
+type ChatMessage = {
+  name: string | null,
+  profilePicUrl: string | null,
+  timestamp: FieldValue,
+  uid: string | null,
+  text?: string,
+  imageUrl?: string
+};
+
 
 @Injectable({
   providedIn: 'root',
@@ -51,8 +62,16 @@ export class ChatService {
   private provider = new GoogleAuthProvider();
   LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
-  // Observable user
+  // observable that is updated when the auth state changes
   user$ = user(this.auth);
+  currentUser: User | null = this.auth.currentUser;
+  userSubscription: Subscription;
+  
+  constructor() {
+    this.userSubscription = this.user$.subscribe((aUser: User | null) => {
+        this.currentUser = aUser;
+    });
+  }
 
   // Login Friendly Chat.
   login() {}
@@ -68,7 +87,7 @@ export class ChatService {
 
   // Saves a new message to Cloud Firestore.
   saveTextMessage = async (messageText: string) => {
-    return null;
+    return this.addMessage(messageText, null);
   };
 
   // Loads chat messages history and listens for upcoming ones.

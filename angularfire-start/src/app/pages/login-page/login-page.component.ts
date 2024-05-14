@@ -5,6 +5,7 @@ import { ChatService } from 'src/app/services/chat.service';
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css'],
+  standalone: true,
 })
 export class LoginPageComponent {
   chatService = inject(ChatService);
