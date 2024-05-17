@@ -1,0 +1,11 @@
+<main>
+    <div *ngIf="travelData$ | async as travelData;">
+        <app-edit-travel [travel]="travelData" (on-change)="updateCurrentTravel($event)">
+        </app-edit-travel>
+        <div *ngIf="stopsData$ | async as stopsData;">
+            <app-edit-stop [stops]="stopsData" [travelId]="travelData.id" (on-change)="updateCurrentStop($event)"
+                [addStop]="addStop" [deleteStop]="deleteStop" [uploadFileToStop]="uploadFileToStop">
+            </app-edit-stop>
+        </div>
+    </div>
+</main>

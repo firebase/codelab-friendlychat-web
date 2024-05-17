@@ -1,0 +1,12 @@
+<header>
+    <nav>
+      <h1>Friendly Travels</h1>
+      <div class="auth" *ngIf="user$ | async else signin">
+        <a href="/my-travels">My Travels</a>
+        <a href="/login" (click)="logout()">Log Out</a>
+      </div>
+      <ng-template #signin>
+        <a href="/signin">Sign In</a>
+      </ng-template>
+    </nav>
+  </header>

@@ -1,0 +1,65 @@
+<div class="min-h-screen h-full w-full bg-navy-30">
+    <div class="w-3/4 bg-navy-10 min-h-screen h-full mx-auto flex flex-col flex-grow pb-56 overflow-auto">
+        @for (message of (messages$ | async); track message) {
+            <div> <!-- TODO: I think this div can be removed-->
+            <div class="flex flex-col flex-grow p-4 gap-3">
+                @if (user$ | async; as user) {
+                    <div class="flex flex-nowrap gap-4" [class.flex-row-reverse]="user.uid === message['uid']">
+                            <img class="w-10 h-10 rounded-full" [src]="message['profilePicUrl']"
+                                [alt]="message['name']" />
+                        <div class="flex flex-wrap gap-1 text-neutral-800" [class.flex-row-reverse]="user.uid === message['uid']">
+                                <div class="p-4 rounded-lg max-w-xl flex flex-col justify-between gap-1" [class.bg-amber-200]="user.uid === message['uid']" [class.bg-white]="user.uid !== message['uid']">
+                            @if (message['text'] && message['text'].length > 0){
+                                <div>
+                                    {{message['text']}} 
+                                </div>
+                            }
+                            @if (message['imageUrl'] && message['imageUrl'].length > 0) {
+                                <div class="flex justify-center">
+                                    <img class="max-w-[50vw] max-h-[30vh] rounded-md" [src]="message['imageUrl']" alt="image" />
+                                </div>
+                            }
+                            <div class="flex flex-nowrap justify-end">
+                                <span class="text-neutral-500 text-sm">
+                                    {{message['timestamp'].toDate().toLocaleTimeString()}}
+                                </span>
+                            </div>
+                        </div>
+                        
+                            @if (message['response'] && message['response'].length > 0){
+                                <div class="transition-all opacity-30 hover:opacity-100 hover:border-2 hover:border-navy-200 hover:py-6 gap-1 p-4 rounded-lg max-w-xl flex flex-col justify-between">
+                                <div>
+                                    {{message['response']}}
+                                </div>
+                                <div class="flex flex-nowrap justify-end">
+                                    <span class="text-neutral-500 text-sm">
+                                        ✨ ai generated
+                                    </span>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                        
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    </div>
+    <div class="bg-navy-10 w-full shadow-[0_35px_60px_-15px_rgba(0,0,0,1)] bottom-0 fixed">
+        <div class="flex-wrap flex w-5/6 mx-auto">
+            <input type="file" class="file-input hidden" (change)="this.uploadImage($event)" #fileUpload>
+            <div class="file-upload w-16 h-16 rounded-full bg-amber-800 my-3">
+                <button color="primary" class="upload-btn" (click)="fileUpload.click()">
+                    <img class="w-16 h-16" src="../../../assets/add.svg" alt="Upload image" />
+                </button>
+            </div>
+            <textarea
+                class="w-4/5 mx-auto h-16 rounded-3xl my-auto overflow-auto text-gray-900 dark:placeholder-gray-400 p-4"
+                placeholder="Write your thoughts here..." [(ngModel)]="this.text"></textarea>
+            <button class="w-16 h-16 rounded-full bg-amber-800 my-3" (click)="this.sendTextMessage()">
+                <img class="w-16 h-16" src="../../../assets/send.svg" alt="Send message" />
+            </button>
+        </div>
+    </div>
+</div>

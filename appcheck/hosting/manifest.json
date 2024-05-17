@@ -1,0 +1,8 @@
+{
+    "name": "Friendly Chat",
+    "short_name": "Friendly Chat",
+    "display": "standalone",
+    "orientation": "portrait",
+    "gcm_sender_id": "668582889497"
+  }
+  

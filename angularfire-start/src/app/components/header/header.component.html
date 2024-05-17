@@ -1,0 +1,45 @@
+<header>
+    <nav class="bg-navy-400 px-2 lg:px-4 py-2.5 h-18">
+        <div class="flex flex-wrap justify-between items-center max-w-screen">
+            <a href="/" class="flex items-center">
+                <img src="../../../assets/FriendlyChatLogo.png" alt="FriendlyChat" class="mr-3 h-16 sm:h-10 stop-image" />
+                <span class="mr-3 self-center text-2xl whitespace-nowrap font-light text-white">
+                    Friendly Chat
+                </span>
+            </a>
+            @if(user$ | async; as user) {
+                <div class="flex flex-wrap items-center content-center auth">
+                    <div class="hidden sm:flex flex-wrap items-center content-center text-white">
+                        <img class="w-10 h-10 rounded-full" [src]="user?.photoURL"
+                            [alt]="user?.displayName" />
+                        <span class="text-white text-xl whitespace-nowrap font-light px-4 lg:px-5 py-2 lg:py-2.5">
+                            {{user?.displayName}}
+                        </span>
+                    </div>
+                        <div class="dropdown rounded-lg px-4 py-2 hover:bg-navy-700 transition-colors">
+                            <div class="flex items-center">
+                            <button class="text-gray-700 inline-flex items-center font-semibold">
+                                <img class="w-8 h-8" src="../../../assets/menu.svg" />
+                            </button></div>
+                            <ul class="dropdown-menu absolute hidden bg-white w-48 p-1 right-2 shadow-xl rounded-lg">
+                                <li class="bg-white flex flex-row gap-2 items-center px-4 py-4 rounded-lg">
+                                    <img class="w-10 h-10 rounded-full" [src]="user?.photoURL"
+                                        [alt]="user?.displayName" />
+                                    <span
+                                        class="text-navy-200 text-md whitespace-nowrap">
+                                        {{user?.displayName}}
+                                    </span>
+                                </li>
+                                <li>
+                                    <a class="bg-white hover:bg-navy-20 rounded-md mt-4 py-3 px-4 block whitespace-no-wrap text-navy-500 font-semibold"
+                                        href="/" (click)="this.chatService.logout()">
+                                        Sign out
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                </div>
+            }
+        </div>
+    </nav>
+</header>

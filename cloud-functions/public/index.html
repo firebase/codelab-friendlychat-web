@@ -78,11 +78,10 @@
       <div id="messages-card" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--6-col-tablet mdl-cell--6-col-desktop">
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
           <div id="messages">
-            <span id="message-filler"></span>
           </div>
           <form id="message-form" action="#">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <input class="mdl-textfield__input" type="text" id="message">
+              <input class="mdl-textfield__input" type="text" id="message" autocomplete="off">
               <label class="mdl-textfield__label" for="message">Message...</label>
             </div>
             <button id="submit" disabled type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
@@ -110,11 +109,11 @@
 <!-- Import and configure the Firebase SDK -->
 <!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
 <!-- If you do not want to serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
-<script src="/__/firebase/5.6.0/firebase-app.js"></script>
-<script src="/__/firebase/5.6.0/firebase-auth.js"></script>
-<script src="/__/firebase/5.6.0/firebase-database.js"></script>
-<script src="/__/firebase/5.6.0/firebase-storage.js"></script>
-<script src="/__/firebase/5.6.0/firebase-messaging.js"></script>
+<script src="/__/firebase/8.6.7/firebase-app.js"></script>
+<script src="/__/firebase/8.6.7/firebase-auth.js"></script>
+<script src="/__/firebase/8.6.7/firebase-storage.js"></script>
+<script src="/__/firebase/8.6.7/firebase-messaging.js"></script>
+<script src="/__/firebase/8.6.7/firebase-firestore.js"></script>
 <script src="/__/firebase/init.js"></script>
 
 <script src="scripts/main.js"></script>

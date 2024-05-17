@@ -1,0 +1,48 @@
+<main>
+    <div *ngIf="user$ | async as user; ">
+        <div *ngIf="travelsData$ | async as travelsData; ">
+            <button mat-raised-button color="primary" class="add" (click)="createTravel(user.uid)">Create
+                Travel</button>
+            <div class="travel-card">
+                <mat-list role="list">
+                    <mat-list-item role="listitem" *ngFor="let tr of travelsData">
+                        <mat-radio-button [checked]="tr.id == selectedTravel" [value]="tr.id"
+                            (change)="onSelectTravelUpdate($event.value)">
+                            <mat-card>
+                                <mat-card-header>
+                                    <mat-card-title>{{tr.title}}</mat-card-title>
+                                </mat-card-header>
+                                <mat-card-actions>
+                                    <button mat-raised-button color="primary" mat-button
+                                        (click)="editTravel(tr.id)">Edit</button>
+                                    <button color="warn" mat-button>Delete</button>
+                                </mat-card-actions>
+                            </mat-card>
+                            <br>
+                        </mat-radio-button>
+                    </mat-list-item>
+                </mat-list>
+            </div>
+            
+        </div>
+        <div class="stops-card">
+            <mat-list role="list">
+                <mat-list-item role="listitem" *ngFor="let st of stopsList$ | async as stopsList;">
+                    <mat-card class="example-card" id=${st.id}>
+                        <mat-card-header>
+                            <div mat-card-avatar class="example-header-image"></div>
+                            <mat-card-title>{{st.title}}</mat-card-title>
+                            <mat-card-subtitle>{{st.type}}</mat-card-subtitle>
+                        </mat-card-header>
+                        <img mat-card-image src={{st.image}} alt="Photo of a Shiba Inu">
+                        <mat-card-content>
+                            <p>
+                                {{st.blogText}}
+                            </p>
+                        </mat-card-content>
+                    </mat-card>
+                </mat-list-item>
+            </mat-list>
+        </div>
+    </div>
+</main>

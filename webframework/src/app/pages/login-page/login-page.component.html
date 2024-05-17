@@ -1,0 +1,10 @@
+<main>
+  <div *ngIf="user$ | async as user; else showLogin">
+    <h1 class="title">{{ user.displayName }}</h1>
+  </div>
+  <ng-template #showLogin>
+    <h1 class="title">FriendlyTravels</h1>
+    <h2 class="description">A travel blog built by AngularFire</h2>
+    <button class="login-button" (click)="login()">Login</button>
+  </ng-template>
+</main>

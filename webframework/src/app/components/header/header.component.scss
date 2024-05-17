@@ -1,0 +1,25 @@
+header {
+    display: grid;
+    grid-template-columns: var(--site-grid);
+    background-color: var(--theme-surface-dark);
+  }
+  
+  header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-block: 32px;
+    font-family: var(--font-body);
+    grid-column: container;
+  }
+  
+  header,
+  header a {
+    color: var(--theme-text-on-dark);
+    padding: 12px;
+  }
+  
+  header h1 {
+    font: var(--font-heading-sm);
+  }
+  
