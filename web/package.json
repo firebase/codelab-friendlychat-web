@@ -6,7 +6,8 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack --watch --progress",
-    "visualize-bundle": "webpack --analyze"
+    "visualize-bundle": "webpack --analyze",
+    "serve": "firebase serve --only hosting"
   },
   "author": "",
   "license": "Apache-2.0",
