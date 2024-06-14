@@ -42,89 +42,176 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from 'firebase/storage';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import {
+  getMessaging,
+  getToken,
+  onMessage
+} from 'firebase/messaging'; 
+import {
+  fetchAndActivate, 
+  getRemoteConfig,
+  getValue
+} from 'firebase/remote-config';
 import { getPerformance } from 'firebase/performance';
 
 import { getFirebaseConfig } from './firebase-config.js';
 
+// TODO: Initialize Firebase
+
 // Signs-in Friendly Chat.
 async function signIn() {
-  alert('TODO: Implement Google Sign-In');
-  // TODO 1: Sign in Firebase with credential from the Google user.
+  // Sign in Firebase using popup auth and Google as the identity provider.
+  var provider = new GoogleAuthProvider();
+  await signInWithPopup(getAuth(), provider);
 }
 
 // Signs-out of Friendly Chat.
 function signOutUser() {
-  // TODO 2: Sign out of Firebase.
+  // Sign out of Firebase.
+  signOut(getAuth());
 }
 
-// Initiate firebase auth
+// Initialize firebase auth
 function initFirebaseAuth() {
-  // TODO 3: Subscribe to the user's signed-in status
+  // Listen to auth state changes.
+  onAuthStateChanged(getAuth(), authStateObserver);
 }
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
-  // TODO 4: Return the user's profile pic URL.
+  return getAuth().currentUser.photoURL || '/images/profile_placeholder.png';
 }
 
 // Returns the signed-in user's display name.
 function getUserName() {
-  // TODO 5: Return the user's display name.
+  return getAuth().currentUser.displayName;
 }
 
 // Returns true if a user is signed-in.
 function isUserSignedIn() {
-  // TODO 6: Return true if a user is signed-in.
+  return !!getAuth().currentUser;
 }
 
-// Saves a new message on the Cloud Firestore.
+// Saves a new message to Cloud Firestore.
 async function saveMessage(messageText) {
-  // TODO 7: Push a new message to Cloud Firestore.
+  // Add a new message entry to the Firebase database.
+  try {
+    await addDoc(collection(getFirestore(), 'messages'), {
+      name: getUserName(),
+      text: messageText,
+      profilePicUrl: getProfilePicUrl(),
+      timestamp: serverTimestamp()
+    });
+  }
+  catch(error) {
+    console.error('Error writing new message to Firebase Database', error);
+  }
 }
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
-  // TODO 8: Load and listen for new messages.
+  // Create the query to load the last 12 messages and listen for new ones.
+  const recentMessagesQuery = query(collection(getFirestore(), 'messages'), orderBy('timestamp', 'desc'), limit(12));
+  
+  // Start listening to the query.
+  onSnapshot(recentMessagesQuery, function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'removed') {
+        deleteMessage(change.doc.id);
+      } else {
+        var message = change.doc.data();
+        displayMessage(change.doc.id, message.timestamp, message.name,
+                      message.text, message.profilePicUrl, message.imageUrl);
+      }
+    });
+  });
 }
 
 // Saves a new message containing an image in Firebase.
 // This first saves the image in Firebase storage.
 async function saveImageMessage(file) {
-  // TODO 9: Posts a new image as a message.
+  try {
+    // 1 - We add a message with a loading icon that will get updated with the shared image.
+    const messageRef = await addDoc(collection(getFirestore(), 'messages'), {
+      name: getUserName(),
+      imageUrl: LOADING_IMAGE_URL,
+      profilePicUrl: getProfilePicUrl(),
+      timestamp: serverTimestamp()
+    });
+
+    // 2 - Upload the image to Cloud Storage.
+    const filePath = `${getAuth().currentUser.uid}/${messageRef.id}/${file.name}`;
+    const newImageRef = ref(getStorage(), filePath);
+    const fileSnapshot = await uploadBytesResumable(newImageRef, file);
+    
+    // 3 - Generate a public URL for the file.
+    const publicImageUrl = await getDownloadURL(newImageRef);
+
+    // 4 - Update the chat message placeholder with the image's URL.
+    await updateDoc(messageRef,{
+      imageUrl: publicImageUrl,
+      storageUri: fileSnapshot.metadata.fullPath
+    });
+  } catch (error) {
+    console.error('There was an error uploading a file to Cloud Storage:', error);
+  }
 }
 
 // Saves the messaging device token to Cloud Firestore.
 async function saveMessagingDeviceToken() {
-  // TODO 10: Save the device token in Cloud Firestore
+  // TODO: Save the device token in Cloud Firestore
 }
 
 // Requests permissions to show notifications.
 async function requestNotificationsPermissions() {
-  // TODO 11: Request permissions to send notifications.
+  // TODO: Request permissions to send notifications.
 }
 
-// Triggered when a file is selected via the media picker.
-function onMediaFileSelected(event) {
-  event.preventDefault();
-  var file = event.target.files[0];
+// Sets up Remote Config
+export function initRemoteConfig() {
+  // TODO: Initialize Remote Config
 
-  // Clear the selection in the file picker input.
-  imageFormElement.reset();
+  // TODO: Get a parameter value
 
-  // Check if the file is an image.
-  if (!file.type.match('image.*')) {
-    var data = {
-      message: 'You can only share images',
-      timeout: 2000,
-    };
-    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
-    return;
-  }
-  // Check if the user is signed-in
-  if (checkSignedInWithMessage()) {
-    saveImageMessage(file);
-  }
+  // TODO: Fetch config from the server
+}
+
+initRemoteConfig();
+
+function renderImageButton(imagePlacement) {
+  const imageButtonLeftElement = document.getElementById('leftSubmitImage');
+  const imageButtonRightElement = document.getElementById('rightSubmitImage');
+  imageButtonLeftElement.style.display = imagePlacement === 'left' ? 'initial' : 'none';
+  imageButtonRightElement.style.display = (imagePlacement === 'right' ? 'initial' : 'none');
+  const imageButtonElement = imagePlacement === 'left' ? imageButtonLeftElement : imageButtonRightElement;
+  var mediaCaptureElement = document.getElementById(imagePlacement === 'left' ? 'leftMediaCapture' : 'rightMediaCapture');
+
+  imageButtonElement.addEventListener('click', function (e) {
+    e.preventDefault();
+    mediaCaptureElement.click();
+  });
+
+  mediaCaptureElement.addEventListener('change', (event) => {
+    event.preventDefault();
+    var file = event.target.files[0];
+
+    // Clear the selection in the file picker input.
+    mediaCaptureElement.value = '';
+
+    // Check if the file is an image.
+    if (!file.type.match('image.*')) {
+      var data = {
+        message: 'You can only share images',
+        timeout: 2000,
+      };
+      signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
+      return;
+    }
+    // Check if the user is signed-in
+    if (checkSignedInWithMessage()) {
+      saveImageMessage(file);
+    }
+  }); 
 }
 
 // Triggered when the send new message form is submitted.
@@ -317,9 +404,6 @@ var messageListElement = document.getElementById('messages');
 var messageFormElement = document.getElementById('message-form');
 var messageInputElement = document.getElementById('message');
 var submitButtonElement = document.getElementById('submit');
-var imageButtonElement = document.getElementById('submitImage');
-var imageFormElement = document.getElementById('image-form');
-var mediaCaptureElement = document.getElementById('mediaCapture');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
@@ -334,18 +418,6 @@ signInButtonElement.addEventListener('click', signIn);
 // Toggle for the button.
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);
-
-// Events for image upload.
-imageButtonElement.addEventListener('click', function (e) {
-  e.preventDefault();
-  mediaCaptureElement.click();
-});
-mediaCaptureElement.addEventListener('change', onMediaFileSelected);
-
-const firebaseAppConfig = getFirebaseConfig();
-// TODO 0: Initialize Firebase
-
-// TODO 12: Initialize Firebase Performance Monitoring
 
 initFirebaseAuth();
 loadMessages();
