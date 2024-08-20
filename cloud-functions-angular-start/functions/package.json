@@ -3,7 +3,7 @@
   "description": "Cloud Functions for Firebase",
   "dependencies": {
     "firebase-admin": "~12.3.1",
-    "firebase-functions": "^5.0.1"
+    "firebase-functions": "^5.1.0"
   },
   "scripts": {
     "serve": "firebase serve --only functions",
