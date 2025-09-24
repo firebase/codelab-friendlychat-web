@@ -262,7 +262,7 @@ function createAndInsertMessage(id, timestamp) {
 
   // If timestamp is null, assume we've gotten a brand new message.
   // https://stackoverflow.com/a/47781432/4816918
-  timestamp = timestamp ? timestamp.toMillis() : Date.now();
+  timestamp = timestamp ?? Date.now();
   div.setAttribute('timestamp', timestamp);
 
   // figure out where to insert new message
