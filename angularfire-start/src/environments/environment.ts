@@ -3,7 +3,7 @@ export const environment = {
   firebase: {
     projectId: 'PROJECT_ID',
     appId: 'APP_ID',
-    storageBucket: 'PROJECT_ID.appspot.com',
+    storageBucket: 'PROJECT_ID.firebasestorage.app',
     apiKey: 'API_KEY',
     authDomain: 'PROJECT_ID.firebaseapp.com',
     messagingSenderId: 'SENDER_ID',
