@@ -70,6 +70,9 @@ export class ChatService {
   constructor() {
     this.userSubscription = this.user$.subscribe((aUser: User | null) => {
         this.currentUser = aUser;
+        if (aUser) {
+          this.requestNotificationsPermissions();
+        }
     });
   }
 
