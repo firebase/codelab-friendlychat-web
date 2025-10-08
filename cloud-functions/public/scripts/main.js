@@ -278,7 +278,9 @@ const toggleButton = () => {
 };
 
 const addSizeToGoogleProfilePic = (url) => {
-  return url.includes("googleusercontent.com") && !url.includes("?")
+  const allowedHosts = ["lh3.googleusercontent.com"];
+  const host = new URL(url).hostname;
+  return allowedHosts.includes(host) && !url.includes("?")
     ? `${url}?sz=150`
     : url;
 };
