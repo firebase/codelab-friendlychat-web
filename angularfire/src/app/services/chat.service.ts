@@ -84,7 +84,7 @@ export class ChatService {
     });
   }
 
-  // Login Friendly Chat.
+  // TODO 1: Login Friendly Chat. Replace the entire function with the code from the codelab.
   login() {
     signInWithPopup(this.auth, this.provider).then((result) => {
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -93,7 +93,7 @@ export class ChatService {
       return credential;
     });
   }
-  // Logout of Friendly Chat.
+  // TODO 2: Logout of Friendly Chat. Replace the entire function with the code from the codelab.
   logout() {
     signOut(this.auth)
       .then(() => {
