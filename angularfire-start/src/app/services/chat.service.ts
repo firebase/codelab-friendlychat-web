@@ -76,10 +76,10 @@ export class ChatService {
     });
   }
 
-  // Login Friendly Chat.
+  // TODO 1: Login Friendly Chat. Replace the entire function with the code from the codelab.
   login() {}
 
-  // Logout of Friendly Chat.
+  // TODO 2: Logout of Friendly Chat. Replace the entire function with the code from the codelab.
   logout() {}
 
   // Adds a text or image message to Cloud Firestore.
