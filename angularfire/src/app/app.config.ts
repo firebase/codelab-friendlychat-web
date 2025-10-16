@@ -23,8 +23,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
 
-  
-
     // Firebase Modules (Auth, Firestore, Functions, Storage, Messaging)
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
@@ -43,7 +41,7 @@ export const appConfig: ApplicationConfig = {
       }
       return appCheck;
     }),
-      // Firebase Initialization
+    // Firebase Initialization
     provideFirebaseApp(() => initializeApp(environment.firebase)),
   ],
 };

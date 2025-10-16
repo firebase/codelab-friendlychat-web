@@ -1,40 +1,25 @@
 import { inject, Injectable } from '@angular/core';
 import {
   Auth,
-  authState,
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
   user,
-  getAuth,
   User,
 } from '@angular/fire/auth';
-import {
-  map,
-  switchMap,
-  firstValueFrom,
-  filter,
-  Observable,
-  Subscription,
-} from 'rxjs';
+import { Subscription } from 'rxjs';
 import {
   doc,
-  docData,
   DocumentReference,
   Firestore,
-  getDoc,
   setDoc,
   updateDoc,
   collection,
   addDoc,
-  deleteDoc,
   collectionData,
-  Timestamp,
-  serverTimestamp,
   query,
   orderBy,
   limit,
-  onSnapshot,
   DocumentData,
   FieldValue,
 } from '@angular/fire/firestore';
@@ -195,21 +180,6 @@ export class ChatService {
     }
   };
 
-  async updateData(path: string, data: any) {}
-
-  async deleteData(path: string) {}
-
-  getDocData(path: string) {}
-
-  getCollectionData(path: string) {}
-
-  async uploadToStorage(
-    path: string,
-    input: HTMLInputElement,
-    contentType: any
-  ) {
-    return null;
-  }
   // Requests permissions to show notifications.
   requestNotificationsPermissions = async () => {
     console.log('Requesting notifications permission...');
