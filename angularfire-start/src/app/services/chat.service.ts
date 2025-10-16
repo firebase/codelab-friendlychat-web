@@ -102,21 +102,6 @@ export class ChatService {
   // This first saves the image in Firebase storage.
   saveImageMessage = async (file: any) => {};
 
-  async updateData(path: string, data: any) {}
-
-  async deleteData(path: string) {}
-
-  getDocData(path: string) {}
-
-  getCollectionData(path: string) {}
-
-  async uploadToStorage(
-    path: string,
-    input: HTMLInputElement,
-    contentType: any
-  ) {
-    return null;
-  }
   // Requests permissions to show notifications.
   requestNotificationsPermissions = async () => {};
 
