@@ -22,7 +22,6 @@ declare global {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-
     // Firebase Modules (Auth, Firestore, Functions, Storage, Messaging)
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
