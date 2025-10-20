@@ -14,119 +14,218 @@
  * limitations under the License.
  */
 
-// Import the Firebase SDK for Google Cloud Functions.
-const functions = require('firebase-functions');
-// Import and initialize the Firebase Admin SDK.
-const admin = require('firebase-admin');
-admin.initializeApp();
-const Vision = require('@google-cloud/vision');
-const vision = new Vision.ImageAnnotatorClient();
-const {promisify} = require('util');
-const exec = promisify(require('child_process').exec);
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
+import { auth, logger, runWith, firestore } from "firebase-functions/v1"; // Firebase Functions
+import { initializeApp } from "firebase-admin/app"; // App Initialization
+import { getFirestore, FieldValue } from "firebase-admin/firestore"; // Firestore
+import { getStorage } from "firebase-admin/storage"; // Firebase Cloud Storage
+import { getMessaging } from "firebase-admin/messaging";
+import {
+  ImageAnnotatorClient,
+  protos as visionProtos,
+} from "@google-cloud/vision"; // Google Vision API
+import { promisify } from "util"; // Node.js Utility for promisifying functions
+import { exec as childExec } from "child_process"; // For running shell commands
+import path from "path"; // For handling file paths
+import os from "os"; // For working with temporary OS files
+import fs from "fs"; // File system module
 
-// Adds a message that welcomes new users into the chat.
-exports.addWelcomeMessages = functions.auth.user().onCreate(async (user) => {
-  functions.logger.log('A new user signed in for the first time.');
-  const fullName = user.displayName || 'Anonymous';
+// Initialize Firebase Admin SDK
+initializeApp();
 
-  // Saves the new welcome message into the database
-  // which then displays it in the FriendlyChat clients.
-  await admin.firestore().collection('messages').add({
-    name: 'Firebase Bot',
-    profilePicUrl: '/images/firebase-logo.png', // Firebase logo
-    text: `${fullName} signed in for the first time! Welcome!`,
-    timestamp: admin.firestore.FieldValue.serverTimestamp(),
-  });
-  functions.logger.log('Welcome message written to database.');
+const db = getFirestore();
+const messaging = getMessaging();
+
+// Initialize Google Vision API Client
+const vision = new ImageAnnotatorClient();
+const { Likelihood } = visionProtos.google.cloud.vision.v1; // Helper for likelihood comparison
+
+// Promisify exec for async use
+const exec = promisify(childExec);
+
+// ----------------------------
+// 1. Welcome Message Function
+// ----------------------------
+export const addWelcomeMessages = auth.user().onCreate(async (user) => {
+  logger.log("A new user signed in for the first time.");
+  const fullName = user.displayName || "Anonymous";
+
+  try {
+    // Add a welcome message to the "messages" collection
+    await db.collection("messages").add({
+      name: "Firebase Bot",
+      profilePicUrl: "/images/firebase-logo.png",
+      text: `${fullName} signed in for the first time! Welcome!`,
+      timestamp: FieldValue.serverTimestamp(),
+    });
+    logger.log("Welcome message written to Firestore successfully.");
+  } catch (error) {
+    logger.error("Error writing welcome message to Firestore:", error);
+  }
 });
 
-// Checks if uploaded images are flagged as Adult or Violence and if so blurs them.
-exports.blurOffensiveImages = functions.runWith({memory: '2GB'}).storage.object().onFinalize(
-    async (object) => {
-      const imageUri = `gs://${object.bucket}/${object.name}`;
+// ------------------------------------------------
+// 2. Blur Offensive Images Function (Storage API)
+// ------------------------------------------------
+export const blurOffensiveImages = runWith({ memory: "2GB" })
+  .storage.object()
+  .onFinalize(async (object) => {
+    const fileURI = `gs://${object.bucket}/${object.name}`; // Google Cloud Storage URI
 
-      // Check the image content using the Cloud Vision API.
-      const batchAnnotateImagesResponse = await vision.safeSearchDetection(imageUri);
-      const safeSearchResult = batchAnnotateImagesResponse[0].safeSearchAnnotation;
-      const Likelihood = Vision.protos.google.cloud.vision.v1.Likelihood;
-      if (Likelihood[safeSearchResult.adult] >= Likelihood.LIKELY ||
-          Likelihood[safeSearchResult.violence] >= Likelihood.LIKELY) {
-        functions.logger.log('The image', object.name, 'has been detected as inappropriate.');
-        return blurImage(object.name);
+    logger.log(`Analyzing image: ${fileURI}`);
+
+    try {
+      // Run Vision API's SafeSearch Detection to check for inappropriate content
+      const [result] = await vision.safeSearchDetection(fileURI);
+      const safeSearchAnnotation = result.safeSearchAnnotation;
+
+      // Check likelihood of adult or violent content
+      if (
+        Likelihood[safeSearchAnnotation?.adult] >= Likelihood.LIKELY ||
+        Likelihood[safeSearchAnnotation?.violence] >= Likelihood.LIKELY
+      ) {
+        logger.log(
+          `The image "${object.name}" has been marked as inappropriate.`
+        );
+        return blurImage(object.name, object.bucket);
       }
-      functions.logger.log('The image', object.name, 'has been detected as OK.');
-    });
 
-// Blurs the given image located in the given bucket using ImageMagick.
-async function blurImage(filePath) {
-  const tempLocalFile = path.join(os.tmpdir(), path.basename(filePath));
-  const messageId = filePath.split(path.sep)[1];
-  const bucket = admin.storage().bucket();
-
-  // Download file from bucket.
-  await bucket.file(filePath).download({destination: tempLocalFile});
-  functions.logger.log('Image has been downloaded to', tempLocalFile);
-  // Blur the image using ImageMagick.
-  await exec(`convert "${tempLocalFile}" -channel RGBA -blur 0x24 "${tempLocalFile}"`);
-  functions.logger.log('Image has been blurred');
-  // Uploading the Blurred image back into the bucket.
-  await bucket.upload(tempLocalFile, {destination: filePath});
-  functions.logger.log('Blurred image has been uploaded to', filePath);
-  // Deleting the local file to free up disk space.
-  fs.unlinkSync(tempLocalFile);
-  functions.logger.log('Deleted local file.');
-  // Indicate that the message has been moderated.
-  await admin.firestore().collection('messages').doc(messageId).update({moderated: true});
-  functions.logger.log('Marked the image as moderated in the database.');
-}
-
-// Sends a notifications to all users when a new message is posted.
-exports.sendNotifications = functions.firestore.document('messages/{messageId}').onCreate(
-  async (snapshot) => {
-    // Notification details.
-    const text = snapshot.data().text;
-    const payload = {
-      notification: {
-        title: `${snapshot.data().name} posted ${text ? 'a message' : 'an image'}`,
-        body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : '',
-        icon: snapshot.data().profilePicUrl || '/images/profile_placeholder.png',
-        click_action: `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
-      }
-    };
-
-    // Get the list of device tokens.
-    const allTokens = await admin.firestore().collection('fcmTokens').get();
-    const tokens = [];
-    allTokens.forEach((tokenDoc) => {
-      tokens.push(tokenDoc.id);
-    });
-
-    if (tokens.length > 0) {
-      // Send notifications to all tokens.
-      const response = await admin.messaging().sendToDevice(tokens, payload);
-      await cleanupTokens(response, tokens);
-      functions.logger.log('Notifications have been sent and tokens cleaned up.');
+      logger.log(`The image "${object.name}" is safe.`);
+      return null;
+    } catch (error) {
+      logger.error(
+        `Error analyzing the image "${object.name}": ${error.message}`
+      );
+      return null;
     }
   });
 
-// Cleans up the tokens that are no longer valid.
-function cleanupTokens(response, tokens) {
-  // For each notification we check if there was an error.
+// ------------------
+// Helper: Blur Image
+// ------------------
+async function blurImage(filePath, bucketName) {
+  const tempLocalFile = path.join(os.tmpdir(), path.basename(filePath)); // Create temp file path
+  const bucket = getStorage().bucket(bucketName); // Get bucket reference
+  const messageId = filePath.split("/")[1]; // Derive message ID (assuming structure like "messages/{messageId}/{fileName}")
+
+  try {
+    // Step 1: Download the file from Firebase Storage
+    await bucket.file(filePath).download({ destination: tempLocalFile });
+    logger.log(`Image downloaded locally to: "${tempLocalFile}".`);
+
+    // Step 2: Blur the image using ImageMagick
+    await exec(
+      `convert "${tempLocalFile}" -channel RGBA -blur 0x24 "${tempLocalFile}"`
+    );
+    logger.log(`Image blurred locally: "${tempLocalFile}".`);
+
+    // Step 3: Upload the blurred image back to Firebase Storage
+    await bucket.upload(tempLocalFile, { destination: filePath });
+    logger.log(`Blurred image re-uploaded to bucket at path: "${filePath}".`);
+
+    // Step 4: Mark the image as moderated in Firestore
+    if (messageId) {
+      await db
+        .collection("messages")
+        .doc(messageId)
+        .update({ moderated: true });
+      logger.log(`Marked the image "${filePath}" as moderated in Firestore.`);
+    } else {
+      logger.warn(
+        `Could not derive a valid message ID from filePath: "${filePath}". Skipping Firestore update.`
+      );
+    }
+  } catch (error) {
+    logger.error(`Error in blurring image "${filePath}":`, error);
+  } finally {
+    // Step 5: Delete the local temporary file
+    if (fs.existsSync(tempLocalFile)) {
+      fs.unlinkSync(tempLocalFile);
+      logger.log("Temporary local file deleted.");
+    }
+  }
+}
+
+// ---------------------------------------------------
+// 3. Send Notifications when New Firestore Data Added
+// ---------------------------------------------------
+export const sendNotifications = firestore
+  .document("messages/{messageId}")
+  .onCreate(async (snapshot) => {
+    const messageData = snapshot.data();
+    const text = messageData.text;
+
+    logger.log("New message detected:", messageData);
+
+    try {
+      // Fetch all available FCM tokens from the "fcmTokens" collection
+      const allTokensSnapshot = await db.collection("fcmTokens").get();
+
+      const tokens = [];
+      allTokensSnapshot.forEach((tokenDoc) => {
+        const token = tokenDoc.data().token;
+        if (token) {
+          tokens.push(token);
+        }
+      });
+
+      logger.log("Fetched FCM tokens:", tokens);
+
+      if (tokens.length > 0) {
+        const responses = await Promise.all(
+          tokens.map((token) =>
+            messaging.send({
+              token: token,
+              notification: {
+                title: `${messageData.name} posted ${
+                  text ? "a message" : "an image"
+                }`,
+                body: text
+                  ? text.length <= 100
+                    ? text
+                    : text.substring(0, 97) + "..."
+                  : "",
+                imageUrl:
+                  messageData.profilePicUrl ||
+                  "/images/profile_placeholder.png",
+              },
+            })
+          )
+        );
+
+        logger.log("Send Responses:", responses);
+
+        await cleanupTokens(responses, tokens);
+      }
+    } catch (error) {
+      logger.error("Error sending notifications:", error);
+    }
+  });
+
+// -------------------
+// Helper: Cleanup Tokens
+// -------------------
+const cleanupTokens = async (responses, tokens) => {
   const tokensDelete = [];
-  response.results.forEach((result, index) => {
-    const error = result.error;
+
+  responses.forEach((res, index) => {
+    const error = res.error;
     if (error) {
-      functions.logger.error('Failure sending notification to', tokens[index], error);
-      // Cleanup the tokens who are not registered anymore.
-      if (error.code === 'messaging/invalid-registration-token' ||
-          error.code === 'messaging/registration-token-not-registered') {
-        const deleteTask = admin.firestore().collection('fcmTokens').doc(tokens[index]).delete();
-        tokensDelete.push(deleteTask);
+      logger.error(
+        "Failure sending notification to token:",
+        tokens[index],
+        error
+      );
+
+      // Remove invalid or unregistered tokens
+      if (
+        error.code === "messaging/invalid-registration-token" ||
+        error.code === "messaging/registration-token-not-registered"
+      ) {
+        const tokenDoc = db.collection("fcmTokens").doc(tokens[index]);
+        tokensDelete.push(tokenDoc.delete());
       }
     }
   });
-  return Promise.all(tokensDelete); 
-}
+
+  return Promise.all(tokensDelete);
+};
