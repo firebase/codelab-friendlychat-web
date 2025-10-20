@@ -43,7 +43,7 @@ import { Router } from '@angular/router';
 type ChatMessage = {
   name: string | null,
   profilePicUrl: string | null,
-  timestamp: FieldValue,
+  timestamp: Date | FieldValue,
   uid: string | null,
   text?: string,
   imageUrl?: string
