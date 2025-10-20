@@ -43,7 +43,7 @@ import { Router } from '@angular/router';
 type ChatMessage = {
   name: string | null,
   profilePicUrl: string | null,
-  timestamp: FieldValue,
+  timestamp: Date | FieldValue,
   uid: string | null,
   text?: string,
   imageUrl?: string
@@ -70,13 +70,16 @@ export class ChatService {
   constructor() {
     this.userSubscription = this.user$.subscribe((aUser: User | null) => {
         this.currentUser = aUser;
+        if (aUser) {
+          this.requestNotificationsPermissions();
+        }
     });
   }
 
-  // Login Friendly Chat.
+  // TODO 1: Login Friendly Chat. Replace the entire function with the code from the codelab.
   login() {}
 
-  // Logout of Friendly Chat.
+  // TODO 2: Logout of Friendly Chat. Replace the entire function with the code from the codelab.
   logout() {}
 
   // Adds a text or image message to Cloud Firestore.
@@ -99,21 +102,6 @@ export class ChatService {
   // This first saves the image in Firebase storage.
   saveImageMessage = async (file: any) => {};
 
-  async updateData(path: string, data: any) {}
-
-  async deleteData(path: string) {}
-
-  getDocData(path: string) {}
-
-  getCollectionData(path: string) {}
-
-  async uploadToStorage(
-    path: string,
-    input: HTMLInputElement,
-    contentType: any
-  ) {
-    return null;
-  }
   // Requests permissions to show notifications.
   requestNotificationsPermissions = async () => {};
 

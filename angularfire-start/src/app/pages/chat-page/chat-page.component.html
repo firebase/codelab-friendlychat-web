@@ -5,7 +5,7 @@
             <div class="flex flex-col flex-grow p-4 gap-3">
                 @if (user$ | async; as user) {
                     <div class="flex flex-nowrap gap-4" [class.flex-row-reverse]="user.uid === message['uid']">
-                            <img class="w-10 h-10 rounded-full" [src]="message['profilePicUrl']"
+                            <img class="w-10 h-10 rounded-full" [src]="avatarUrl(message)"
                                 [alt]="message['name']" />
                         <div class="flex flex-wrap gap-1 text-neutral-800" [class.flex-row-reverse]="user.uid === message['uid']">
                                 <div class="p-4 rounded-lg max-w-xl flex flex-col justify-between gap-1" [class.bg-amber-200]="user.uid === message['uid']" [class.bg-white]="user.uid !== message['uid']">
@@ -25,7 +25,7 @@
                                 </span>
                             </div>
                         </div>
-                        
+
                             @if (message['response'] && message['response'].length > 0){
                                 <div class="transition-all opacity-30 hover:opacity-100 hover:border-2 hover:border-navy-200 hover:py-6 gap-1 p-4 rounded-lg max-w-xl flex flex-col justify-between">
                                 <div>
@@ -39,7 +39,7 @@
                             </div>
                             }
                         </div>
-                        
+
                     </div>
                 }
             </div>
@@ -63,3 +63,4 @@
         </div>
     </div>
 </div>
+ 
