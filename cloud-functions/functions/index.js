@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { auth, logger, storage, firestore } from "firebase-functions/v1"; // Firebase Functions
+import { auth, logger, runWith, firestore } from "firebase-functions/v1"; // Firebase Functions
 import { initializeApp } from "firebase-admin/app"; // App Initialization
 import { getFirestore, FieldValue } from "firebase-admin/firestore"; // Firestore
 import { getStorage } from "firebase-admin/storage"; // Firebase Cloud Storage
@@ -66,8 +66,8 @@ export const addWelcomeMessages = auth.user().onCreate(async (user) => {
 // ------------------------------------------------
 // 2. Blur Offensive Images Function (Storage API)
 // ------------------------------------------------
-export const blurOffensiveImages = storage
-  .object()
+export const blurOffensiveImages = runWith({ memory: "2GB" })
+  .storage.object()
   .onFinalize(async (object) => {
     const fileURI = `gs://${object.bucket}/${object.name}`; // Google Cloud Storage URI
 
