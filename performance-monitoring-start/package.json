@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "firebase": "^9.0.2"
+    "firebase": "^9.23.0"
   },
   "devDependencies": {
     "webpack": "^5.53.0",
