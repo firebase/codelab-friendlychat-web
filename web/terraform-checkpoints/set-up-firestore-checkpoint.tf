@@ -3,7 +3,7 @@ terraform {
   required_providers {
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.0"
+      version = "~> 7.0"
     }
   }
 }
@@ -27,13 +27,7 @@ resource "google_project" "default" {
   # TODO: REPLACE WITH YOUR OWN VALUES
   name       = "<PROJECT_NAME_OF_YOUR_PROJECT>"
   project_id = "<PROJECT_ID_OF_YOUR_PROJECT>"
-  # UNCOMMENT BELOW IF YOU IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
-  # billing_account = "<BILLING_ACCOUNT_ID>"
-
-  # Required for the project to display in any list of Firebase projects.
-  labels = {
-    "firebase" = "enabled"
-  }
+  billing_account = "<BILLING_ACCOUNT_ID>"
 }
 
 # Enable the required underlying Service Usage API.
@@ -78,7 +72,6 @@ resource "google_firebase_web_app" "default" {
   project         = google_firebase_project.default.project
   # TODO: REPLACE WITH YOUR OWN VALUE
   display_name    = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
-  deletion_policy = "DELETE"
 }
 
 # UNCOMMENT BELOW IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
@@ -198,10 +191,4 @@ resource "google_firebaserules_release" "firestore" {
   depends_on = [
     google_firestore_database.default,
   ]
-
-  lifecycle {
-    replace_triggered_by = [
-      google_firebaserules_ruleset.firestore
-    ]
-  }
 }

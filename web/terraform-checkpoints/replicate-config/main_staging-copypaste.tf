@@ -3,15 +3,9 @@ resource "google_project" "staging" {
   provider = google-beta.no_user_project_override
 
   # TODO: REPLACE WITH YOUR OWN VALUES
-  name       = "<PROJECT_NAME_OF_YOUR_STAGING_PROJECT>"
-  project_id = "<PROJECT_ID_OF_YOUR_STAGING_PROJECT>"
-  # UNCOMMENT BELOW IF YOU IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
-  # billing_account = "<BILLING_ACCOUNT_ID>"
-
-  # Required for the project to display in any list of Firebase projects.
-  labels = {
-    "firebase" = "enabled"
-  }
+  name            = "<PROJECT_NAME_OF_YOUR_STAGING_PROJECT>"
+  project_id      = "<PROJECT_ID_OF_YOUR_STAGING_PROJECT>"
+  billing_account = "<BILLING_ACCOUNT_ID>"
 }
 
 # Enable the required underlying Service Usage API.
@@ -53,10 +47,9 @@ resource "google_firebase_project" "staging" {
 resource "google_firebase_web_app" "staging" {
   provider = google-beta
 
-  project         = google_firebase_project.staging.project
+  project = google_firebase_project.staging.project
   # TODO: REPLACE WITH YOUR OWN VALUE
-  display_name    = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
-  deletion_policy = "DELETE"
+  display_name = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
 }
 
 # UNCOMMENT BELOW IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
@@ -176,12 +169,6 @@ resource "google_firebaserules_release" "firestore_staging" {
   depends_on = [
     google_firestore_database.staging,
   ]
-
-  lifecycle {
-    replace_triggered_by = [
-      google_firebaserules_ruleset.firestore_staging
-    ]
-  }
 }
 
 # Enable required APIs for Cloud Storage for Firebase.
@@ -200,33 +187,14 @@ resource "google_project_service" "storage_staging" {
   disable_on_destroy = false
 }
 
-# Provision the default Cloud Storage bucket for the project via Google App Engine.
-resource "google_app_engine_application" "staging" {
+# Provision a default Firebase Storage bucket.
+resource "google_firebase_storage_default_bucket" "bucket_staging" {
   provider = google-beta
+  project  = google_firebase_project.staging.project
+  # See available locations: https://cloud.google.com/storage/docs/locations#available-locations
+  location = "<NAME_OF_DESIRED_REGION_FOR_BUCKET>"
 
-  project = google_firebase_project.staging.project
-  # See available locations: https://firebase.google.com/docs/projects/locations#default-cloud-location
-  # This will set the location for the default Storage bucket and the App Engine App.
-  # TODO: REPLACE WITH YOUR OWN VALUE
-  location_id = "<NAME_OF_DESIRED_REGION_FOR_DEFAULT_BUCKET>" # Must be in the same location as Firestore (above)
-
-  # Wait until Firestore is provisioned first.
-  depends_on = [
-    google_firestore_database.staging
-  ]
-}
-
-# Make the default Storage bucket accessible for Firebase SDKs, authentication, and Firebase Security Rules.
-resource "google_firebase_storage_bucket" "default_bucket_staging" {
-  provider = google-beta
-
-  project   = google_firebase_project.staging.project
-  bucket_id = google_app_engine_application.staging.default_bucket
-
-
-  depends_on = [
-    google_project_service.storage_staging
-  ]
+  depends_on = [google_project_service.storage_staging]
 }
 
 # Create a ruleset of Cloud Storage Security Rules from a local file.
@@ -243,23 +211,17 @@ resource "google_firebaserules_ruleset" "storage_staging" {
     }
   }
 
-  # Wait for the default Storage bucket to be provisioned before creating this ruleset.
+  # Wait for the Storage bucket to be provisioned before creating this ruleset.
   depends_on = [
-    google_firebase_storage_bucket.default_bucket_staging,
+    google_firebase_storage_default_bucket.bucket_staging,
   ]
 }
 
-# Release the ruleset to the default Storage bucket.
-resource "google_firebaserules_release" "default_bucket_staging" {
+# Release the ruleset to the Storage bucket.
+resource "google_firebaserules_release" "bucket_staging" {
   provider = google-beta
 
-  name         = "firebase.storage/${google_app_engine_application.staging.default_bucket}"
-  ruleset_name = "projects/${google_firebase_project.staging.project}/rulesets/${google_firebaserules_ruleset.storage_staging.name}"
+  name         = "firebase.storage/${google_firebase_storage_default_bucket.bucket_staging.project}.firebasestorage.app"
+  ruleset_name = google_firebaserules_ruleset.storage_staging.name
   project      = google_firebase_project.staging.project
-
-  lifecycle {
-    replace_triggered_by = [
-      google_firebaserules_ruleset.storage_staging
-    ]
-  }
 }

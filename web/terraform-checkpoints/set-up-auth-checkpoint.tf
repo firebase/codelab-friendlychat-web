@@ -3,7 +3,7 @@ terraform {
   required_providers {
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.0"
+      version = "~> 7.0"
     }
   }
 }
@@ -28,11 +28,6 @@ resource "google_project" "default" {
   name       = "<PROJECT_NAME_OF_YOUR_PROJECT>"
   project_id = "<PROJECT_ID_OF_YOUR_PROJECT>"
   billing_account = "<BILLING_ACCOUNT_ID>"
-
-  # Required for the project to display in any list of Firebase projects.
-  labels = {
-    "firebase" = "enabled"
-  }
 }
 
 # Enable the required underlying Service Usage API.
@@ -77,7 +72,6 @@ resource "google_firebase_web_app" "default" {
   project         = google_firebase_project.default.project
   # TODO: REPLACE WITH YOUR OWN VALUE
   display_name    = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
-  deletion_policy = "DELETE"
 }
 
 # Enable the Identity Toolkit API.

@@ -3,7 +3,7 @@ terraform {
   required_providers {
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.0"
+      version = "~> 7.0"
     }
   }
 }
@@ -29,11 +29,6 @@ resource "google_project" "default" {
   project_id = "<PROJECT_ID>-${each.key}"
   # Required if you want to set up Authentication via Terraform
   billing_account = "<YOUR_BILLING_ACCOUNT_ID>"
-
-  # Required for the projects to display in any list of Firebase projects.
-  labels = {
-    "firebase" = "enabled"
-  }
 
   # TODO: REPLACE WITH YOUR OWN VALUES
   for_each = {
@@ -85,10 +80,9 @@ resource "google_firebase_web_app" "default" {
   provider = google-beta
   for_each = google_firebase_project.default
 
-  project         = each.value.project
+  project = each.value.project
   # TODO: REPLACE WITH YOUR OWN VALUE
-  display_name    = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
-  deletion_policy = "DELETE"
+  display_name = "<DISPLAY_NAME_OF_YOUR_WEB_APP>"
 }
 
 # UNCOMMENT BELOW IF YOU SET UP FIREBASE AUTHENTICATION USING TERRAFORM IN THE PREVIOUS STEP
@@ -224,12 +218,6 @@ resource "google_firebaserules_release" "firestore" {
   depends_on = [
     google_firestore_database.default,
   ]
-
-  lifecycle {
-    replace_triggered_by = [
-      google_firebaserules_ruleset.firestore[each.key]
-    ]
-  }
 }
 
 # Enable required APIs for Cloud Storage for Firebase.
@@ -256,30 +244,14 @@ resource "google_project_service" "firebasestorage" {
   disable_on_destroy = false
 }
 
-# Provision the default Cloud Storage bucket for the project via Google App Engine.
-resource "google_app_engine_application" "default" {
+# Provision a default Firebase Storage bucket.
+resource "google_firebase_storage_default_bucket" "bucket" {
   provider = google-beta
   for_each = google_firebase_project.default
 
   project = each.value.project
-  # See available locations: https://firebase.google.com/docs/projects/locations#default-cloud-location
-  # This will set the location for the default Storage bucket and the App Engine App.
-  # TODO: REPLACE WITH YOUR OWN VALUE
-  location_id = "<NAME_OF_DESIRED_REGION_FOR_DEFAULT_BUCKET>" # Must be in the same location as Firestore (above)
-
-  # Wait until Firestore is provisioned first.
-  depends_on = [
-    google_firestore_database.default
-  ]
-}
-
-# Make the default Storage bucket accessible for Firebase SDKs, authentication, and Firebase Security Rules.
-resource "google_firebase_storage_bucket" "default_bucket" {
-  provider = google-beta
-  for_each = google_firebase_project.default
-
-  project   = each.value.project
-  bucket_id = google_app_engine_application.default[each.key].default_bucket
+  # See available locations: https://cloud.google.com/storage/docs/locations#available-locations
+  location = "<NAME_OF_DESIRED_REGION_FOR_BUCKET>"
 
   depends_on = [
     google_project_service.firebasestorage,
@@ -302,24 +274,18 @@ resource "google_firebaserules_ruleset" "storage" {
     }
   }
 
-  # Wait for the default Storage bucket to be provisioned before creating this ruleset.
+  # Wait for the Storage bucket to be provisioned before creating this ruleset.
   depends_on = [
-    google_firebase_storage_bucket.default_bucket,
+    google_firebase_storage_default_bucket.bucket,
   ]
 }
 
-# Release the ruleset to the default Storage bucket.
-resource "google_firebaserules_release" "default_bucket" {
+# Release the ruleset to the Storage bucket.
+resource "google_firebaserules_release" "bucket" {
   provider = google-beta
   for_each = google_firebase_project.default
 
-  name         = "firebase.storage/${google_app_engine_application.default[each.key].default_bucket}"
-  ruleset_name = "projects/${google_firebase_project.default[each.key].project}/rulesets/${google_firebaserules_ruleset.storage[each.key].name}"
+  name         = "firebase.storage/${google_firebase_storage_default_bucket.bucket[each.key].project}.firebasestorage.app"
+  ruleset_name = google_firebaserules_ruleset.storage[each.key].name
   project      = each.value.project
-
-  lifecycle {
-    replace_triggered_by = [
-      google_firebaserules_ruleset.storage
-    ]
-  }
 }

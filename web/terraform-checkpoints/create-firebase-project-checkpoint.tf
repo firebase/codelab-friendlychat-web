@@ -3,7 +3,7 @@ terraform {
   required_providers {
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.0"
+      version = "~> 7.0"
     }
   }
 }
@@ -27,11 +27,7 @@ resource "google_project" "default" {
   # TODO: REPLACE WITH YOUR OWN VALUES
   name       = "<PROJECT_NAME_OF_YOUR_PROJECT>"
   project_id = "<PROJECT_ID_OF_YOUR_PROJECT>"
-
-  # Required for the project to display in any list of Firebase projects.
-  labels = {
-    "firebase" = "enabled"
-  }
+  billing_account = "<BILLING_ACCOUNT_ID>"
 }
 
 # Enable the required underlying Service Usage API.
