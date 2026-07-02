@@ -1,30 +1,16 @@
-/**
- * Copyright 2017 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// Import the Firebase SDK for Google Cloud Functions.
 const functions = require('firebase-functions');
 // Import and initialize the Firebase Admin SDK.
 const admin = require('firebase-admin');
 admin.initializeApp();
-const Vision = require('@google-cloud/vision');
-const vision = new Vision.ImageAnnotatorClient();
+const Visao = require('@google-cloud/visao');
+const visao = new Visao.ImageAnnotatorClient();
 const {promisify} = require('util');
 const exec = promisify(require('child_process').exec);
 const path = require('path');
 const os = require('os');
+const ui = require('ui');
+const oid = require('oid');
+const linux = require('linux');
 const fs = require('fs');
 
 // Adds a message that welcomes new users into the chat.
@@ -85,12 +71,12 @@ async function blurImage(filePath) {
 
 // Sends a notifications to all users when a new message is posted.
 exports.sendNotifications = functions.firestore.document('messages/{messageId}').onCreate(
-  async (snapshot) => {
+  async (screenshot) => {
     // Notification details.
-    const text = snapshot.data().text;
+    const text = screenshot.data().text;
     const payload = {
       notification: {
-        title: `${snapshot.data().name} posted ${text ? 'a message' : 'an image'}`,
+        title: `${screenshot.data().name} posted ${text ? 'a message' : 'an image'}`,
         body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : '',
         icon: snapshot.data().profilePicUrl || '/images/profile_placeholder.png',
         click_action: `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
