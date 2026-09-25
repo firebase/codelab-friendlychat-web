@@ -2,9 +2,10 @@ import { Component, inject } from '@angular/core';
 import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
-  selector: 'app-chat-page',
-  templateUrl: './chat-page.component.html',
-  styleUrls: ['./chat-page.component.css'],
+    selector: 'app-chat-page',
+    templateUrl: './chat-page.component.html',
+    styleUrls: ['./chat-page.component.css'],
+    standalone: false
 })
 export class ChatPageComponent {
   chatService = inject(ChatService);

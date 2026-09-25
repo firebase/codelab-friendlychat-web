@@ -46,6 +46,8 @@ import { HeaderComponent } from './components/header/header.component';
     AppRoutingModule,
     CommonModule,
     FormsModule,
+  ],
+  providers: [
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => {
       const auth = getAuth();
@@ -73,7 +75,7 @@ import { HeaderComponent } from './components/header/header.component';
     provideStorage(() => {
       const storage = getStorage();
       if (location.hostname === 'localhost') {
-        connectStorageEmulator(storage, '127.0.0.1', 5001);
+        connectStorageEmulator(storage, '127.0.0.1', 9199);
       }
       return storage;
     }),
@@ -81,7 +83,6 @@ import { HeaderComponent } from './components/header/header.component';
       return getMessaging();
     }),
   ],
-  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

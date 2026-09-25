@@ -79,28 +79,27 @@ export class ChatService {
     textMessage: string | null,
     imageUrl: string | null
   ): Promise<void | DocumentReference<DocumentData>> => {
-    let data: any;
     try {
-      this.user$.subscribe(async (user) => {
-        if (textMessage && textMessage.length > 0) {
-          data = await addDoc(collection(this.firestore, 'messages'), {
-            name: user?.displayName,
-            text: textMessage,
-            profilePicUrl: user?.photoURL,
-            timestamp: serverTimestamp(),
-            uid: user?.uid,
-          });
-        } else if (imageUrl && imageUrl.length > 0) {
-          data = await addDoc(collection(this.firestore, 'messages'), {
-            name: user?.displayName,
-            imageUrl: imageUrl,
-            profilePicUrl: user?.photoURL,
-            timestamp: serverTimestamp(),
-            uid: user?.uid,
-          });
-        }
-        return data;
-      });
+
+      const user = await firstValueFrom(this.user$);
+      const base = {
+        name: user?.displayName,
+        profilePicUrl: user?.photoURL,
+        timestamp: serverTimestamp(),
+        uid: user?.uid,
+      };
+      if (textMessage && textMessage.length > 0) {
+        return await addDoc(collection(this.firestore, 'messages'), {
+          ...base,
+          text: textMessage,
+        });
+      } else if (imageUrl && imageUrl.length > 0) {
+        return await addDoc(collection(this.firestore, 'messages'), {
+          ...base,
+          imageUrl: imageUrl,
+        });
+      }
+      return;
     } catch (error) {
       console.error('Error writing new message to Firebase Database', error);
       return;
